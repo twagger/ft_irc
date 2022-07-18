@@ -3,14 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/18 11:43:35 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/18 11:43:58 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/18 09:51:52 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../includes/irc.hpp"
+
 int main(int ac, char **av)
 {
-
+    (void)ac;
+    (void)av;
+    return (0);
 }
