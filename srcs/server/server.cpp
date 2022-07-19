@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 14:56:42 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/19 15:54:32 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,29 +23,34 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <map>
+#include <vector>
 
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
 
 #define BACKLOG 10
 #define MAX_EVENTS 10
-#define BUF_SIZE 10
+#define BUF_SIZE 513
 
 int server(int port, std::string password)
 {
     // socket
-    int                 sockfd;
-	int					newfd;
-    struct sockaddr_in  srv_addr;
-    socklen_t           sin_size;
+    int                                         sockfd;
+	int					                        newfd;
+    struct sockaddr_in                          srv_addr;
+    socklen_t                                   sin_size;
     // epoll
-    int                 epollfd;
-    int                 nfds;
-    struct epoll_event  ev;
-    struct epoll_event  events[MAX_EVENTS];
-    // message
-    char                buf[BUF_SIZE];
-    ssize_t             ret;
+    int                                         epollfd;
+    int                                         nfds;
+    struct epoll_event                          ev;
+    struct epoll_event                          events[MAX_EVENTS];
+    // message  
+    char                                        buf[BUF_SIZE];
+    ssize_t                                     ret;
+    std::string                                 message;
+    std::map< int, std::vector<std::string> >   cmd;
+    size_t                                      pos;
 
     (void)password;
 
@@ -94,7 +99,7 @@ int server(int port, std::string password)
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
         {
-            // check if sockfd is receiving new connection request
+            // check if sockfd is receiving new connection request ----------- /
             if (events[i].data.fd == sockfd)            
             {
                 // accept the connect request
@@ -112,13 +117,25 @@ int server(int port, std::string password)
                 if (epoll_ctl(epollfd, EPOLL_CTL_ADD, newfd, &ev) == -1)
                     return (print_error("New fd add error: ", 1, true));
             }
-            else // message from existing connection
+            else // message from existing connection ------------------------- /
             {
                 memset(buf, 0, BUF_SIZE);
                 ret = recv(events[i].data.fd, buf, BUF_SIZE, 0);
                 buf[ret] = '\0';
                 std::cout << "Message received from (" << events[i].data.fd 
                           << ") : " << buf << std::endl;
+                
+                // split the message and create a map with the fd as a key
+                message = static_cast<std::string>(buf);
+                pos = 0;
+                while ((pos = message.find(' ')) != std::string::npos) 
+                {
+                    cmd[events[i].data.fd].push_back(message.substr(0, pos));
+                    message.erase(0, pos + 1);
+                }
+
+                // test the map
+                std::cout << "MAP: " << cmd[events[i].data.fd][0] << std::endl;
             }
         }
     }
