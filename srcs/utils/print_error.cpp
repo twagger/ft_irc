@@ -1,21 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   irc.hpp                                            :+:      :+:    :+:   */
+/*   print_error.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/18 11:47:12 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 11:54:42 by twagner          ###   ########.fr       */
+/*   Created: 2022/07/19 10:19:22 by twagner           #+#    #+#             */
+/*   Updated: 2022/07/19 10:41:02 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef IRC_HPP
-# define IRC_HPP
+#include "../../includes/utils.hpp"
+#include <string>
+#include <cstring>
+#include <iostream>
+#include <cerrno>
 
-# include <string>
-
-// Server
-int server(int port, std::string password);
-
-#endif
+int print_error(std::string message, int code, bool with_errno = false)
+{
+    std::cout << message;
+    if (with_errno)
+        std::cout << std::strerror(errno);
+    std::cout << std::endl;
+    return (code);
+}
