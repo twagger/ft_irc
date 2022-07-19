@@ -30,10 +30,10 @@ class User {
 		std::string getUsername(void) { return this->_username; }
 		std::string getFullname(void) { return this->_fullname; }
 
-		setNickname(std::string nickname) : { this->_nickname = nickname; }
-		setUsername(std::string username) : { this->_username = username; }
-		setFullname(std::string username) : { this->_fullname = fullname; }
+		void setNickname(std::string nickname) : { this->_nickname = nickname; }
+		void setUsername(std::string username) : { this->_username = username; }
+		void setFullname(std::string username) : { this->_fullname = fullname; }
 
-}
+};
 
 #endif
