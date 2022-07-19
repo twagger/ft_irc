@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 11:58:26 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/19 14:25:14 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 #include "../../includes/utils.hpp"
 
 #define BACKLOG 10
+#define MAX_EVENTS 10
 #define BUF_SIZE 10
 
 int server(int port, std::string password)
@@ -37,11 +38,15 @@ int server(int port, std::string password)
     int                 nfds;
 	int					new_fd;
     struct sockaddr_in  srv_addr;
-    struct sockaddr_in  cli_addr;
     socklen_t           sin_size;
     // epoll
     int                 epollfd;
-    struct epoll_event  ev, events[BACKLOG];
+    int                 nfds;
+    struct epoll_event  ev;
+    struct epoll_event  events[MAX_EVENTS];
+    // message
+    char                buf[BUF_SIZE];
+    ssize_t             ret;
 
     (void)password;
 
@@ -51,7 +56,7 @@ int server(int port, std::string password)
         return (print_error("Socket error: ", 1, true));
     
     // socket non blocking --------------------------------------------------- /
-    if (fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL, 0) | O_NONBLOCK) == -1)
+    if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1)
         return (print_error("Socket ctl error: ", 1, true));
 
     // binding to ip address + port ------------------------------------------ /
@@ -72,16 +77,17 @@ int server(int port, std::string password)
     if (epollfd == -1)
         return (print_error("Epoll create error: ", 1, true));
 
-    // adding current fd to epoll interest list ------------------------------ /
-    ev.events = EPOLLIN;
+    // adding current fd to epoll interest list so we can loop on it to accept /
+    // connections ----------------------------------------------------------- /
+    ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = sockfd;
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &ev) == -1)
-        return (print_error("Epoll ctl error: ", 1, true));
+        return (print_error("Nezw fd add error: ", 1, true));
 
     // server loop ----------------------------------------------------------- /
     while (1)
     {
-		nfds = epoll_wait(epollfd, events, BACKLOG, -1);
+		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		if (nfds == -1) 
        		return (print_error("Epoll wait error: ", 1, true));
 		for (int n = 0; n < nfds; ++n) {
@@ -112,9 +118,7 @@ int server(int port, std::string password)
 					// std::cout << "nfds" << nfds << std::endl;					
 			}
 		// write someting uppon reception
-		std::cout << "Received from : " 
-				<< inet_ntoa(cli_addr.sin_addr) 
-				<< std::endl;
+		std::cout << "Received connection " << std::endl;
 		}
 	}
     return (0);
