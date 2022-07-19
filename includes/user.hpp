@@ -6,9 +6,10 @@
 class User {
 
 	private:
-		std::string	_nickname;
-		std::string	_username;
+		std::string	_nickname;			// max 9 characters
+		std::string	_username;			
 		std::string _fullname;
+		bool		_operator;			// SQUIT, CONNECT, KILL
 
 	public:
 		User(void);
