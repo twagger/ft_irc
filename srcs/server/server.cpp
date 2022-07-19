@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 15:54:32 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/19 16:22:48 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,8 @@ int server(int port, std::string password)
     // message  
     char                                        buf[BUF_SIZE];
     ssize_t                                     ret;
-    std::string                                 message;
+    std::string                                 mess;
     std::map< int, std::vector<std::string> >   cmd;
-    size_t                                      pos;
 
     (void)password;
 
@@ -126,13 +125,9 @@ int server(int port, std::string password)
                           << ") : " << buf << std::endl;
                 
                 // split the message and create a map with the fd as a key
-                message = static_cast<std::string>(buf);
-                pos = 0;
-                while ((pos = message.find(' ')) != std::string::npos) 
-                {
-                    cmd[events[i].data.fd].push_back(message.substr(0, pos));
-                    message.erase(0, pos + 1);
-                }
+                mess = static_cast<std::string>(buf);
+                while (mess.length() > 0) 
+                    cmd[events[i].data.fd].push_back(get_next_tokn(&mess, " "));
 
                 // test the map
                 std::cout << "MAP: " << cmd[events[i].data.fd][0] << std::endl;

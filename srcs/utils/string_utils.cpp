@@ -1,22 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.hpp                                          :+:      :+:    :+:   */
+/*   string_utils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/19 10:19:33 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 16:22:53 by twagner          ###   ########.fr       */
+/*   Created: 2022/07/19 16:06:53 by twagner           #+#    #+#             */
+/*   Updated: 2022/07/19 16:22:41 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILS_HPP
-# define UTILS_HPP
+#include "../../includes/utils.hpp"
 
-# include <string>
-
-// Util functions
-int         print_error(std::string message, int code, bool with_errno);
-std::string get_next_tokn(std::string *str, std::string delimiter);
-
-#endif
+std::string get_next_tokn(std::string *str, std::string delimiter)
+{
+    std::string token;
+    int         end;
+    
+    end = (*str).find(delimiter);
+    if (end == -1)
+        end = (*str).length();
+    token = (*str).substr(0, end);
+    (*str).erase(0, end + delimiter.length());
+    return (token);
+}
