@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 14:54:02 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/19 14:56:42 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,8 @@ int server(int port, std::string password)
                 memset(buf, 0, BUF_SIZE);
                 ret = recv(events[i].data.fd, buf, BUF_SIZE, 0);
                 buf[ret] = '\0';
-                std::cout << "Message received from fd : " << buf << std::endl;
+                std::cout << "Message received from (" << events[i].data.fd 
+                          << ") : " << buf << std::endl;
             }
         }
     }
