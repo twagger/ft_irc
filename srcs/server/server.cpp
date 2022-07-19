@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 14:25:14 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/19 14:49:41 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ int server(int port, std::string password)
     ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = sockfd;
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &ev) == -1)
-        return (print_error("Nezw fd add error: ", 1, true));
+        return (print_error("New fd add error: ", 1, true));
 
     // server loop ----------------------------------------------------------- /
     while (1)
@@ -112,9 +112,10 @@ int server(int port, std::string password)
             }
             else // message from existing connection
             {
-               ret = recv(events[i].data.fd, buf, BUF_SIZE, 0);
-               buf[ret] = '\0';
-               std::cout << "Message received : " << buf << std::endl;
+                memset(buf, 0, BUF_SIZE);
+                ret = recv(events[i].data.fd, buf, BUF_SIZE, 0);
+                buf[ret] = '\0';
+                std::cout << "Message received from fd : " << buf << std::endl;
             }
         }
     }
