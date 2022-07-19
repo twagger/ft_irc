@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 14:49:41 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/19 14:54:02 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,21 @@
 #include <arpa/inet.h>
 #include <sys/epoll.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
 
 #define BACKLOG 10
 #define MAX_EVENTS 10
-#define BUF_SIZE 5000
+#define BUF_SIZE 10
 
 int server(int port, std::string password)
 {
     // socket
     int                 sockfd;
-    int                 newfd;
+	int					newfd;
     struct sockaddr_in  srv_addr;
     socklen_t           sin_size;
     // epoll
