@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 16:41:27 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/19 18:01:51 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,12 +129,7 @@ int server(int port, std::string password)
                 while (mess.length() > 0) 
                     cmd[events[i].data.fd].push_back(get_next_tokn(&mess, " "));
 
-                // test the map
-                std::cout << "MAP[" << events[i].data.fd << "]: " 
-                          << cmd[events[i].data.fd][0] << std::endl;
-                
                 // parse the command from the map ---------------------------- /
-
 
             }
         }
