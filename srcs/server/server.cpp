@@ -21,23 +21,27 @@
 #include <arpa/inet.h>
 #include <sys/epoll.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
 
 #define BACKLOG 10
+#define BUF_SIZE 10
 
 int server(int port, std::string password)
 {
     // socket
     int                 sockfd;
-    int                 newfd;
+    int                 nfds;
+	int					new_fd;
     struct sockaddr_in  srv_addr;
     struct sockaddr_in  cli_addr;
     socklen_t           sin_size;
     // epoll
     int                 epollfd;
-    struct epoll_event  ev;
+    struct epoll_event  ev, events[BACKLOG];
 
     (void)password;
 
@@ -77,28 +81,41 @@ int server(int port, std::string password)
     // server loop ----------------------------------------------------------- /
     while (1)
     {
-        sin_size = sizeof(struct sockaddr_in);
-        // create a fd for each connect request (accept all incoming connection)
-        newfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&srv_addr), \
-                     &sin_size);
-        if (newfd == -1)
-        {
-            print_error("Accept error: ", 1, true);
-            continue;
-        }
-
-        // add the fd to epoll
-        ev.events = EPOLLIN;
-        ev.data.fd = newfd;
-        if (epoll_ctl(epollfd, EPOLL_CTL_ADD, newfd, &ev) == -1)
-            return (print_error("Epoll ctl error: ", 1, true));
-        
-
-        // write someting uppon reception
-        std::cout << "Received from : " 
-                  << inet_ntoa(cli_addr.sin_addr) 
-                  << std::endl;
-    }
-
+		nfds = epoll_wait(epollfd, events, BACKLOG, -1);
+		if (nfds == -1) 
+       		return (print_error("Epoll wait error: ", 1, true));
+		for (int n = 0; n < nfds; ++n) {
+			if (events[n].data.fd == sockfd) {
+				sin_size = sizeof(struct sockaddr_in);
+				new_fd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&srv_addr), 
+							&sin_size);
+				// create a fd for each connect request (accept all incoming connection)
+				if (new_fd == -1) {
+					print_error("Accept error: ", 1, true);
+					exit(EXIT_FAILURE);
+				}
+				if (fcntl(new_fd, F_SETFL, fcntl(sockfd, F_GETFL, 0) | O_NONBLOCK) == -1)
+					return (print_error("Socket ctl error: ", 1, true));
+				ev.events = EPOLLIN;
+				ev.data.fd = new_fd;
+				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, new_fd, &ev) == -1) {
+					return (print_error("Epoll ctl error: ", 1, true));
+							exit(EXIT_FAILURE);
+				}
+			}
+			else if (events[n].events & EPOLLIN) {
+				//do_use_fd(events[n].data.fd);
+					char buf[BUF_SIZE] = {0};
+					int nbytes = read(events[n].data.fd, buf, sizeof(buf));
+					// std::cout << "received bytes: " << nbytes << std::endl;
+					// std::cout << buf << std::endl;
+					// std::cout << "nfds" << nfds << std::endl;					
+			}
+		// write someting uppon reception
+		std::cout << "Received from : " 
+				<< inet_ntoa(cli_addr.sin_addr) 
+				<< std::endl;
+		}
+	}
     return (0);
 }
