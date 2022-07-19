@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/18 11:43:35 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 17:56:22 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/19 17:59:19 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,9 @@
 int main(int ac, char **av)
 {
     // parameters
-    stringstream    ss; 
-    int             port = DEF_PORT;
-    std::string     password = DEF_PASS;
-    char            *end;
+    std::stringstream   ss; 
+    int                 port = DEF_PORT;
+    std::string         password = DEF_PASS;
 
     // basic using parameters ------------------------------------------------ /
     // (add more control later)
