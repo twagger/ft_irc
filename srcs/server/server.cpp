@@ -29,7 +29,7 @@
 
 #define BACKLOG 10
 #define MAX_EVENTS 10
-#define BUF_SIZE 10
+#define BUF_SIZE 513
 
 int server(int port, std::string password)
 {
