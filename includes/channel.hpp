@@ -2,9 +2,10 @@
 #define CHANNEL_HPP
 
 #include <iostream>
-#include <map>
+#include <deque>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "user.hpp"
 
 class Channel
@@ -14,23 +15,45 @@ class Channel
     std::string             _topic;
     std::string             _channelName;
     std::string             _key;
-    std::map<int, User*>    _operators;
-    std::map<int, User*>    _users;
-    std::map<int, User*>    _bannedUsers;
-    std::map<int, User*>    _invitee;
-    std::vector<char>       _mode;
+    std::vector<char>       _mode;   
+    std::deque<User*>    _operators;
+    std::deque<User*>    _users;
+    std::deque<User*>    _bannedUsers;
+    std::deque<User*>    _invitees;
     int                     _limitNumberOfUsers;
-   
+
+
 
     public:
+/** Constructors and destructor **/
 
     Channel(std::string name);
     Channel(std::string name, std::string key);
     ~Channel(void);
 
+
+/** Getters **/
+
     std::string getTopic(void) const;
     std::string getChannelName(void) const;
     std::string getKey(void) const;
+    int getLimitNumberOfUsers(void) const;
+
+/** Setters **/
+    
+    void setTopic(std::string topic);
+    void setKey(std::string key);
+    void setMode(char mode);
+    void setLimitNumberofUsers(int limitNumberOfUsers);
+
+/** Member functions **/
+
+    void removeMode(char mode);
+    void addUser(User *newUser);
+    void removeUser(std::string userName);
+    void addOperator(User *newOperator);
+    void addBannedUser(User *newBannedUser);
+    void addInvitee(User *newInvitee);
 };
 
-#endif CHANNEL_HPP
+#endif
