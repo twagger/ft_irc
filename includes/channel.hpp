@@ -16,10 +16,10 @@ class Channel
     std::string             _channelName;
     std::string             _key;
     std::vector<char>       _mode;   
-    std::deque<User*>    _operators;
-    std::deque<User*>    _users;
-    std::deque<User*>    _bannedUsers;
-    std::deque<User*>    _invitees;
+    std::deque<User*>       _operators;
+    std::deque<User*>       _users;
+    std::deque<User*>       _bannedUsers;
+    std::deque<User*>       _invitees;
     int                     _limitNumberOfUsers;
 
 
@@ -50,7 +50,7 @@ class Channel
 
     void removeMode(char mode);
     void addUser(User *newUser);
-    void removeUser(std::string userName);
+    void removeUser(User *userToDelete);
     void addOperator(User *newOperator);
     void addBannedUser(User *newBannedUser);
     void addInvitee(User *newInvitee);

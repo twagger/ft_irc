@@ -1,7 +1,7 @@
 #include "../../includes/utils.hpp"
 #include <sstream>
 
-bool is_channel(std::string channelName)
+bool isChannel(std::string channelName)
 {
     if (channelName.find("#") != std::string::npos
         || channelName.find("&") != std::string::npos)
@@ -11,7 +11,7 @@ bool is_channel(std::string channelName)
     return (false);
 }
 
-std::vector<std::string> split_by_comma(std::string parameter)
+std::vector<std::string> splitByComma(std::string parameter)
 {
     std::vector<std::string> tab;
     std::string temp;

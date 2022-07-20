@@ -42,7 +42,6 @@
 	#define ERR_RESTRICTED
 
 	// USER
-	#define  ERR_NEEDMOREPARAMS
 	#define  ERR_ALREADYREGISTRED
 
 
