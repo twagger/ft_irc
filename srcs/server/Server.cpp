@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 18:01:51 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 09:59:06 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <map>
 #include <vector>
 
+#include "Server.hpp"
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
 
@@ -33,7 +34,33 @@
 #define MAX_EVENTS 10
 #define BUF_SIZE 513
 
-int server(int port, std::string password)
+// Constructors & destructor
+Server::Server(Server const &src)
+{ *this = src; }
+
+// Assignment operator
+Server  &Server::operator=(Server const &rhs)
+{
+    if (*this != rhs) {
+        *this->_port = src._port;
+        *this->_password = src._password;
+        *this->_name = src._name;
+    }
+    return (*this);
+}
+
+// Getters
+int         &Server::getPort(void) const 
+{ return this->_port; }
+
+std::string &Server::getPassword(void) const
+{ return this->_password; }
+
+std::string &Server::getName(void) const
+{ return this->_name; }
+
+// Member functions
+Server::start(void)
 {
     // socket
     int                                         sockfd;
@@ -51,8 +78,6 @@ int server(int port, std::string password)
     std::string                                 mess;
     std::map< int, std::vector<std::string> >   cmd;
 
-    (void)password;
-
     // socket creation ------------------------------------------------------- /
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
@@ -64,7 +89,7 @@ int server(int port, std::string password)
 
     // binding to ip address + port ------------------------------------------ /
     srv_addr.sin_family = AF_INET; // host byte order
-    srv_addr.sin_port = htons(port);
+    srv_addr.sin_port = htons(this._port);
     srv_addr.sin_addr.s_addr = INADDR_ANY; // autofill with any ip
     bzero(&(srv_addr.sin_zero), 8); // fill with 0
     if (bind(sockfd, reinterpret_cast<struct sockaddr*>(&srv_addr), \
@@ -130,6 +155,8 @@ int server(int port, std::string password)
                     cmd[events[i].data.fd].push_back(get_next_tokn(&mess, " "));
 
                 // parse the command from the map ---------------------------- /
+                if (this._cmd_list[CMD].exec_command(FD, CMD, PARAM) == -1)
+                    // send an error to client
 
             }
         }
