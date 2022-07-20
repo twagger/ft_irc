@@ -50,7 +50,6 @@ std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
             result.push_back(*(new Command(it->substr(0, end))));
             // PARAMS
             it->erase(0, end + 1);
-            end = it->find(' ');
             while (end != -1)
             {
                 result.back().params.push_back(it->substr(0, end));

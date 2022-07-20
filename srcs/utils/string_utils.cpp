@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 16:06:53 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/20 18:44:31 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 18:58:32 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ std::vector<std::string>    splitBy(std::string str, std::string delimiter)
     int                         end;
 
     // first check 
-    std::cout << "received : " << str << std::endl;
     end = str.find(delimiter);
     if (end == -1)
         throw std::runtime_error("IRC message must end with CRLF");
