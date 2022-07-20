@@ -10,9 +10,15 @@ GCLONE		= git clone
 # SOURCES
 ################################################################################
 SRCS		= srcs/main.cpp \
+<<<<<<< HEAD
 			  srcs/server/Server.cpp \
 			  srcs/utils/print_error.cpp \
 			  srcs/utils/string_utils.cpp
+=======
+			  srcs/server/server.cpp \
+			  srcs/utils/print_error.cpp \
+			  srcs/user/user.cpp 
+>>>>>>> 4ab43c0bfcd5cc7734f13982910d89891f3ac63d
 OBJS		= $(SRCS:.cpp=.o)
 
 # EXECUTABLES & LIBRARIES

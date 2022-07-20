@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/20 15:23:19 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 15:37:40 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,24 +148,43 @@ void    Server::_accept_connection(\
         throw Server::AcceptException();
 }
 
+void    Server::_handle_new_message()
+{
+    // message / command  
+    char                                        buf[BUF_SIZE];
+    ssize_t                                     ret;
+    std::string                                 mess;
+    std::map< int, std::vector<std::string> >   cmd;
+
+    memset(buf, 0, BUF_SIZE);
+    ret = recv(events[i].data.fd, buf, BUF_SIZE, 0);
+    buf[ret] = '\0';
+    std::cout << "Message received from (" << events[i].data.fd 
+                << ") : " << buf << std::endl;
+    
+    // split the message and create a map with the fd as a key
+    mess = static_cast<std::string>(buf);
+    while (mess.length() > 0) 
+        cmd[events[i].data.fd].push_back(get_next_tokn(&mess, " "));
+
+    // parse the command from the map ---------------------------- /
+    //if (this._cmd_list[CMD].exec_command(FD, CMD, PARAM) == -1)
+        // send an error to client
+}
+
 /* ************************************************************************** */
 /* Member functions                                                           */
 /* ************************************************************************** */
 void    Server::start(void)
 {
     // socket
-    int                                         sockfd;
-    struct sockaddr_in                          srv_addr;
+    int                 sockfd;
+    struct sockaddr_in  srv_addr;
     // epoll
-    int                                         pollfd;
-    int                                         nfds;
-    struct epoll_event                          events[MAX_EVENTS];
-    struct epoll_event                          *events_tmp;
-    // message / command  
-    char                                        buf[BUF_SIZE];
-    ssize_t                                     ret;
-    std::string                                 mess;
-    std::map< int, std::vector<std::string> >   cmd;
+    int                 pollfd;
+    int                 nfds;
+    struct epoll_event  events[MAX_EVENTS];
+    struct epoll_event  *events_tmp;
 
     // socket creation and param---------------------------------------------- /
     try { sockfd = this->_create_socket(); }
@@ -191,7 +210,6 @@ void    Server::start(void)
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
         {
-
             // handle new connection requests -------------------------------- /
             if (events[i].data.fd == sockfd)            
             {
@@ -200,22 +218,10 @@ void    Server::start(void)
                 { print_error(e.what(), 1, true); return; }
                 catch (Server::PollAddException &e) {}
             }
-            else // message from existing connection ------------------------- /
+            else // new message from existing connection --------------------- /
             {
-                memset(buf, 0, BUF_SIZE);
-                ret = recv(events[i].data.fd, buf, BUF_SIZE, 0);
-                buf[ret] = '\0';
-                std::cout << "Message received from (" << events[i].data.fd 
-                          << ") : " << buf << std::endl;
-                
-                // split the message and create a map with the fd as a key
-                mess = static_cast<std::string>(buf);
-                while (mess.length() > 0) 
-                    cmd[events[i].data.fd].push_back(get_next_tokn(&mess, " "));
-
-                // parse the command from the map ---------------------------- /
-                //if (this._cmd_list[CMD].exec_command(FD, CMD, PARAM) == -1)
-                    // send an error to client
+                try { this->_handle_new_message(sockfd); }
+                catch (std::exception &e) { }
             }
         }
     }

@@ -1,40 +1,57 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   user.hpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/07/20 12:58:15 by erecuero          #+#    #+#             */
+/*   Updated: 2022/07/20 15:46:54 by twagner          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef USER_HPP
 # define USER_HPP
 
 # include <string>
+# include <iostream>
+# include <stdint.h>
 
 class User {
 
 	private:
-		std::string	_nickname;
-		std::string	_username;
+		int			_fd;
+		std::string	_nickname;			// max 9 characters
+		std::string	_username;			
 		std::string _fullname;
 		int			_numberOfChannelJoined;
+		uint16_t	_mode;				// OPER: SQUIT, CONNECT, KILL
+		bool		_password;
+		bool		_authentified;
 
 	public:
-		User(void);
-		User(const User &other) {
-			*this = other;
-		}
+		User(int fd);
+		User(const User &src);
 		~User();
 
-		User &operator=(const User &src) {
-			if (*this != &src) {
-				*this->_nickname = src._nickname;
-				*this->_username = src._username;
-				*this->_fullname = src._fullname;
-			}
-			return *this;
-		}
+		User &operator=(User const &rhs);
 
-		std::string getNickname(void) { return this->_nickname; }
-		std::string getUsername(void) { return this->_username; }
-		std::string getFullname(void) { return this->_fullname; }
+		std::string getNickname(void) const;
+		std::string getUsername(void) const;
+		std::string getFullname(void) const;
+		uint16_t 	getMode(void) const;
+		bool 		getPassword(void) const;
+		bool 		getAuthentified(void) const;
 
-		void setNickname(std::string nickname) : { this->_nickname = nickname; }
-		void setUsername(std::string username) : { this->_username = username; }
-		void setFullname(std::string username) : { this->_fullname = fullname; }
+		void setNickname(std::string nickname);
+		void setUsername(std::string username);
+		void setFullname(std::string fullname);
+		void setMode(uint16_t mode);
+		void setPassword(bool pass);
+		void setAuthentified(bool authentified);
 
 };
+
+std::ostream & operator<<(std::ostream &o, User const &rhs);	// for printing 'nickname!username@host.name.com ...'
 
 #endif
