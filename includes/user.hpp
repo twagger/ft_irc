@@ -9,6 +9,7 @@ class User {
 		std::string	_nickname;
 		std::string	_username;
 		std::string _fullname;
+		int			_numberOfChannelJoined;
 
 	public:
 		User(void);

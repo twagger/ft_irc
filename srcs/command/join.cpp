@@ -1,2 +1,3 @@
-#include "../../includes/command.hpp"
+#include "../../includes/channel.hpp"
+#include "../../includes/returnCode.hpp"
 
