@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 16:25:33 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/19 18:01:51 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int server(int port, std::string password)
     int                                         nfds;
     struct epoll_event                          ev;
     struct epoll_event                          events[MAX_EVENTS];
-    // message  
+    // message / command  
     char                                        buf[BUF_SIZE];
     ssize_t                                     ret;
     std::string                                 mess;
@@ -129,9 +129,8 @@ int server(int port, std::string password)
                 while (mess.length() > 0) 
                     cmd[events[i].data.fd].push_back(get_next_tokn(&mess, " "));
 
-                // test the map
-                std::cout << "MAP[" << events[i].data.fd << "]: " 
-                          << cmd[events[i].data.fd][0] << std::endl;
+                // parse the command from the map ---------------------------- /
+
             }
         }
     }
