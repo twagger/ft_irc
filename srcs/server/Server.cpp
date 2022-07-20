@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/20 15:37:40 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 15:54:39 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ void    Server::_accept_connection(\
         throw Server::AcceptException();
 }
 
-void    Server::_handle_new_message()
+void    Server::_handle_new_message(struct epoll_event event)
 {
     // message / command  
     char                                        buf[BUF_SIZE];
@@ -157,15 +157,15 @@ void    Server::_handle_new_message()
     std::map< int, std::vector<std::string> >   cmd;
 
     memset(buf, 0, BUF_SIZE);
-    ret = recv(events[i].data.fd, buf, BUF_SIZE, 0);
+    ret = recv(event.data.fd, buf, BUF_SIZE, 0);
     buf[ret] = '\0';
-    std::cout << "Message received from (" << events[i].data.fd 
+    std::cout << "Message received from (" << event.data.fd 
                 << ") : " << buf << std::endl;
     
     // split the message and create a map with the fd as a key
     mess = static_cast<std::string>(buf);
     while (mess.length() > 0) 
-        cmd[events[i].data.fd].push_back(get_next_tokn(&mess, " "));
+        cmd[event.data.fd].push_back(get_next_tokn(&mess, " "));
 
     // parse the command from the map ---------------------------- /
     //if (this._cmd_list[CMD].exec_command(FD, CMD, PARAM) == -1)
@@ -186,7 +186,7 @@ void    Server::start(void)
     struct epoll_event  events[MAX_EVENTS];
     struct epoll_event  *events_tmp;
 
-    // socket creation and param---------------------------------------------- /
+    // socket creation and param --------------------------------------------- /
     try { sockfd = this->_create_socket(); }
     catch (Server::SocketException &e){ print_error(e.what(), 1, true); return;}
 
@@ -220,7 +220,7 @@ void    Server::start(void)
             }
             else // new message from existing connection --------------------- /
             {
-                try { this->_handle_new_message(sockfd); }
+                try { this->_handle_new_message(events[i]); }
                 catch (std::exception &e) { }
             }
         }

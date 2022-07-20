@@ -33,4 +33,4 @@ class Channel
     std::string getKey(void) const;
 };
 
-#endif CHANNEL_HPP
+#endif

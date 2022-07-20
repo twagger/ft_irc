@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
-/*   Updated: 2022/07/20 15:33:35 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 15:55:10 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ class Server
                            int max_events);
         void    _accept_connection(int sockfd, int pollfd, \
                                    struct sockaddr_in *srv_addr);
-        void    _handle_new_message();
+        void    _handle_new_message(struct epoll_event event);
 
         // Member attributes
         int         _port;
