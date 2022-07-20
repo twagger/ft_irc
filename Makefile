@@ -10,7 +10,7 @@ GCLONE		= git clone
 # SOURCES
 ################################################################################
 SRCS		= srcs/main.cpp \
-			  srcs/server/server.cpp \
+			  srcs/server/Server.cpp \
 			  srcs/utils/print_error.cpp \
 			  srcs/utils/string_utils.cpp
 OBJS		= $(SRCS:.cpp=.o)
@@ -21,7 +21,7 @@ NAME		= server
 
 # DIRECTORIES
 ################################################################################
-HEADERS		= includes
+HEADERS		= -Iincludes -Isrcs/server
 
 # FLAGS
 ################################################################################
@@ -38,10 +38,10 @@ endif
 # RULES
 ################################################################################
 .c.o:
-			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) -I$(HEADERS)
+			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS)
 
 $(NAME):	$(OBJS)
-			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) -I$(HEADERS)
+			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) $(HEADERS)
 
 all:		$(NAME)
 
