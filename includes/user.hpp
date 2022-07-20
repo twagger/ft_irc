@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   user.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
+/*   By: erecuero <erecuero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 12:58:15 by erecuero          #+#    #+#             */
-/*   Updated: 2022/07/20 15:46:54 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 20:09:42 by erecuero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,11 @@ class User {
 		std::string	_nickname;			// max 9 characters
 		std::string	_username;			
 		std::string _fullname;
+		std::string	_hostname;
 		int			_numberOfChannelJoined;
 		uint16_t	_mode;				// OPER: SQUIT, CONNECT, KILL
 		bool		_password;
-		bool		_authentified;
+		bool		_authenticated;
 
 	public:
 		User(int fd);
@@ -41,14 +42,14 @@ class User {
 		std::string getFullname(void) const;
 		uint16_t 	getMode(void) const;
 		bool 		getPassword(void) const;
-		bool 		getAuthentified(void) const;
+		bool 		getAuthenticated(void) const;
 
 		void setNickname(std::string nickname);
 		void setUsername(std::string username);
 		void setFullname(std::string fullname);
 		void setMode(uint16_t mode);
 		void setPassword(bool pass);
-		void setAuthentified(bool authentified);
+		void setAuthenticated(bool authenticated);
 
 };
 

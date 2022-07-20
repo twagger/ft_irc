@@ -1,5 +1,7 @@
 #include "../../includes/utils.hpp"
 #include <sstream>
+#include <iostream>
+#include "../server/Server.hpp"
 
 bool is_channel(std::string channelName)
 {
@@ -21,4 +23,11 @@ std::vector<std::string> split_by_comma(std::string parameter)
         tab.push_back(temp);
     }
     return (tab);
+}
+
+std::string reply(std::string servername, std::string code, std::string nickname, std::string replyMsg)
+{
+	std::cout << ":" + servername + " " + code + " " +  nickname + " :" + replyMsg;		
+	// string int should be a 3-digits number 
+	// to be returned to the client send(new_fd, "\n\", 14, 0) == -1)
 }
