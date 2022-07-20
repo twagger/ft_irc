@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
-/*   Updated: 2022/07/20 15:55:10 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 18:39:49 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,19 @@
 # define SERVER_HPP
 
 #include <vector>
-#include "../../includes/channel.hpp"
+#include <map>
+#include "channel.hpp"
+#include "user.hpp"
+
+struct Command
+{
+    std::string                 command;
+    std::vector<std::string>    params;
+
+    Command(std::string cmd, \
+            std::vector<std::string> params = std::vector<std::string>());
+    ~Command(){};
+};
 
 class Server
 {
@@ -37,22 +49,25 @@ class Server
         void    stop(void); // quit all clients with a message
 
         // exceptions
-        class SocketException : public std::exception
+        class socketException : public std::exception
         { public: virtual const char *what() const throw(); };
         
-        class BindException : public std::exception
+        class bindException : public std::exception
         { public: virtual const char *what() const throw(); };
 
-        class PollException : public std::exception
+        class pollException : public std::exception
         { public: virtual const char *what() const throw(); };
 
-        class PollWaitException : public std::exception
+        class pollWaitException : public std::exception
         { public: virtual const char *what() const throw(); };
 
-        class PollAddException : public std::exception
+        class pollAddException : public std::exception
         { public: virtual const char *what() const throw(); };
 
-        class AcceptException : public std::exception
+        class acceptException : public std::exception
+        { public: virtual const char *what() const throw(); };
+        
+        class passwordException : public std::exception
         { public: virtual const char *what() const throw(); };
 
     private:
@@ -60,23 +75,23 @@ class Server
         Server(void){};
 
         // Private member functions
-        int     _create_socket(void);
-        void    _bind_socket(int sockfd, struct sockaddr_in *srv_addr);
-        int     _create_poll(int sockfd);
-        int     _poll_wait(int pollfd, struct epoll_event **events, \
+        int     _createSocket(void);
+        void    _bindSocket(int sockfd, struct sockaddr_in *srv_addr);
+        int     _createPoll(int sockfd);
+        int     _pollWait(int pollfd, struct epoll_event **events, \
                            int max_events);
-        void    _accept_connection(int sockfd, int pollfd, \
+        void    _acceptConnection(int sockfd, int pollfd, \
                                    struct sockaddr_in *srv_addr);
-        void    _handle_new_message(struct epoll_event event);
+        void    _handleNewMessage(struct epoll_event event);
 
         // Member attributes
         int         _port;
         std::string _password;
         std::string _name;
         
-        // std::vector<User *>  _user_list;
-        std::vector<Channel *>  _channel_list;
-        // std::map<std::string, void *>   _cmd_list;
+        std::map<int, User *>               _userList;
+        std::map<std::string, Channel *>    _channelList;
+        std::map<std::string, void *>       _cmdList;
 };
 
 #endif

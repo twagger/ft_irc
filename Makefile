@@ -13,6 +13,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/server/Server.cpp \
 			  srcs/utils/print_error.cpp \
 			  srcs/utils/string_utils.cpp \
+			  srcs/utils/command_utils.cpp \
 			  srcs/user/user.cpp 
 OBJS		= $(SRCS:.cpp=.o)
 

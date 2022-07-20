@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/20 15:54:39 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 18:50:56 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #include <map>
 #include <vector>
 
-#include "Server.hpp"
+#include "../../includes/Server.hpp"
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
 
@@ -42,6 +42,10 @@ Server::Server(int port, std::string password, std::string name)
 
 Server::Server(Server const &src)
 { *this = src; }
+
+Command::Command(\
+std::string cmd, std::vector<std::string> params)
+: command(cmd), params(params){}
 
 /* ************************************************************************** */
 /* Operator overloads                                                         */
@@ -71,19 +75,19 @@ std::string Server::getName(void) const
 /* ************************************************************************** */
 /* Private member functions                                                   */
 /* ************************************************************************** */
-int Server::_create_socket(void)
+int Server::_createSocket(void)
 {
     int sockfd;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
-        throw Server::SocketException();
+        throw Server::socketException();
     if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1)
-        throw Server::SocketException();
+        throw Server::socketException();
     return (sockfd);
 }
 
-void    Server::_bind_socket(int sockfd, struct sockaddr_in *srv_addr)
+void    Server::_bindSocket(int sockfd, struct sockaddr_in *srv_addr)
 {
     // binding to ip address + port
     srv_addr->sin_family = AF_INET; // host byte order
@@ -92,14 +96,14 @@ void    Server::_bind_socket(int sockfd, struct sockaddr_in *srv_addr)
     bzero(&(srv_addr->sin_zero), 8); // fill with 0
     if (bind(sockfd, reinterpret_cast<struct sockaddr *>(srv_addr), \
         sizeof(struct sockaddr)) == -1)
-        throw Server::BindException();
+        throw Server::bindException();
 
     // mark the socket as passive and set a max connection backlog
     if (listen(sockfd, BACKLOG) == -1)
-        throw Server::BindException();
+        throw Server::bindException();
 }
 
-int Server::_create_poll(int sockfd)
+int Server::_createPoll(int sockfd)
 {
     int                 pollfd;
     struct epoll_event  ev;
@@ -107,28 +111,28 @@ int Server::_create_poll(int sockfd)
     // epoll creation
     pollfd = epoll_create1(0);
     if (pollfd == -1)
-        throw Server::PollException();
+        throw Server::pollException();
 
     // adding current fd to epoll interest list so we can loop on it to accept
     // connections
     ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = sockfd;
     if (epoll_ctl(pollfd, EPOLL_CTL_ADD, sockfd, &ev) == -1)
-        throw Server::PollException();
+        throw Server::pollException();
     return (pollfd);
 }
 
-int Server::_poll_wait(int pollfd, struct epoll_event **events, int max_events)
+int Server::_pollWait(int pollfd, struct epoll_event **events, int max_events)
 {
     int nfds;
 
     nfds = epoll_wait(pollfd, *events, max_events, -1);
     if (nfds == -1)
-        throw Server::PollWaitException();
+        throw Server::pollWaitException();
     return (nfds);
 }
 
-void    Server::_accept_connection(\
+void    Server::_acceptConnection(\
                 int sockfd, int pollfd, struct sockaddr_in *srv_addr)
 {
     socklen_t           sin_size;
@@ -139,37 +143,51 @@ void    Server::_accept_connection(\
     newfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(srv_addr), \
         &sin_size);
     if (newfd == -1)
-        throw Server::AcceptException();
-
+        throw Server::acceptException();
+    
     // add the new fd to the poll
     ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = newfd;
     if (epoll_ctl(pollfd, EPOLL_CTL_ADD, newfd, &ev) == -1)
-        throw Server::AcceptException();
+        throw Server::acceptException();
 }
 
-void    Server::_handle_new_message(struct epoll_event event)
+void    Server::_handleNewMessage(struct epoll_event event)
 {
-    // message / command  
-    char                                        buf[BUF_SIZE];
-    ssize_t                                     ret;
-    std::string                                 mess;
-    std::map< int, std::vector<std::string> >   cmd;
+    char                        buf[BUF_SIZE];
+    ssize_t                     ret;
+    std::string                 mess;
+    std::vector< std::string >  cmd_strings;
+    std::vector<Command>        cmd;
 
+    // fill a buffer with the message
     memset(buf, 0, BUF_SIZE);
     ret = recv(event.data.fd, buf, BUF_SIZE, 0);
     buf[ret] = '\0';
-    std::cout << "Message received from (" << event.data.fd 
-                << ") : " << buf << std::endl;
     
-    // split the message and create a map with the fd as a key
-    mess = static_cast<std::string>(buf);
-    while (mess.length() > 0) 
-        cmd[event.data.fd].push_back(get_next_tokn(&mess, " "));
+    // split the commands in a vector
+    try { cmd_strings = splitBy(buf, "\n"); } // not working with "\n\r"
+    catch (std::runtime_error &e) { printError(e.what(), 1, false); }
 
-    // parse the command from the map ---------------------------- /
-    //if (this._cmd_list[CMD].exec_command(FD, CMD, PARAM) == -1)
-        // send an error to client
+    // split all commands in a vector of t_command (CMD / PARAM)
+    cmd = splitCmds(cmd_strings);
+
+    // temporary check
+    std::vector<Command>::iterator  it;
+    std::vector<std::string>::iterator  it2;
+    for (it = cmd.begin(); it < cmd.end(); ++it)
+    {
+        std::cout << "\nCMD : " << it->command << std::endl;
+        for (it2 = it->params.begin(); it2 < it->params.end(); ++it2)
+        {
+            std::cout << "PARAM : " << *it2 << std::endl;
+        }
+    }
+    // Loop on the commands and execute them (use vector iterator)
+    
+    // Search the proper function in cmd map and execute it with params
+        //if (this._cmd_list[CMD].exec_command(FD, CMD, PARAM) == -1)
+            // send an error to client
 }
 
 /* ************************************************************************** */
@@ -187,25 +205,25 @@ void    Server::start(void)
     struct epoll_event  *events_tmp;
 
     // socket creation and param --------------------------------------------- /
-    try { sockfd = this->_create_socket(); }
-    catch (Server::SocketException &e){ print_error(e.what(), 1, true); return;}
+    try { sockfd = this->_createSocket(); }
+    catch (Server::socketException &e){ printError(e.what(), 1, true); return;}
 
     // binding to ip address + port and switch to passive mode --------------- /
-    try { this->_bind_socket(sockfd, &srv_addr); }
-    catch (Server::BindException &e) { print_error(e.what(), 1, true); return; }
+    try { this->_bindSocket(sockfd, &srv_addr); }
+    catch (Server::bindException &e) { printError(e.what(), 1, true); return; }
 
     // poll creation --------------------------------------------------------- /
-    try { pollfd = this->_create_poll(sockfd); }
-    catch (Server::PollException &e) { print_error(e.what(), 1, true); return; }
+    try { pollfd = this->_createPoll(sockfd); }
+    catch (Server::pollException &e) { printError(e.what(), 1, true); return; }
 
     // server loop ----------------------------------------------------------- /
     while (1)
     {
         // poll wait --------------------------------------------------------- /
         events_tmp = &(events[0]);
-        try { nfds = this->_poll_wait(pollfd, &events_tmp, MAX_EVENTS); }
-        catch (Server::PollWaitException &e)
-        { print_error(e.what(), 1, true); return; }
+        try { nfds = this->_pollWait(pollfd, &events_tmp, MAX_EVENTS); }
+        catch (Server::pollWaitException &e)
+        { printError(e.what(), 1, true); return; }
 
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
@@ -213,14 +231,18 @@ void    Server::start(void)
             // handle new connection requests -------------------------------- /
             if (events[i].data.fd == sockfd)            
             {
-                try { this->_accept_connection(sockfd, pollfd, &srv_addr); }
-                catch (Server::AcceptException &e)
-                { print_error(e.what(), 1, true); return; }
-                catch (Server::PollAddException &e) {}
+                try { this->_acceptConnection(sockfd, pollfd, &srv_addr); }
+                catch (Server::acceptException &e)
+                { printError(e.what(), 1, true); return; }
+                catch (Server::pollAddException &e)
+                { printError(e.what(), 1, true); return; }
+                catch (Server::passwordException &e)
+                { printError(e.what(), 1, true); }
+
             }
             else // new message from existing connection --------------------- /
             {
-                try { this->_handle_new_message(events[i]); }
+                try { this->_handleNewMessage(events[i]); }
                 catch (std::exception &e) { }
             }
         }
@@ -230,20 +252,23 @@ void    Server::start(void)
 /* ************************************************************************** */
 /* Exceptions                                                                 */
 /* ************************************************************************** */
-const char	*Server::SocketException::what() const throw()
+const char	*Server::socketException::what() const throw()
 { return ("Socket creation or mode error: "); }
 
-const char	*Server::BindException::what() const throw()
+const char	*Server::bindException::what() const throw()
 { return ("Bind error: "); }
 
-const char	*Server::PollException::what() const throw()
+const char	*Server::pollException::what() const throw()
 { return ("Poll error: "); }
 
-const char	*Server::PollWaitException::what() const throw()
+const char	*Server::pollWaitException::what() const throw()
 { return ("Poll wail error: "); }
 
-const char	*Server::PollAddException::what() const throw()
+const char	*Server::pollAddException::what() const throw()
 { return ("Poll add error: "); }
 
-const char	*Server::AcceptException::what() const throw()
+const char	*Server::acceptException::what() const throw()
 { return ("Accept error: "); }
+
+const char	*Server::passwordException::what() const throw()
+{ return ("Password error: please provide a correct password"); }

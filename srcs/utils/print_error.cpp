@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 10:19:22 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 10:41:02 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 17:52:53 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <iostream>
 #include <cerrno>
 
-int print_error(std::string message, int code, bool with_errno = false)
+int printError(std::string message, int code, bool with_errno = false)
 {
     std::cout << message;
     if (with_errno)
