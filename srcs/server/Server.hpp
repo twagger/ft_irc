@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
-/*   Updated: 2022/07/20 15:24:59 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/20 15:55:10 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define SERVER_HPP
 
 #include <vector>
+#include "../../includes/channel.hpp"
 
 class Server
 {
@@ -66,14 +67,15 @@ class Server
                            int max_events);
         void    _accept_connection(int sockfd, int pollfd, \
                                    struct sockaddr_in *srv_addr);
+        void    _handle_new_message(struct epoll_event event);
 
         // Member attributes
         int         _port;
         std::string _password;
         std::string _name;
         
-        // std::vector<User *>             _user_list;
-        // std::vector<Channel *>          _channel_list;
+        // std::vector<User *>  _user_list;
+        std::vector<Channel *>  _channel_list;
         // std::map<std::string, void *>   _cmd_list;
 };
 
