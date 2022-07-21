@@ -16,15 +16,15 @@ class Channel
     std::string             _channelName;
     std::string             _key;
     std::vector<char>       _mode;   
+
+    public:
+
+/** Public attributes **/
     std::deque<User*>       _operators;
     std::deque<User*>       _users;
     std::deque<User*>       _bannedUsers;
     std::deque<User*>       _invitees;
-    int                     _limitNumberOfUsers;
 
-
-
-    public:
 /** Constructors and destructor **/
 
     Channel(std::string name, User *currentUser);
@@ -33,17 +33,17 @@ class Channel
 
 /** Getters **/
 
-    std::string getTopic(void) const;
-    std::string getChannelName(void) const;
-    std::string getKey(void) const;
-    int getLimitNumberOfUsers(void) const;
+    std::string         getTopic(void) const;
+    std::string         getChannelName(void) const;
+    std::string         getKey(void) const;
+    std::deque<User*>   getUsers(void) const;
+    int                 getLimitNumberOfUsers(void) const;
 
 /** Setters **/
     
     void setTopic(std::string topic);
     void setKey(std::string key);
     void setMode(char mode);
-    void setLimitNumberofUsers(int limitNumberOfUsers);
 
 /** Member functions **/
 
