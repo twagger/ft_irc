@@ -27,10 +27,9 @@ class Channel
     public:
 /** Constructors and destructor **/
 
-    Channel(std::string name);
-    Channel(std::string name, std::string key);
+    Channel(std::string name, User *currentUser);
+    Channel(std::string name, std::string key, User *currentUser);
     ~Channel(void);
-
 
 /** Getters **/
 
