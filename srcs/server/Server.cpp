@@ -218,7 +218,7 @@ void    Server::_executeCommands(int fd, std::vector<Command> cmds)
     std::vector<Command>::iterator                  it;
     std::map<std::string, CmdFunction>::iterator    it_cmd;
     std::string                                     result;
-    CmdFunction                                     exec_command;
+    //CmdFunction                                     exec_command;
     int                                             ret;
 
     // for each command in the message
@@ -229,8 +229,8 @@ void    Server::_executeCommands(int fd, std::vector<Command> cmds)
         if (it_cmd != this->_cmdList.end())
         {
             // execute the command
-            exec_command = it_cmd->second;
-            result = exec_command(fd, it->params, this);
+            //exec_command = it_cmd->second;
+            result = "toto"; //exec_command(fd, it->params, this);
             // send the result to the client if it is not empty
             if (!result.empty())
             {

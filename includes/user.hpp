@@ -8,7 +8,7 @@
 class User {
 
 	private:
-		int			_fd;
+		const int			_fd;
 		std::string	_nickname;			// max 9 characters
 		std::string	_username;			
 		std::string _fullname;
@@ -19,7 +19,7 @@ class User {
 		bool		_authenticated;
 
 	public:
-		User(int fd);
+		User(const int fd, std::string hostname);
 		User(const User &src);
 		~User();
 
@@ -28,6 +28,7 @@ class User {
 		std::string getNickname(void) const;
 		std::string getUsername(void) const;
 		std::string getFullname(void) const;
+		std::string getHostname(void) const;
 		uint16_t 	getMode(void) const;
 		bool 		getPassword(void) const;
 		bool 		getAuthenticated(void) const;
@@ -35,10 +36,10 @@ class User {
 		void setNickname(std::string nickname);
 		void setUsername(std::string username);
 		void setFullname(std::string fullname);
+		void setHostname(std::string fullname);
 		void setMode(uint16_t mode);
 		void setPassword(bool pass);
 		void setAuthenticated(bool authenticated);
-
 };
 
 std::ostream & operator<<(std::ostream &o, User const &rhs);	// for printing 'nickname!username@host.name.com ...'

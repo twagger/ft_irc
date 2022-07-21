@@ -12,6 +12,7 @@ int                         printError(std::string message, int code, \
 std::vector<std::string>    splitBy(std::string str, std::string delimiter);
 std::vector<Command>        splitCmds(std::vector<std::string> cmd_strings);
 # include "replies.hpp"
+# include "Server.hpp"
 
 // Util functions
 int         print_error(std::string message, int code, bool with_errno);
