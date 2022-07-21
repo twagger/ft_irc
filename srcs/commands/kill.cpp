@@ -38,9 +38,10 @@ std::string kill(int fd, std::vector<std::string> params, Server *srv)
     //try { srv->killConnection(target->getFd()); }
     try { srv->killConnection(temp_fd); }
     catch (Server::pollDelException &e) { printError(e.what(), 1, true); }
-    catch (std::exception &e) { printError(e.what(), 1, false); }
+    catch (Server::invalidFdException &e) { printError(e.what(), 1, false); }
 
     // add the nickname to the list of unavailable nicknames
+    srv->_unavailableNicknames.insert(nickname);
 
     return (NULL);
 }

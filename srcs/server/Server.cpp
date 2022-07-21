@@ -321,7 +321,7 @@ void    Server::killConnection(int fd)
 {
     // check if fd exists using the userlist --------------------------------- /
     if (this->_userList.find(fd) == this->_userList.end())
-        throw std::exception();
+        throw Server::invalidFdException();
 
     // fd exists, clean all -------------------------------------------------- /
     // remove user from list
@@ -330,7 +330,7 @@ void    Server::killConnection(int fd)
     if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
         throw Server::pollDelException();
     // close the socket
-
+    // I don't know yet how to do it without close(fd);
 }
 
 /* ************************************************************************** */
@@ -359,3 +359,6 @@ const char	*Server::acceptException::what() const throw()
 
 const char	*Server::passwordException::what() const throw()
 { return ("Password error: please provide a correct password"); }
+
+const char	*Server::invalidFdException::what() const throw()
+{ return ("Fd error: please provide a valid fd"); }

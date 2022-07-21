@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <set>
 #include "channel.hpp"
 #include "user.hpp"
 
@@ -70,9 +71,13 @@ class Server
         
         class passwordException : public std::exception
         { public: virtual const char *what() const throw(); };
+
+        class invalidFdException : public std::exception
+        { public: virtual const char *what() const throw(); };
  
         std::map<std::string, Channel *>    _channelList;
         std::map<std::string, CmdFunction>  _cmdList;
+        std::set<std::string>               _unavailableNicknames;
 
     private:
         // Cannot be default construct
