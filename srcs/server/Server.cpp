@@ -77,6 +77,18 @@ User*		Server::getUserByFd(const int &fd) const
 	return (NULL);
 }
 
+User*		Server::getUserByNickname(const std::string &nick) const
+{
+	std::map<int, User *>::const_iterator it;
+
+    for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+	{
+        if (it->second->getNickname() == nick)
+            return (it->second);
+    }
+    return (NULL);
+}
+
 /* ************************************************************************** */
 /* Private member functions                                                   */
 /* ************************************************************************** */
@@ -157,7 +169,7 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
     ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = newfd;
     if (epoll_ctl(pollfd, EPOLL_CTL_ADD, newfd, &ev) == -1)
-        throw Server::acceptException();
+        throw Server::pollAddException();
 }
 
 void    Server::_handleNewMessage(struct epoll_event event)
@@ -261,6 +273,7 @@ void    Server::start(void)
     // socket creation and param --------------------------------------------- /
     try { sockfd = this->_createSocket(); }
     catch (Server::socketException &e){ printError(e.what(), 1, true); return;}
+    this->_sockfd = sockfd;
 
     // binding to ip address + port and switch to passive mode --------------- /
     try { this->_bindSocket(sockfd, &srv_addr); }
@@ -269,6 +282,7 @@ void    Server::start(void)
     // poll creation --------------------------------------------------------- /
     try { pollfd = this->_createPoll(sockfd); }
     catch (Server::pollException &e) { printError(e.what(), 1, true); return; }
+    this->_pollfd = pollfd;
 
     // server loop ----------------------------------------------------------- /
     while (1)
@@ -303,6 +317,22 @@ void    Server::start(void)
     }
 }
 
+void    Server::killConnection(int fd)
+{
+    // check if fd exists using the userlist --------------------------------- /
+    if (this->_userList.find(fd) == this->_userList.end())
+        throw std::exception();
+
+    // fd exists, clean all -------------------------------------------------- /
+    // remove user from list
+    this->_userList.erase(fd);
+    // remove user's fd from the poll
+    if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
+        throw Server::pollDelException();
+    // close the socket
+
+}
+
 /* ************************************************************************** */
 /* Exceptions                                                                 */
 /* ************************************************************************** */
@@ -320,6 +350,9 @@ const char	*Server::pollWaitException::what() const throw()
 
 const char	*Server::pollAddException::what() const throw()
 { return ("Poll add error: "); }
+
+const char	*Server::pollDelException::what() const throw()
+{ return ("Poll del error: "); }
 
 const char	*Server::acceptException::what() const throw()
 { return ("Accept error: "); }

@@ -59,6 +59,7 @@
 
 
 	// OTHER ERRORS:
+	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator")							// 481
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel")														// 401
 	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command") 															// 421
 

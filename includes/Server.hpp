@@ -40,10 +40,11 @@ class Server
 		std::string	getName(void) const;
 		std::string getHostname(void) const;
 		User*		getUserByFd(const int &fd) const;
+        User*		getUserByNickname(const std::string &nick) const;
 
         // Member functions
         void    start(void);
-        void    stop(void); // quit all clients with a message
+        void    killConnection(int fd);
 
         // exceptions
         class socketException : public std::exception
@@ -59,6 +60,9 @@ class Server
         { public: virtual const char *what() const throw(); };
 
         class pollAddException : public std::exception
+        { public: virtual const char *what() const throw(); };
+
+        class pollDelException : public std::exception
         { public: virtual const char *what() const throw(); };
 
         class acceptException : public std::exception
@@ -86,12 +90,15 @@ class Server
         void    _executeCommands(int fd, std::vector<Command> cmds);
 
         // Member attributes
-        int         _port;
-        std::string _password;
-        std::string _name;
-        std::string _hostname;
+        int                     _port;
+        std::string             _password;
+        std::string             _name;
+        std::string             _hostname;
 
-        std::map<int, User *>               _userList;
+        int                     _pollfd;
+        int                     _sockfd;
+
+        std::map<int, User *>   _userList;
 };
 
 #endif
