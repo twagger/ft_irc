@@ -31,6 +31,9 @@ class Server
         Server(Server const &src);
         ~Server(void){};
 
+        // Public parameters
+        std::map<std::string, Channel *>    _channelList;
+
         // Operator overload
         Server  &operator=(Server const &rhs);
         
@@ -89,7 +92,6 @@ class Server
         std::string _hostname;
         
         std::map<int, User *>               _userList;
-        std::map<std::string, Channel *>    _channelList;
         std::map<std::string, CmdFunction>  _cmdList;
 };
 

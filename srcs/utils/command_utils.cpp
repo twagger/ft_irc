@@ -25,6 +25,19 @@ std::vector<std::string> splitByComma(std::string parameter)
     return (tab);
 }
 
+std::string getChannelTopic(std::string channelName,
+                        std::map<std::string, Channel *> channelList)
+{
+    std::map<std::string, Channel*>::iterator  i;
+
+    i = channelList.find(channelName);
+    if (i != channelList.end())
+    {
+        return (i->second->getTopic());
+    }
+    return (0);
+}
+
 /**
  * @brief Convert a vector of strings into a vector of Command by splitting 
  *        parameters and command

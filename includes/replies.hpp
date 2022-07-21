@@ -14,6 +14,8 @@
 	#define	RPL_WELCOME(nick, user, clientHost)				("Welcome to the Internet Relay Network " + nick + "!" + user + "@" + clientHost + "\r\n")	// 001
 	#define	RPL_YOURHOST(serverName, version)				("Your host is " + serverName + ", running version " + version + "\r\n")					// 002
 	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")												// 003
+	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic)																// 332
+	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set")															// 331
 
 	#define ERR_NOTREGISTERED								(":You have not registered" + "\r\n")														// 451
 

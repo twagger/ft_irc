@@ -9,7 +9,7 @@ Channel::Channel(std::string name, User *currentUser): _topic(0), _channelName(n
 Channel::Channel(std::string name, std::string key, User *currentUser): _topic(0), _channelName(name), _key(key),
             _operators(0), _bannedUsers(0), _invitees(0), _limitNumberOfUsers(-1)
             {
-                addUser(currentUser);
+                addOperator(currentUser);
                 this->_mode.push_back('k');
             }
 

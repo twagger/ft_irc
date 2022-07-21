@@ -22,5 +22,8 @@ std::string get_next_tokn(std::string *str, std::string delimiter);
 // Channel util functions
 std::vector<std::string> splitByComma(std::string parameter);
 bool                     isChannel(std::string channel_name);
+std::string              getChannelTopic(std::string channelName,
+                            std::map<std::string, Channel *> channelList);
+
 
 #endif

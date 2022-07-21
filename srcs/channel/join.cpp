@@ -30,31 +30,41 @@ std::vector<std::string> getKey(std::vector<std::string> parameter)
 {
     std::vector<std::string>::iterator it = parameter.end();
 
-    return(splitByComma(*it));
+    return (splitByComma(*it));
 }
 
-void createChannel(std::vector<std::string> channel, std::vector<std::string> key)
+void createChannel(std::vector<std::string> channel, std::vector<std::string> key,
+                   User *currentUser, Server *server)
 {
     std::vector<std::string>::iterator it = channel.begin();
     std::vector<std::string>::iterator it2 = key.begin();
 
     for (; it != channel.end(); it++)
     {
+        std::string channelName = *it;
+        std::string channelKey = *it2;
         if (key.empty() == false || it2 != key.end())
         {
-            Channel newChannel(*it, *it2);
+            Channel newChannel(channelName, channelKey, currentUser);
+            server->_channelList.insert(std::pair<std::string, Channel*>(channelName, &newChannel));
             it2++;
         }
         else
         {
-            Channel newChannel(*it);
+            Channel newChannel(channelName, currentUser);
+            server->_channelList.insert(std::pair<std::string, Channel*>(channelName, &newChannel));
         }
-        // Function to add new channel to list in server
-        // addChanneltoList(newChannel);
     }
 }
 
-void join(std::vector<std::string> parameter)
+std::map<std::string, Channel *>::iterator channelAlreadyExists(std::map<std::string,
+        Channel *> channelList, std::string channelName)
+{
+    std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
+    return (it);
+}
+
+std::string join(const int fdUser, std::vector<std::string> parameter, Server *server)
 {
     // Check parameters of join
 
@@ -66,13 +76,11 @@ void join(std::vector<std::string> parameter)
     std::string tmp = *it;
     if (tmp.compare("0") == 0)
     {
-        return ;
+        return (std::string("PART"));
     }
     if (channel.empty() == true)
     {
-        // std::cout << ERR_NEEDMOREPARAMS << std::endl;
-        std::cout << "JOIN :Not enough parameters" << std::endl;
-        return ;
+        return (reply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("JOIN"))));
     }
     if (parameter.size() > 1)
     {
@@ -80,7 +88,23 @@ void join(std::vector<std::string> parameter)
     }
 
     // Check if channel already exists
-    // Make a function that allows to look for a string inside the private argument channel_list
-    // Create channel
-    createChannel(channel, key);
-}
+    it = channel.begin();
+    for (;; it++)
+    {
+        std::string channelName = *it;
+        std::string channelTopic = getChannelTopic(channelName, server->_channelList);
+        std::map<std::string, Channel *>::iterator itMap = channelAlreadyExists(server->_channelList,
+            channelName);
+        if (itMap != server->_channelList.end() && channelTopic.empty() == false)
+        {
+            return (reply(server, fdUser, "332",
+                    RPL_TOPIC(channelName, channelTopic)));
+        }
+        // Create channel
+        else if (itMap == server->_channelList.end())
+        {
+            createChannel(channel, key, server->getUserByFd(fdUser), server);
+        }
+        return (reply(server, fdUser, "331", RPL_NOTOPIC(channelName)));
+    }
+} 
