@@ -29,7 +29,7 @@
 	#define ERR_NEEDMOREPARAMS(command)						(command + " :Not enough parameters" + "\r\n")												// 461
 	#define ERR_ALREADYREGISTRED 							(":Unauthorized command (already registered)\r\n")											// 462
 
-// CHANNEL CONNECTION
+	// CHANNEL CONNECTION
 
 	#define ERR_NOSUCHCHANNEL(channelName)					(channelName + " :No such channel" + "\r\n")												// 403
 	#define ERR_TOOMANYCHANNELS(channelName)				(channelName + " :You have joined too many channels" + "\r\n")								// 405
@@ -56,5 +56,10 @@
 	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users" + "\r\n")											// 502
 	#define ERR_UMODEUNKNOWNFLAG 							(":Unknown MODE flag" + "\r\n")																// 501
 	// #define ERR_NEEDMOREPARAMS 461
+
+
+	// OTHER ERRORS:
+	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel")														// 401
+	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command") 															// 421
 
 #endif
