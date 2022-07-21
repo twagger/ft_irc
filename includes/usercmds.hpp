@@ -7,6 +7,6 @@
 class Server;
 
 std::string	pass(int fd, std::vector<std::string> params, Server *irc);
-
+std::string nick(const int fd, std::vector<std::string> params, Server *irc);
 
 #endif

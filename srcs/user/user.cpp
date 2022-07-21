@@ -1,7 +1,7 @@
 #include "../../includes/user.hpp"
 
 // CONSTRUCTORS
-User::User(int fd, std::string hostname) : _fd(fd), _nickname("*"), _hostname(hostname), _mode(0), _authenticated(false) { }
+User::User(const int fd, std::string hostname) : _fd(fd), _nickname("*"), _hostname(hostname), _mode(0), _authenticated(false) { }
 
 User::User(const User &src) : _fd(src._fd) {
 	*this = src;
@@ -13,7 +13,6 @@ User::~User() { }
 // ASSIGN OVERLOAD
 User& User::operator=(User const &rhs) {
 	if (this != &rhs) {
-		this->_fd = rhs._fd;
 		this->_nickname = rhs._nickname;
 		this->_username = rhs._username;
 		this->_fullname = rhs._fullname;
@@ -26,6 +25,7 @@ User& User::operator=(User const &rhs) {
 }
 
 // GETTERS
+int			User::getFd(void) const { return this->_fd; }
 std::string	User::getNickname(void) const { return this->_nickname; }
 std::string	User::getUsername(void) const { return this->_username; }
 std::string	User::getFullname(void) const { return this->_fullname; }

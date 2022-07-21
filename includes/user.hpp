@@ -8,7 +8,7 @@
 class User {
 
 	private:
-		int			_fd;
+		const int			_fd;
 		std::string	_nickname;			// max 9 characters
 		std::string	_username;			
 		std::string _fullname;
@@ -19,12 +19,13 @@ class User {
 		bool		_authenticated;
 
 	public:
-		User(int fd, std::string hostname);
+		User(const int fd, std::string hostname);
 		User(const User &src);
 		~User();
 
 		User &operator=(User const &rhs);
 
+		int			getFd(void) const;
 		std::string getNickname(void) const;
 		std::string getUsername(void) const;
 		std::string getFullname(void) const;
