@@ -66,9 +66,6 @@ class Server
         class passwordException : public std::exception
         { public: virtual const char *what() const throw(); };
 
-        // Public parameters
-        std::map<std::string, Channel *>    _channelList;
-
     private:
         // Cannot be default construct
         Server(void){};
