@@ -74,10 +74,10 @@ std::string Server::getName(void) const
 
 User*		Server::getUserByFd(const int &fd) const
 {
-	std::map<int, User *>::const_iterator ite = this->_user_list.end();
+	std::map<int, User *>::const_iterator ite = this->_userList.end();
 
-	if (this->_user_list.find(fd) != ite)
-		return (this->_user_list.find(fd)->second);
+	if (this->_userList.find(fd) != ite)
+		return (this->_userList.find(fd)->second);
 	return (NULL);
 }
 

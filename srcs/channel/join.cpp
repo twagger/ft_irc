@@ -1,5 +1,5 @@
 #include "../../includes/channel.hpp"
-#include "../../includes/returnCode.hpp"
+#include "../../includes/replies.hpp"
 #include "../../includes/utils.hpp"
 
 std::vector<std::string> getChannel(std::vector<std::string> parameter)
@@ -30,7 +30,7 @@ std::vector<std::string> getKey(std::vector<std::string> parameter)
 {
     std::vector<std::string>::iterator it = parameter.end();
 
-    return(split_by_comma(*it));
+    return(splitByComma(*it));
 }
 
 void createChannel(std::vector<std::string> channel, std::vector<std::string> key)
@@ -70,7 +70,7 @@ void join(std::vector<std::string> parameter)
     }
     if (channel.empty() == true)
     {
-        std::cout << ERR_NEEDMOREPARAMS << std::endl;
+        // std::cout << ERR_NEEDMOREPARAMS << std::endl;
         std::cout << "JOIN :Not enough parameters" << std::endl;
         return ;
     }

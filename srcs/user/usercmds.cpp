@@ -32,7 +32,7 @@ bool	pass(Server irc, const int &fd, std::string password) {
 	if (irc.getUserByFd(fd) != 0)
 	{
 		if (password.empty()) {
-			reply(irc.getName(), "461", irc.getUserByFd(fd)->getNickname(), ERR_NEEDMOREPARAMS("PASS"));
+			// reply(irc.getName(), "461", irc.getUserByFd(fd)->getNickname(), ERR_NEEDMOREPARAMS("PASS"));
 			return false;
 		}
 		else if (irc.getUserByFd(fd)->getPassword() == true) {

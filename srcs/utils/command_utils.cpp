@@ -1,6 +1,6 @@
 #include <sstream>
 #include <iostream>
-#include "../server/Server.hpp"
+#include "../../includes/Server.hpp"
 
 bool isChannel(std::string channelName)
 {
@@ -82,9 +82,9 @@ std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
     
     return (result);
 }
-std::string reply(std::string servername, std::string code, std::string nickname, std::string replyMsg)
-{
-	std::cout << ":" + servername + " " + code + " " +  nickname + " :" + replyMsg;		
-	// string int should be a 3-digits number 
-	// to be returned to the client send(new_fd, "\n\", 14, 0) == -1)
-}
+// std::string reply(std::string servername, std::string code, std::string nickname, std::string replyMsg)
+// {
+// 	std::cout << ":" + servername + " " + code + " " +  nickname + " :" + replyMsg;		
+// 	// string int should be a 3-digits number 
+// 	// to be returned to the client send(new_fd, "\n\", 14, 0) == -1)
+// }

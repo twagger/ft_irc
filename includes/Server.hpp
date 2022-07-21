@@ -30,9 +30,6 @@ struct Command
             std::vector<std::string> params = std::vector<std::string>());
     ~Command(){};
 };
-#include "../../includes/channel.hpp"
-#include "../../includes/user.hpp"
-
 
 class Server
 {
