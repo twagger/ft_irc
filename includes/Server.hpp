@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
+/*   By: erecuero <erecuero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
 /*   Updated: 2022/07/21 09:52:45 by twagner          ###   ########.fr       */
@@ -43,9 +43,10 @@ class Server
         Server  &operator=(Server const &rhs);
         
         // Getters
-        int         getPort(void) const;
-        std::string getPassword(void) const;
-        std::string getName(void) const;
+		int			getPort(void) const;
+		std::string	getPassword(void) const;
+		std::string	getName(void) const;
+		User*		getUserByFd(const int &fd) const;
 
         // Member functions
         void    start(void);
@@ -91,7 +92,7 @@ class Server
         // Member attributes
         int         _port;
         std::string _password;
-        std::string _name;
+        std::string _name;					// I need a hostname for the server, pleaseeeeeee!
         
         std::map<int, User *>               _userList;
         std::map<std::string, Channel *>    _channelList;

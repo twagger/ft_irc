@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
+/*   By: erecuero <erecuero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2022/07/21 10:05:48 by twagner          ###   ########.fr       */
+=======
+/*   Updated: 2022/07/20 17:23:55 by erecuero         ###   ########.fr       */
+>>>>>>> f488343da356093565b4a5186e2510c3eca358a6
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +78,16 @@ std::string Server::getPassword(void) const
 { return this->_password; }
 
 std::string Server::getName(void) const
-{ return this->_name; }
+{return this->_name; }
+
+User*		Server::getUserByFd(const int &fd) const
+{
+	std::map<int, User *>::const_iterator ite = this->_userList.end();
+
+	if (this->_userList.find(fd) != ite)
+		return (this->_userList.find(fd)->second);
+	return (NULL);
+}
 
 /* ************************************************************************** */
 /* Private member functions                                                   */
