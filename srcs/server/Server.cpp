@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/21 13:00:01 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/21 13:04:08 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,10 @@ std::string Server::getPassword(void) const
 { return this->_password; }
 
 std::string Server::getName(void) const
-{return this->_name; }
+{ return this->_name; }
+
+std::string Server::getHostname(void) const
+{ return this->_hostname; }
 
 User*		Server::getUserByFd(const int &fd) const
 {
@@ -207,6 +210,14 @@ void    Server::_handleNewMessage(struct epoll_event event)
 
     // execute all commands in the vector
     this->_executeCommands(event.data.fd, cmds);
+
+// ESTELLE:
+	// reply returned from command			 ---------------------------- /
+	// reply = this._cmd_list[CMD].exec_command(FD, CMD, PARAM)
+    // if (!reply.empty())
+	    // if (send(fd, reply.c_str(), reply.length(), 0) == -1)
+            // perror("send");
+
 }
 
 void    Server::_initCommandList(void)

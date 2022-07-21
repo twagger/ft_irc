@@ -6,7 +6,11 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
+<<<<<<< HEAD:includes/Server.hpp
 /*   Updated: 2022/07/21 12:59:44 by twagner          ###   ########.fr       */
+=======
+/*   Updated: 2022/07/21 11:24:02 by erecuero         ###   ########.fr       */
+>>>>>>> f45dda1de83fff518358b5c97906643dee2e4201:srcs/server/Server.hpp
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +53,7 @@ class Server
 		int			getPort(void) const;
 		std::string	getPassword(void) const;
 		std::string	getName(void) const;
+		std::string getHostname(void) const;
 		User*		getUserByFd(const int &fd) const;
 
         // Member functions
@@ -95,8 +100,13 @@ class Server
         // Member attributes
         int         _port;
         std::string _password;
+<<<<<<< HEAD:includes/Server.hpp
         std::string _hostname;
         std::string _name;
+=======
+        std::string _name;
+		std::string _hostname;
+>>>>>>> f45dda1de83fff518358b5c97906643dee2e4201:srcs/server/Server.hpp
         
         std::map<int, User *>               _userList;
         std::map<std::string, Channel *>    _channelList;
