@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 16:06:53 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/20 18:58:32 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/21 09:23:47 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ std::vector<std::string>    splitBy(std::string str, std::string delimiter)
     if (end == -1)
         throw std::runtime_error("IRC message must end with CRLF");
     // save first command in vector
+    if (end + 2 > MAX_CMD_LEN)
+        throw std::runtime_error("IRC message shall not exceed 512 characters");
     result.push_back(str.substr(0, end));
     // update str
     str.erase(0, end + delimiter.length());
@@ -30,6 +32,9 @@ std::vector<std::string>    splitBy(std::string str, std::string delimiter)
     end = str.find(delimiter);
     while (end != -1)
     {
+        if (end + 2 > MAX_CMD_LEN)
+            throw std::runtime_error(\
+                                 "IRC message shall not exceed 512 characters");
         result.push_back(str.substr(0, end));
         str.erase(0, end + delimiter.length());
         end = str.find(delimiter);

@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
-/*   Updated: 2022/07/20 18:39:49 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/21 09:41:35 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,15 @@
 #include "channel.hpp"
 #include "user.hpp"
 
+#define MAX_CMD_LEN 512
+
 struct Command
 {
     std::string                 command;
+    std::string                 prefix;
     std::vector<std::string>    params;
 
-    Command(std::string cmd, \
+    Command(std::string cmd, std::string prefix = std::string(), \
             std::vector<std::string> params = std::vector<std::string>());
     ~Command(){};
 };

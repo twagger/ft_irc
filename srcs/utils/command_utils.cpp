@@ -37,19 +37,38 @@ std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
     std::vector<Command>                result;
     std::vector<std::string>::iterator  it;
     int                                 end;
+    std::string                         prefix;
 
     for (it = cmd_strings.begin(); it != cmd_strings.end(); ++it)
     {
         // extract CMD name 
         end = it->find(' ');
-        if (end == -1) // only command
+        if (end == -1) // only the command
+        {
+            if (it->find(':') == 0)
+                throw std::runtime_error("IRC message must have a command");
             result.push_back(*(new Command(it->substr(0, end))));
+        }
         else // command + params
         {
-            // CMD
-            result.push_back(*(new Command(it->substr(0, end))));
+            // CMD WITH PREFIX
+            if (it->find(':') == 0)
+            {
+                prefix = it->substr(1, end);
+                it->erase(0, end + 1);
+                end = it->find(' ');
+                if (end == -1)
+                    result.push_back(*(new Command(*it, prefix)));
+                else
+                    result.push_back(*(new Command(it->substr(0, end), prefix)));
+                it->erase(0, end + 1);
+            }
+            else // CMD WITH NO PREFIX
+            { 
+                result.push_back(*(new Command(it->substr(0, end))));
+                it->erase(0, end + 1);
+            }
             // PARAMS
-            it->erase(0, end + 1);
             while (end != -1)
             {
                 end = it->find(' ');

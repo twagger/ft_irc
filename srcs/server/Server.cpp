@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/21 09:16:01 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/21 09:47:25 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ Server::Server(Server const &src)
 { *this = src; }
 
 Command::Command(\
-std::string cmd, std::vector<std::string> params)
-: command(cmd), params(params){}
+std::string cmd, std::string prefix, std::vector<std::string> params)
+: command(cmd), prefix(prefix), params(params){}
 
 /* ************************************************************************** */
 /* Operator overloads                                                         */
@@ -165,19 +165,21 @@ void    Server::_handleNewMessage(struct epoll_event event)
     ret = recv(event.data.fd, buf, BUF_SIZE, 0);
     buf[ret] = '\0';
 
-    // split the commands in a vector
+    // split the commands in a vector. Non blocking in case of not ok message.
     try { cmd_strings = splitBy(buf, "\r\n"); } 
     catch (std::runtime_error &e) { printError(e.what(), 1, false); }
 
     // split all commands in a vector of t_command (CMD / PARAM)
-    cmd = splitCmds(cmd_strings);
+    try { cmd = splitCmds(cmd_strings); }
+    catch (std::runtime_error &e) {printError(e.what(), 1, false); }
 
     // temporary check
     std::vector<Command>::iterator  it;
     std::vector<std::string>::iterator  it2;
     for (it = cmd.begin(); it < cmd.end(); ++it)
     {
-        std::cout << "\nCMD : " << it->command << std::endl;
+        std::cout << "\nPREFIX : " << it->prefix << std::endl;
+        std::cout << "CMD : " << it->command << std::endl;
         for (it2 = it->params.begin(); it2 < it->params.end(); ++it2)
         {
             std::cout << "PARAM : " << *it2 << std::endl;
