@@ -6,7 +6,7 @@
 /*   By: erecuero <erecuero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/20 17:23:55 by erecuero         ###   ########.fr       */
+/*   Updated: 2022/07/21 12:26:30 by erecuero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,10 @@ std::string Server::getPassword(void) const
 { return this->_password; }
 
 std::string Server::getName(void) const
-{return this->_name; }
+{ return this->_name; }
+
+std::string Server::getHostname(void) const
+{ return this->_hostname; }
 
 User*		Server::getUserByFd(const int &fd) const
 {
@@ -166,7 +169,7 @@ void    Server::_handle_new_message(struct epoll_event event)
     std::map< int, std::vector<std::string> >   cmd;
 
     memset(buf, 0, BUF_SIZE);
-    ret = recv(event.data.fd, buf, BUF_SIZE, 0);
+    ret = recv(event.data.fd, buf, BUF_SIZE, 0);						// a proteger perror()
     buf[ret] = '\0';
     std::cout << "Message received from (" << event.data.fd 
                 << ") : " << buf << std::endl;
@@ -177,8 +180,13 @@ void    Server::_handle_new_message(struct epoll_event event)
         cmd[event.data.fd].push_back(get_next_tokn(&mess, " "));
 
     // parse the command from the map ---------------------------- /
-    //if (this._cmd_list[CMD].exec_command(FD, CMD, PARAM) == -1)
-        // send an error to client
+
+	// ESTELLE:
+	// reply returned from command			 ---------------------------- /
+	// reply = this._cmd_list[CMD].exec_command(FD, CMD, PARAM)
+    // if (!reply.empty())
+	    // if (send(fd, reply.c_str(), reply.length(), 0) == -1)
+            // perror("send");
 }
 
 /* ************************************************************************** */

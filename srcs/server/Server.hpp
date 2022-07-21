@@ -6,7 +6,7 @@
 /*   By: erecuero <erecuero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
-/*   Updated: 2022/07/20 19:37:50 by erecuero         ###   ########.fr       */
+/*   Updated: 2022/07/21 11:24:02 by erecuero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ class Server
 		int			getPort(void) const;
 		std::string	getPassword(void) const;
 		std::string	getName(void) const;
+		std::string getHostname(void) const;
 		User*		getUserByFd(const int &fd) const;
 
         // Member functions
@@ -76,7 +77,8 @@ class Server
         // Member attributes
         int         _port;
         std::string _password;
-        std::string _name;					// I need a hostname for the server, pleaseeeeeee!
+        std::string _name;
+		std::string _hostname;
         
        	std::map<int, User *>  _user_list;
         std::vector<Channel *>  _channel_list;

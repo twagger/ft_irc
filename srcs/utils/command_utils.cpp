@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include "../server/Server.hpp"
+#include <sys/socket.h>
 
 bool is_channel(std::string channelName)
 {
@@ -25,9 +26,10 @@ std::vector<std::string> split_by_comma(std::string parameter)
     return (tab);
 }
 
-std::string reply(std::string servername, std::string code, std::string nickname, std::string replyMsg)
+
+std::string reply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
-	std::cout << ":" + servername + " " + code + " " +  nickname + " :" + replyMsg;		
-	// string int should be a 3-digits number 
-	// to be returned to the client send(new_fd, "\n\", 14, 0) == -1)
+	std::string reply = ":" + irc->getHostname() + " " + code + " "
+						+ irc->getUserByFd(fd)->getNickname() + " :" + replyMsg;		
+	return (reply);
 }
