@@ -200,17 +200,11 @@ void    Server::_handleNewMessage(struct epoll_event event)
     this->_executeCommands(event.data.fd, cmds);
 }
 
-void    Server::_initCommandList(void)
+void    Server::_initCommandList(void) // functions to complete
 {
-    this->_cmdList["PASS"] = NULL;
-    this->_cmdList["NICK"] = NULL;
-    this->_cmdList["USER"] = NULL;
-    this->_cmdList["OPER"] = NULL;
-    this->_cmdList["QUIT"] = NULL;
-    this->_cmdList["SQUIT"] = NULL;
-    this->_cmdList["JOIN"] = NULL;
-    this->_cmdList["INVITE"] = NULL;
-    this->_cmdList["TOPIN"] = NULL;
+    this->_cmdList["-PASS"] = NULL;
+    this->_cmdList["-NICK"] = NULL;
+    this->_cmdList["-USER"] = NULL;
 }
 
 void    Server::_executeCommands(int fd, std::vector<Command> cmds)
@@ -218,7 +212,8 @@ void    Server::_executeCommands(int fd, std::vector<Command> cmds)
     std::vector<Command>::iterator                  it;
     std::map<std::string, CmdFunction>::iterator    it_cmd;
     std::string                                     result;
-    //CmdFunction                                     exec_command;
+    CmdFunction                                     exec_command;
+    std::string                                     reply_str;
     int                                             ret;
 
     // for each command in the message
@@ -229,8 +224,8 @@ void    Server::_executeCommands(int fd, std::vector<Command> cmds)
         if (it_cmd != this->_cmdList.end())
         {
             // execute the command
-            //exec_command = it_cmd->second;
-            result = "toto"; //exec_command(fd, it->params, this);
+            exec_command = it_cmd->second;
+            result = exec_command(fd, it->params, this);
             // send the result to the client if it is not empty
             if (!result.empty())
             {
@@ -241,7 +236,10 @@ void    Server::_executeCommands(int fd, std::vector<Command> cmds)
         }
         else // the command is unknown, send something to the client
         {
-           ret = 0; 
+            reply_str = reply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command));
+            ret = send(fd, reply_str.c_str(), reply_str.length(), 0);
+            if (ret == -1)
+                throw std::exception();
         }
     }
 }
