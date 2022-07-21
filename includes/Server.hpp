@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erecuero <erecuero@student.42.fr>          +#+  +:+       +#+        */
+/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
-/*   Updated: 2022/07/21 09:52:45 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/21 12:59:44 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,9 @@ struct Command
 class Server
 {
     public:
+        // member type
+        typedef void (*CmdFunction)(int, std::vector<std::string>, Server*); 
+
         // Constructors & destructor
         Server(int port, std::string password, std::string name = "Gunther");
         Server(Server const &src);
@@ -85,18 +88,19 @@ class Server
         int     _createPoll(int sockfd);
         int     _pollWait(int pollfd, struct epoll_event **events, \
                            int max_events);
-        void    _acceptConnection(int sockfd, int pollfd, \
-                                   struct sockaddr_in *srv_addr);
+        void    _acceptConnection(int sockfd, int pollfd);
         void    _handleNewMessage(struct epoll_event event);
+        void    _executeCommands(int fd, std::vector<Command> cmds);
 
         // Member attributes
         int         _port;
         std::string _password;
-        std::string _name;					// I need a hostname for the server, pleaseeeeeee!
+        std::string _hostname;
+        std::string _name;
         
         std::map<int, User *>               _userList;
         std::map<std::string, Channel *>    _channelList;
-        std::map<std::string, void *>       _cmdList;
+        std::map<std::string, CmdFunction>  _cmdList;
 };
 
 #endif
