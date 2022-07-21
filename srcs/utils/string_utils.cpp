@@ -6,21 +6,38 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 16:06:53 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/19 16:22:41 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/21 09:23:47 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/utils.hpp"
 
-std::string get_next_tokn(std::string *str, std::string delimiter)
+// Split a string by \n\r and return a string vector
+std::vector<std::string>    splitBy(std::string str, std::string delimiter)
 {
-    std::string token;
-    int         end;
-    
-    end = (*str).find(delimiter);
+    std::vector<std::string>    result;
+    int                         end;
+
+    // first check 
+    end = str.find(delimiter);
     if (end == -1)
-        end = (*str).length();
-    token = (*str).substr(0, end);
-    (*str).erase(0, end + delimiter.length());
-    return (token);
+        throw std::runtime_error("IRC message must end with CRLF");
+    // save first command in vector
+    if (end + 2 > MAX_CMD_LEN)
+        throw std::runtime_error("IRC message shall not exceed 512 characters");
+    result.push_back(str.substr(0, end));
+    // update str
+    str.erase(0, end + delimiter.length());
+    // loop for other commands
+    end = str.find(delimiter);
+    while (end != -1)
+    {
+        if (end + 2 > MAX_CMD_LEN)
+            throw std::runtime_error(\
+                                 "IRC message shall not exceed 512 characters");
+        result.push_back(str.substr(0, end));
+        str.erase(0, end + delimiter.length());
+        end = str.find(delimiter);
+    }
+    return (result);
 }

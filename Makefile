@@ -15,6 +15,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/utils/string_utils.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/channel/join.cpp \
+			  srcs/utils/command_utils.cpp \
 			  srcs/user/user.cpp 
 OBJS		= $(SRCS:.cpp=.o)
 

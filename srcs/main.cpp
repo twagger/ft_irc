@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/18 11:43:35 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/20 08:16:14 by codespace        ###   ########.fr       */
+/*   Updated: 2022/07/20 18:34:25 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 #include "../includes/irc.hpp"
 #include "../includes/utils.hpp"
-#include "./server/Server.hpp"
+#include "../includes/Server.hpp"
 
 #define DEF_PORT 6667
 #define DEF_PASS "changeme"
@@ -30,7 +30,7 @@ int main(int ac, char **av)
 
     // basic using parameters ------------------------------------------------ /
     if (ac != 3)
-        return (print_error("Parameters error", 1, false));
+        return (printError("Parameters error", 1, false));
     ss << av[1];
     ss >> port;
     password = av[2]; 
