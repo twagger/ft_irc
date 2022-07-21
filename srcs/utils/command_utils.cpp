@@ -30,7 +30,7 @@ std::vector<std::string> split_by_comma(std::string parameter)
  *        parameters and command
  * 
  * @param cmd_strings Vector of commands, not splitted by space
- * @return vector of t_command where CMD and PARAMS are separated
+ * @return vector of Command where [ PREFIX ], CMD and PARAMS are separated
  */
 std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
 {
