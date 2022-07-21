@@ -1,6 +1,5 @@
-#include "usercmds.hpp"
-#include "../server/Server.hpp"
-#include "utils.hpp"
+#include "../../includes/usercmds.hpp"
+#include "../../includes/utils.hpp"
 
 
 // Registration functions for each client
@@ -20,30 +19,38 @@
 //                  ; any octet except NUL, CR, LF, " " and "@"
 
 
-std::string	pass(Server *irc, const int &fd, std::vector<std::string> params) {
+
+//What should we do if user send PASS pwd1 pwd2 ? Is it wrong?
+
+std::string	pass(int fd, std::vector<std::string> params, Server *irc) {
+	std::string replyMsg;
 	if (irc->getUserByFd(fd) != 0)
 	{
-		if (params[0].empty())
-			return reply(irc, fd, "461", ERR_NEEDMOREPARAMS(std::string("PASS")));
-		else if (irc->getUserByFd(fd)->getPassword() == true)
-			return reply(irc, fd, "462", ERR_ALREADYREGISTRED);
+		if (params.empty()) {
+			replyMsg = reply(irc, fd, "461", ERR_NEEDMOREPARAMS(std::string("PASS")));
+			return replyMsg;
+		}
+		else if (irc->getUserByFd(fd)->getPassword() == true) {
+			replyMsg = reply(irc, fd, "462", ERR_ALREADYREGISTRED); 
+			return replyMsg;
+		}
 		else if (!irc->getUserByFd(fd)->getPassword() && irc->getPassword() == params[0]) 
 		{	
 			// never authenticated with a password + password given is OK
 			irc->getUserByFd(fd)->setPassword(true);
-			return (NULL);
+			return replyMsg;
 		}
 	}
 	// if wrong password but not authenticated, do nothing >> TO BE CHECKED
 	// if user not find, will return null as well
-	return (NULL);
+	return replyMsg;
 }
 
 
-std::string nick(Server *irc, const int &fd, std::vector<std::string> params) {
+std::string nick(int fd, std::vector<std::string> params, Server *irc) {
 	if (irc->getUserByFd(fd) != 0)
 	{
-		if ()
+		if (params.empty())
 	}
 	return (NULL);
 }

@@ -18,7 +18,8 @@ SRCS		= srcs/main.cpp \
 			  srcs/utils/string_utils.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/utils/command_utils.cpp \
-			  srcs/user/user.cpp 
+			  srcs/user/user.cpp \
+			  srcs/user/usercmds.cpp 
 OBJS		= $(SRCS:.cpp=.o)
 
 # EXECUTABLES & LIBRARIES

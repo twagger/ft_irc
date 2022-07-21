@@ -202,7 +202,7 @@ void    Server::_handleNewMessage(struct epoll_event event)
 
 void    Server::_initCommandList(void) // functions to complete
 {
-    this->_cmdList["-PASS"] = NULL;
+    this->_cmdList["PASS"] = &pass;
     this->_cmdList["-NICK"] = NULL;
     this->_cmdList["-USER"] = NULL;
 }

@@ -59,7 +59,7 @@
 
 
 	// OTHER ERRORS:
-	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel")														// 401
-	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command") 															// 421
+	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel"+ "\r\n")														// 401
+	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command"+ "\r\n") 															// 421
 
 #endif
