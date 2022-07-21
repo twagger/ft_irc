@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/20 18:50:56 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/21 09:16:01 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,9 +164,9 @@ void    Server::_handleNewMessage(struct epoll_event event)
     memset(buf, 0, BUF_SIZE);
     ret = recv(event.data.fd, buf, BUF_SIZE, 0);
     buf[ret] = '\0';
-    
+
     // split the commands in a vector
-    try { cmd_strings = splitBy(buf, "\n"); } // not working with "\n\r"
+    try { cmd_strings = splitBy(buf, "\r\n"); } 
     catch (std::runtime_error &e) { printError(e.what(), 1, false); }
 
     // split all commands in a vector of t_command (CMD / PARAM)

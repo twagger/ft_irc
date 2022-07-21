@@ -52,9 +52,12 @@ std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
             it->erase(0, end + 1);
             while (end != -1)
             {
-                result.back().params.push_back(it->substr(0, end));
-                it->erase(0, end + 1);
                 end = it->find(' ');
+                if (end == -1)
+                    result.back().params.push_back(*it);
+                else
+                    result.back().params.push_back(it->substr(0, end));
+                it->erase(0, end + 1);
             }
         }
     }
