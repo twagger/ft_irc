@@ -6,7 +6,7 @@
 /*   By: erecuero <erecuero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 12:58:15 by erecuero          #+#    #+#             */
-/*   Updated: 2022/07/20 20:09:42 by erecuero         ###   ########.fr       */
+/*   Updated: 2022/07/21 13:16:25 by erecuero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 class User {
 
 	private:
-		int			_fd;
+		const int			_fd;
 		std::string	_nickname;			// max 9 characters
 		std::string	_username;			
 		std::string _fullname;
@@ -31,7 +31,7 @@ class User {
 		bool		_authenticated;
 
 	public:
-		User(int fd);
+		User(const int fd, std::string hostname);
 		User(const User &src);
 		~User();
 
@@ -40,6 +40,7 @@ class User {
 		std::string getNickname(void) const;
 		std::string getUsername(void) const;
 		std::string getFullname(void) const;
+		std::string getHostname(void) const;
 		uint16_t 	getMode(void) const;
 		bool 		getPassword(void) const;
 		bool 		getAuthenticated(void) const;
@@ -47,6 +48,7 @@ class User {
 		void setNickname(std::string nickname);
 		void setUsername(std::string username);
 		void setFullname(std::string fullname);
+		void setHostname(std::string fullname);
 		void setMode(uint16_t mode);
 		void setPassword(bool pass);
 		void setAuthenticated(bool authenticated);
