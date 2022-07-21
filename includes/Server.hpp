@@ -23,7 +23,8 @@ class Server
 {
     public:
         // member type
-        typedef void (*CmdFunction)(int, std::vector<std::string>, Server*); 
+        typedef \
+            std::string (*CmdFunction)(int, std::vector<std::string>, Server*); 
 
         // Constructors & destructor
         Server(int port, std::string password, std::string name = "Gunther");
