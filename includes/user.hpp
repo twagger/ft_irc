@@ -6,7 +6,7 @@
 /*   By: erecuero <erecuero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 12:58:15 by erecuero          #+#    #+#             */
-/*   Updated: 2022/07/21 13:16:25 by erecuero         ###   ########.fr       */
+/*   Updated: 2022/07/21 14:51:34 by erecuero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ class User {
 		void setMode(uint16_t mode);
 		void setPassword(bool pass);
 		void setAuthenticated(bool authenticated);
-
 };
 
 std::ostream & operator<<(std::ostream &o, User const &rhs);	// for printing 'nickname!username@host.name.com ...'
