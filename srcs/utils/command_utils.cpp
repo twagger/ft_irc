@@ -1,11 +1,7 @@
 #include <sstream>
 #include <iostream>
-<<<<<<< HEAD
 #include "../../includes/Server.hpp"
-=======
-#include "../server/Server.hpp"
 #include <sys/socket.h>
->>>>>>> f45dda1de83fff518358b5c97906643dee2e4201
 
 bool isChannel(std::string channelName)
 {

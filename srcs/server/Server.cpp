@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/21 13:04:08 by twagner          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <netinet/in.h>
 #include <cstring>
 #include <cstdlib>
@@ -210,14 +198,6 @@ void    Server::_handleNewMessage(struct epoll_event event)
 
     // execute all commands in the vector
     this->_executeCommands(event.data.fd, cmds);
-
-// ESTELLE:
-	// reply returned from command			 ---------------------------- /
-	// reply = this._cmd_list[CMD].exec_command(FD, CMD, PARAM)
-    // if (!reply.empty())
-	    // if (send(fd, reply.c_str(), reply.length(), 0) == -1)
-            // perror("send");
-
 }
 
 void    Server::_initCommandList(void)

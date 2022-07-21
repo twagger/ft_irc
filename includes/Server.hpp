@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
-/*   Updated: 2022/07/21 13:07:32 by twagner          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
@@ -97,7 +85,7 @@ class Server
         int         _port;
         std::string _password;
         std::string _name;
-		std::string _hostname;
+        std::string _hostname;
         
         std::map<int, User *>               _userList;
         std::map<std::string, Channel *>    _channelList;
