@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: erecuero <erecuero@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/20 17:23:55 by erecuero         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <netinet/in.h>
 #include <cstring>
 #include <cstdlib>
@@ -38,7 +26,8 @@
 /* Constructors & destructor                                                  */
 /* ************************************************************************** */
 Server::Server(int port, std::string password, std::string name)
-: _port(port), _password(password), _name(name) {}
+: _port(port), _password(password), _name(name)
+{ this->_initCommandList(); }
 
 Server::Server(Server const &src)
 { *this = src; }
@@ -56,6 +45,9 @@ Server  &Server::operator=(Server const &rhs)
         this->_port = rhs._port;
         this->_password = rhs._password;
         this->_name = rhs._name;
+        this->_userList = rhs._userList;
+        this->_channelList = rhs._channelList;
+        this->_cmdList = rhs._cmdList;
     }
     return (*this);
 }
@@ -70,7 +62,10 @@ std::string Server::getPassword(void) const
 { return this->_password; }
 
 std::string Server::getName(void) const
-{return this->_name; }
+{ return this->_name; }
+
+std::string Server::getHostname(void) const
+{ return this->_hostname; }
 
 User*		Server::getUserByFd(const int &fd) const
 {
@@ -101,8 +96,8 @@ void    Server::_bindSocket(int sockfd, struct sockaddr_in *srv_addr)
     // binding to ip address + port
     srv_addr->sin_family = AF_INET; // host byte order
     srv_addr->sin_port = htons(this->_port);
-    srv_addr->sin_addr.s_addr = INADDR_ANY; // autofill with any ip
-    bzero(&(srv_addr->sin_zero), 8); // fill with 0
+    srv_addr->sin_addr.s_addr = INADDR_ANY;
+    memset(&(srv_addr->sin_zero), 0, 8); // fill remaining space with 0
     if (bind(sockfd, reinterpret_cast<struct sockaddr *>(srv_addr), \
         sizeof(struct sockaddr)) == -1)
         throw Server::bindException();
@@ -141,19 +136,23 @@ int Server::_pollWait(int pollfd, struct epoll_event **events, int max_events)
     return (nfds);
 }
 
-void    Server::_acceptConnection(\
-                int sockfd, int pollfd, struct sockaddr_in *srv_addr)
+void    Server::_acceptConnection(int sockfd, int pollfd)
 {
     socklen_t           sin_size;
     struct epoll_event  ev;
 	int					newfd;
+    struct sockaddr_in  client_addr;
 
     // accept the connect request
-    newfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(srv_addr), \
+    newfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&client_addr), \
         &sin_size);
     if (newfd == -1)
         throw Server::acceptException();
-    
+
+    // create a new empty user 
+    this->_userList[newfd] = new User(newfd, inet_ntoa(client_addr.sin_addr));
+    std::cout << inet_ntoa(client_addr.sin_addr) << std::endl;
+
     // add the new fd to the poll
     ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = newfd;
@@ -167,11 +166,13 @@ void    Server::_handleNewMessage(struct epoll_event event)
     ssize_t                     ret;
     std::string                 mess;
     std::vector< std::string >  cmd_strings;
-    std::vector<Command>        cmd;
+    std::vector<Command>        cmds;
 
     // fill a buffer with the message
     memset(buf, 0, BUF_SIZE);
     ret = recv(event.data.fd, buf, BUF_SIZE, 0);
+    if (ret == -1)
+        throw std::exception();
     buf[ret] = '\0';
 
     // split the commands in a vector. Non blocking in case of not ok message.
@@ -179,13 +180,13 @@ void    Server::_handleNewMessage(struct epoll_event event)
     catch (std::runtime_error &e) { printError(e.what(), 1, false); }
 
     // split all commands in a vector of t_command (CMD / PARAM)
-    try { cmd = splitCmds(cmd_strings); }
+    try { cmds = splitCmds(cmd_strings); }
     catch (std::runtime_error &e) {printError(e.what(), 1, false); }
 
     // temporary check
     std::vector<Command>::iterator  it;
     std::vector<std::string>::iterator  it2;
-    for (it = cmd.begin(); it < cmd.end(); ++it)
+    for (it = cmds.begin(); it < cmds.end(); ++it)
     {
         std::cout << "\nPREFIX : " << it->prefix << std::endl;
         std::cout << "CMD : " << it->command << std::endl;
@@ -194,11 +195,55 @@ void    Server::_handleNewMessage(struct epoll_event event)
             std::cout << "PARAM : " << *it2 << std::endl;
         }
     }
-    // Loop on the commands and execute them (use vector iterator)
-    
-    // Search the proper function in cmd map and execute it with params
-        //if (this._cmd_list[CMD].exec_command(FD, CMD, PARAM) == -1)
-            // send an error to client
+
+    // execute all commands in the vector
+    this->_executeCommands(event.data.fd, cmds);
+}
+
+void    Server::_initCommandList(void)
+{
+    this->_cmdList["PASS"] = NULL;
+    this->_cmdList["NICK"] = NULL;
+    this->_cmdList["USER"] = NULL;
+    this->_cmdList["OPER"] = NULL;
+    this->_cmdList["QUIT"] = NULL;
+    this->_cmdList["SQUIT"] = NULL;
+    this->_cmdList["JOIN"] = NULL;
+    this->_cmdList["INVITE"] = NULL;
+    this->_cmdList["TOPIN"] = NULL;
+}
+
+void    Server::_executeCommands(int fd, std::vector<Command> cmds)
+{
+    std::vector<Command>::iterator                  it;
+    std::map<std::string, CmdFunction>::iterator    it_cmd;
+    std::string                                     result;
+    CmdFunction                                     exec_command;
+    int                                             ret;
+
+    // for each command in the message
+    for (it = cmds.begin(); it < cmds.end(); ++it)
+    {
+        // search if it is in the known commands list of the server
+        it_cmd = this->_cmdList.find(it->command);
+        if (it_cmd != this->_cmdList.end())
+        {
+            // execute the command
+            exec_command = it_cmd->second;
+            result = exec_command(fd, it->params, this);
+            // send the result to the client if it is not empty
+            if (!result.empty())
+            {
+                ret = send(fd, result.c_str(), result.length(), 0);
+                if (ret == -1)
+                    throw std::exception();
+            }
+        }
+        else // the command is unknown, send something to the client
+        {
+           ret = 0; 
+        }
+    }
 }
 
 /* ************************************************************************** */
@@ -242,7 +287,7 @@ void    Server::start(void)
             // handle new connection requests -------------------------------- /
             if (events[i].data.fd == sockfd)            
             {
-                try { this->_acceptConnection(sockfd, pollfd, &srv_addr); }
+                try { this->_acceptConnection(sockfd, pollfd); }
                 catch (Server::acceptException &e)
                 { printError(e.what(), 1, true); return; }
                 catch (Server::pollAddException &e)
@@ -254,7 +299,7 @@ void    Server::start(void)
             else // new message from existing connection --------------------- /
             {
                 try { this->_handleNewMessage(events[i]); }
-                catch (std::exception &e) { }
+                catch (std::exception &e) { printError(e.what(), 1, false); }
             }
         }
     }
