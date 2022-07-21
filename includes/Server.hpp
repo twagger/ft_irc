@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 07:46:38 by codespace         #+#    #+#             */
-/*   Updated: 2022/07/21 09:41:35 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/21 09:52:45 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ class Server
         Server(void){};
 
         // Private member functions
+        void    _initCommandList(void);
         int     _createSocket(void);
         void    _bindSocket(int sockfd, struct sockaddr_in *srv_addr);
         int     _createPoll(int sockfd);

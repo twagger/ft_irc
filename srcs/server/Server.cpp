@@ -6,7 +6,7 @@
 /*   By: twagner <twagner@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/19 11:52:06 by twagner           #+#    #+#             */
-/*   Updated: 2022/07/21 09:47:25 by twagner          ###   ########.fr       */
+/*   Updated: 2022/07/21 10:05:48 by twagner          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@
 /* Constructors & destructor                                                  */
 /* ************************************************************************** */
 Server::Server(int port, std::string password, std::string name)
-: _port(port), _password(password), _name(name) {}
+: _port(port), _password(password), _name(name)
+{ this->_initCommandList(); }
 
 Server::Server(Server const &src)
 { *this = src; }
@@ -56,6 +57,9 @@ Server  &Server::operator=(Server const &rhs)
         this->_port = rhs._port;
         this->_password = rhs._password;
         this->_name = rhs._name;
+        this->_userList = rhs._userList;
+        this->_channelList = rhs._channelList;
+        this->_cmdList = rhs._cmdList;
     }
     return (*this);
 }
@@ -185,12 +189,27 @@ void    Server::_handleNewMessage(struct epoll_event event)
             std::cout << "PARAM : " << *it2 << std::endl;
         }
     }
-    // Loop on the commands and execute them (use vector iterator)
-    
+
+    this->_executeCommands(cmd);
     // Search the proper function in cmd map and execute it with params
         //if (this._cmd_list[CMD].exec_command(FD, CMD, PARAM) == -1)
             // send an error to client
 }
+
+void    _initCommandList(void)
+{
+    this->_cmdList["PASS"] = NULL;
+    this->_cmdList["NICK"] = NULL;
+    this->_cmdList["USER"] = NULL;
+    this->_cmdList["OPER"] = NULL;
+    this->_cmdList["QUIT"] = NULL;
+    this->_cmdList["SQUIT"] = NULL;
+    this->_cmdList["JOIN"] = NULL;
+    this->_cmdList["INVITE"] = NULL;
+    this->_cmdList["TOPIN"] = NULL;
+}
+
+void    _executeCommands()
 
 /* ************************************************************************** */
 /* Member functions                                                           */
