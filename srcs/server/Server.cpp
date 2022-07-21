@@ -17,6 +17,7 @@
 #include "../../includes/Server.hpp"
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
+#include "../../includes/commands.hpp"
 
 #define BACKLOG 10
 #define BUF_SIZE 4096
@@ -151,7 +152,6 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
 
     // create a new empty user 
     this->_userList[newfd] = new User(newfd, inet_ntoa(client_addr.sin_addr));
-    std::cout << inet_ntoa(client_addr.sin_addr) << std::endl;
 
     // add the new fd to the poll
     ev.events = EPOLLIN | EPOLLET;
@@ -202,7 +202,7 @@ void    Server::_handleNewMessage(struct epoll_event event)
 
 void    Server::_initCommandList(void) // functions to complete
 {
-    this->_cmdList["-PASS"] = NULL;
+    this->_cmdList["KILL"] = &kill;
     this->_cmdList["-NICK"] = NULL;
     this->_cmdList["-USER"] = NULL;
 }

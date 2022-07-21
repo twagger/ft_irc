@@ -66,6 +66,9 @@ class Server
         
         class passwordException : public std::exception
         { public: virtual const char *what() const throw(); };
+ 
+        std::map<std::string, Channel *>    _channelList;
+        std::map<std::string, CmdFunction>  _cmdList;
 
     private:
         // Cannot be default construct
@@ -87,10 +90,8 @@ class Server
         std::string _password;
         std::string _name;
         std::string _hostname;
-        
+
         std::map<int, User *>               _userList;
-        std::map<std::string, Channel *>    _channelList;
-        std::map<std::string, CmdFunction>  _cmdList;
 };
 
 #endif
