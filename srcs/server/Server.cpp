@@ -2,6 +2,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <ctime>
 #include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -19,15 +20,11 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
-#define BACKLOG 10
-#define BUF_SIZE 4096
-#define MAX_EVENTS 10
-
 /* ************************************************************************** */
 /* Constructors & destructor                                                  */
 /* ************************************************************************** */
 Server::Server(int port, std::string password, std::string name)
-: _port(port), _password(password), _name(name)
+: _port(port), _password(password), _name(name), _lastPingTime(time())
 { this->_initCommandList(); }
 
 Server::Server(Server const &src)
@@ -132,7 +129,8 @@ int Server::_createPoll(int sockfd)
 
     // adding current fd to epoll interest list so we can loop on it to accept
     // connections
-    ev.events = EPOLLIN | EPOLLET;
+    memset(&ev, 0, sizeof(struct epoll_event));
+    ev.events = EPOLLIN;
     ev.data.fd = sockfd;
     if (epoll_ctl(pollfd, EPOLL_CTL_ADD, sockfd, &ev) == -1)
         throw Server::pollException();
@@ -157,6 +155,7 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
     struct sockaddr_in  client_addr;
 
     // accept the connect request
+    memset(&client_addr, 0, sizeof(struct sockaddr_in));
     newfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&client_addr), \
         &sin_size);
     if (newfd == -1)
@@ -166,6 +165,7 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
     this->_userList[newfd] = new User(newfd, inet_ntoa(client_addr.sin_addr));
 
     // add the new fd to the poll
+    memset(&ev, 0, sizeof(struct epoll_event));
     ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = newfd;
     if (epoll_ctl(pollfd, EPOLL_CTL_ADD, newfd, &ev) == -1)
@@ -257,6 +257,55 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
     }
 }
 
+void    Server::_pingClients(void)
+{
+    int                             ret;
+    int                             userFd;
+    User                            *user;
+    double                          seconds;
+    std::string                     ping_cmd;
+    std::map<int, User *>::iterator it;
+
+    // Check time of last ping ----------------------------------------------- /
+    seconds = difftime(time(), this->_lastPingTime);
+    if (seconds > (PING_DELAY * 60))
+    {
+        // save the new ping time
+        this->_lastPingTime = time();
+        // loop on every active connection
+        for (it = this->_userList.begin(); it != this->_userList.end();)
+        {
+            userFd = it->first;
+            user = it->second;
+            // client was alive at last PING, PING it again ------------------ /
+            if (user->getStatus() == ST_ALIVE)
+            {
+                ping_cmd = PING(this->_hostname);
+                ret = send(userFd, ping_cmd, ping_cmd.length(), 0);
+                if (ret == -1)
+                    throw Server::sendException();
+                user->setStatus(ST_CHECKING);
+                ++it;
+            }
+            else // Client didn't respond to previous PING, KILL it ! -------- /
+            {
+                // cannot reuse killConnection as it invalidates iterator :(
+                // remove user's fd from the poll
+                if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, userFd, NULL) == -1)
+                    throw Server::pollDelException();
+                // close the socket
+                close(fd);
+
+                // add the nickname to the list of unavailable nicknames and 
+                // remove user
+                this->_unavailableNicknames.insert(nickname);
+                delete user;
+                this->_userList.erase(it++);
+            }
+        }
+    }
+}
+
 /* ************************************************************************** */
 /* Member functions                                                           */
 /* ************************************************************************** */
@@ -294,6 +343,12 @@ void    Server::start(void)
         catch (Server::pollWaitException &e)
         { printError(e.what(), 1, true); return; }
 
+        // send a PING to active fds (if delay since last ping is ok) -------- /
+        try { this->_pingClients(); }
+        catch (Server::sendException &e){printError(e.what(), 1, true); return;}
+        catch (Server::pollDelException &e)
+        { printError(e.what(), 1, true); return; }
+
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
         {
@@ -320,18 +375,22 @@ void    Server::start(void)
 
 void    Server::killConnection(int fd)
 {
-    // check if fd exists using the userlist --------------------------------- /
-    if (this->_userList.find(fd) == this->_userList.end())
+    std::map<int, User *>::iterator it;
+
+    // check if fd/user exists using the userlist ---------------------------- /
+    it = this->_userList.find(fd);
+    if (it == this->_userList.end())
         throw Server::invalidFdException();
 
     // fd exists, clean all -------------------------------------------------- /
-    // remove user from list
+    // delete user and remove pair from list
+    delete it->second;
     this->_userList.erase(fd);
     // remove user's fd from the poll
     if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
         throw Server::pollDelException();
     // close the socket
-    // I don't know yet how to do it without close(fd);
+    close(fd);
 }
 
 /* ************************************************************************** */
@@ -363,3 +422,6 @@ const char	*Server::passwordException::what() const throw()
 
 const char	*Server::invalidFdException::what() const throw()
 { return ("Fd error: please provide a valid fd"); }
+
+const char	*Server::sendFdException::what() const throw()
+{ return ("Send error: "); }

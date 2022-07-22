@@ -4,11 +4,17 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <ctime>
 #include "channel.hpp"
 #include "user.hpp"
 #include "usercmds.hpp"
 
 #define MAX_CMD_LEN 512
+#define BACKLOG 10
+#define BUF_SIZE 4096
+#define MAX_EVENTS 10
+#define PING_DELAY 5 // in minutes
+#define	PING(hostname) ("PING " + hostname + "\r\n")
 
 struct Command
 {
@@ -75,6 +81,9 @@ class Server
 
         class invalidFdException : public std::exception
         { public: virtual const char *what() const throw(); };
+
+        class sendException : public std::exception
+        { public: virtual const char *what() const throw(); };
  
         std::map<std::string, Channel *>    _channelList;
         std::map<std::string, CmdFunction>  _cmdList;
@@ -94,12 +103,14 @@ class Server
         void    _acceptConnection(int sockfd, int pollfd);
         void    _handleNewMessage(struct epoll_event event);
         void    _executeCommands(int fd, std::vector<Command> cmds);
+        void    _pingClients(void);
 
         // Member attributes
         int                     _port;
         std::string             _password;
         std::string             _name;
         std::string             _hostname;
+        time_t                  _lastPingTime;
 
         int                     _pollfd;
         int                     _sockfd;

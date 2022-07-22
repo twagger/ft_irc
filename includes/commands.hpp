@@ -7,8 +7,8 @@
 class Server;
 
 // Miscellaneous commands
-std::string kill(int fd, std::vector<std::string> cmds, Server *srv);
-std::string ping(int fd, std::vector<std::string> cmds, Server *srv);
-std::string pong(int fd, std::vector<std::string> cmds, Server *srv);
+std::string kill(const int fd, std::vector<std::string> cmds, Server *srv);
+std::string ping(const int fd, std::vector<std::string> cmds, Server *srv);
+std::string pong(const int fd, std::vector<std::string> cmds, Server *srv);
 
 #endif

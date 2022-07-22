@@ -1,8 +1,10 @@
 #include "../../includes/user.hpp"
+#include <ctime>
 
 // CONSTRUCTORS
 User::User(const int fd, std::string hostname) : _fd(fd), _nickname("*"), 
-			_hostname(hostname), _mode(0), _authenticated(false) { }
+			_hostname(hostname), _mode(0), _authenticated(false), 
+			_status(ST_ALIVE) { }
 
 User::User(const User &src) : _fd(src._fd) {
 	*this = src;
@@ -39,6 +41,7 @@ bool 						User::getAuthenticated(void) const {
 std::vector<std::string>	User::getChannelsJoined(void) const {
 	return this->_channelsJoined;
 }
+int							User::getStatus(void) const { return this->_status; }
 
 // SETTERS
 void User::setNickname(std::string nickname) { this->_nickname = nickname; }
@@ -50,6 +53,7 @@ void User::setPassword(bool password) { this->_password = password; }
 void User::setAuthenticated(bool authenticated) { 
 	this->_authenticated = authenticated; 
 }
+void User::setStatus(int status) { this->_status = status; }
 
 // CHANNEL JOINED MANAGEMENT
 bool User::addChannelJoined(std::string channelName) {
