@@ -38,9 +38,9 @@
 	#define ERR_TOOMANYTARGETS(target, errorCode, AbortMsg)	(target + " :" + errorCode + " recipients. "+ AbortMsg + "\r\n")							// 407
 	#define ERR_CHANNELISFULL(channel)						(channel + " :Cannot join channel (+l)" + "\r\n")											// 471
 	#define ERR_INVITEONLYCHAN(channel)						(channel + " :Cannot join channel (+i)" + "\r\n")											// 473
-	#define ERR_BANNEDFROMCHAN 								(channel + " :Cannot join channel (+b)" + "\r\n")											// 474
-	#define ERR_BADCHANNELKEY 								(channel + " :Cannot join channel (+k)" + "\r\n")											// 475
-	#define ERR_BADCHANMASK 								(channel + " :Bad Channel Mask" + "\r\n")													// 476
+	#define ERR_BANNEDFROMCHAN(channel) 					(channel + " :Cannot join channel (+b)" + "\r\n")											// 474
+	#define ERR_BADCHANNELKEY(channel) 						(channel + " :Cannot join channel (+k)" + "\r\n")											// 475
+	#define ERR_BADCHANMASK(channel) 						(channel + " :Bad Channel Mask" + "\r\n")													// 476
 	// #define ERR_NEEDMOREPARAMS 461
 
 	// USER
