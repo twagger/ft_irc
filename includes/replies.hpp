@@ -15,13 +15,12 @@
 	#define	RPL_YOURHOST(serverName, version)				("Your host is " + serverName + ", running version " + version + "\r\n")					// 002
 	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")												// 003
 
-	#define ERR_NOTREGISTERED								(":You have not registered" + "\r\n")														// 451
 
 	// NICK
-	#define ERR_NONICKNAMEGIVEN								(":No nickname given" + "\r\n")																// 431
+	#define ERR_NONICKNAMEGIVEN								(":No nickname given\r\n")																	// 431
 	#define ERR_ERRONEUSNICKNAME(nick)						(nick + " :Erroneous nickname" + "\r\n")													// 432
 	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :Nickname is already in use" + "\r\n")											// 433
-	#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")				// 436
+	//#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")				// 436
 	#define ERR_UNAVAILRESOURCE(nickChannel) 				(nickChannel + " :Nick/channel is temporarily unavailable" + "\r\n")						// 437
 	#define ERR_RESTRICTED 									(":Your connection is restricted!\r\n")														// 484
 
@@ -46,21 +45,22 @@
 	// #define  ERR_ALREADYREGISTRED 462
 
 	// OPER
-	#define RPL_YOUREOPER									(":You are now an IRC operator" + "\r\n")													// 381
-	#define ERR_PASSWDMISMATCH								(":Password incorrect" + "\r\n")															// 464
-	#define ERR_NOOPERHOST									(":No O-lines for your host" + "\r\n")														// 491
+	#define RPL_YOUREOPER									(":You are now an IRC operator\r\n")														// 381
+	#define ERR_PASSWDMISMATCH								(":Password incorrect\r\n")																	// 464
+	#define ERR_NOOPERHOST									(":No O-lines for your host\r\n")															// 491
 	// #define ERR_NEEDMOREPARAMS 461
 
 	// USER MODE
 	#define RPL_UMODEIS(userModeStr) 						(userModeStr + "\r\n")																		// 221
-	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users" + "\r\n")											// 502
-	#define ERR_UMODEUNKNOWNFLAG 							(":Unknown MODE flag" + "\r\n")																// 501
+	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users\r\n")													// 502
+	#define ERR_UMODEUNKNOWNFLAG 							(":Unknown MODE flag\r\n")																	// 501
 	// #define ERR_NEEDMOREPARAMS 461
 
 
 	// OTHER ERRORS:
-	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator")							// 481
-	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel")														// 401
-	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command") 															// 421
+	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator" + "\r\n")					// 481
+	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel"+ "\r\n")												// 401
+	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command"+ "\r\n") 													// 421
+	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
 
 #endif

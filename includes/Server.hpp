@@ -6,6 +6,7 @@
 #include <set>
 #include "channel.hpp"
 #include "user.hpp"
+#include "usercmds.hpp"
 
 #define MAX_CMD_LEN 512
 

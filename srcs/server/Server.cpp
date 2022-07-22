@@ -215,11 +215,12 @@ void    Server::_handleNewMessage(struct epoll_event event)
 void    Server::_initCommandList(void) // functions to complete
 {
     this->_cmdList["KILL"] = &kill;
-    this->_cmdList["-NICK"] = NULL;
+    this->_cmdList["PASS"] = &pass;
+    this->_cmdList["NICK"] = &nick;
     this->_cmdList["-USER"] = NULL;
 }
 
-void    Server::_executeCommands(int fd, std::vector<Command> cmds)
+void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
 {
     std::vector<Command>::iterator                  it;
     std::map<std::string, CmdFunction>::iterator    it_cmd;
