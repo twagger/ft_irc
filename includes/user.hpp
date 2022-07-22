@@ -43,9 +43,9 @@ class User {
 		void setMode(uint16_t mode);
 		void setPassword(bool pass);
 		void setAuthenticated(bool authenticated);
-		
+
 		bool addChannelJoined(std::string channelName);			// if channel is already in the list, return false, else add + return true 
-		bool deleteChannelJoined(std::string channelName);		// if channel is found in the list, erase it + return true, else do nothing and return false
+		bool removeChannelJoined(std::string channelName);		// if channel is found in the list, erase it + return true, else do nothing and return false
 };
 
 std::ostream & operator<<(std::ostream &o, User const &rhs);	// for printing 'nickname!username@host.name.com ...'

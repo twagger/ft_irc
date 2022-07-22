@@ -64,7 +64,7 @@ bool User::addChannelJoined(std::string channelName) {
 	return true;
 }
 
-bool User::deleteChannelJoined(std::string channelName) {
+bool User::removeChannelJoined(std::string channelName) {
 	std::vector<std::string>::iterator it;
 	std::vector<std::string>::iterator ite = this->_channelsJoined.end();
 
