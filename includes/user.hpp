@@ -6,6 +6,16 @@
 # include <stdint.h>
 # include <vector>
 
+//   The available modes are as follows:
+//		none								=> 0	000
+//		a - user is flagged as away;		=> 1	001			
+//     	i - marks a users as invisible; 	=> 2	010
+//      w - user receives wallops; 			=> 3	011
+//      r - restricted user connection; 	=> 4	100
+//      o - operator flag; 					=> 5	101 
+//      O - local operator flag; 			=> 6	110	
+//      s - marks a user for receipt of server notices. => 7	111
+
 class User {
 
 	private:
@@ -14,10 +24,10 @@ class User {
 		std::string					_username;			
 		std::string 				_fullname;
 		std::string					_hostname;
-		uint16_t					_mode;				// OPER: SQUIT, CONNECT, KILL
+		uint16_t					_mode;
 		bool						_password;
 		bool						_authenticated;
-		std::vector<std::string>	_channelsJoined;
+		std::vector<std::string>	_channelsJoined;	// initialized empty in User constructor 
 
 	public:
 		User(const int fd, std::string hostname);

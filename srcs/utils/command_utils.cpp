@@ -84,9 +84,17 @@ std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
     return (result);
 }
 
-std::string reply(Server *irc, const int &fd, std::string code, std::string replyMsg)
+std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
 						+ irc->getUserByFd(fd)->getNickname() + " :" + replyMsg;		
+	return (reply);
+}
+
+std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
+{
+	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"
+						+ irc->getUserByFd(originFd)->getUsername() + "@"
+						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg;
 	return (reply);
 }
