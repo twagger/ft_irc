@@ -16,6 +16,8 @@
 	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")												// 003
 	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic)																// 332
 	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set")															// 331
+	#define RPL_NAMREPLY(channelName, nickname)																											// 353
+	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list")														// 366
 
 
 	// NICK

@@ -4,24 +4,10 @@
 
 std::vector<std::string> getChannel(std::vector<std::string> parameter)
 {
-    std::vector<std::string>::iterator it = parameter.begin();
     std::vector<std::string> channel;
-
-    // Case if parameter given is a 0
-    std::string tmp = *it;
-    if (tmp.compare("0") == 0)
-    {
-        channel.push_back("0");
-        return (channel);
-    }
-    channel = splitByComma(tmp);
-    for (it = channel.begin(); it != channel.end(); it++)
-    {
-        if (isChannel(*it) == false)
-        {
-            channel.erase(it);
-        }
-    }
+    std::vector<std::string>::iterator it = parameter.begin();
+    
+    channel = splitByComma(*it);
     return (channel);
 }
 
@@ -47,12 +33,13 @@ void createChannel(std::vector<std::string> channel, std::vector<std::string> ke
             Channel newChannel(channelName, channelKey, currentUser);
             server->_channelList.insert(std::pair<std::string, Channel*>(channelName, &newChannel));
             it2++;
-            // server->_userList.
+            // server->getUserList()->getChannelList().insert(channelName);
         }
         else
         {
             Channel newChannel(channelName, currentUser);
             server->_channelList.insert(std::pair<std::string, Channel*>(channelName, &newChannel));
+            // server->getUserList()->getChannelList().insert(channelName);
         }
     }
 }
@@ -80,42 +67,70 @@ int checkInvite(std::map<std::string, Channel *>::iterator itMap, User *currentU
 {
     std::deque<User *> listOfInvitees = itMap->second->_invitees;
     std::deque<User *>::iterator it = listOfInvitees.begin();
+
+    for (; it != listOfInvitees.end(); it++)
+    {
+        if (currentUser == *it)
+        {
+            return (0);
+        }
+    }
+    return (-1);
 }
 
 int checkBan(std::map<std::string, Channel *>::iterator itMap, User *currentUser)
 {
+    std::deque<User *> listOfInvitees = itMap->second->_bannedUsers;
+    std::deque<User *>::iterator it = listOfInvitees.begin();
 
+    for (; it != listOfInvitees.end(); it++)
+    {
+        if (currentUser == *it)
+        {
+            return (0);
+        }
+    }
+    return (-1);
 }
 
+int checkChannel(std::string channel)
+{
+    if (channel.empty() == true)
+        return (-1);
+    if (channel.size() > 50)
+        return (-2);
+    if (isChannel(channel) == false || channel.find(',') != std::string::npos)
+        return(-3);
+    return (0);
+}
 
 std::string join(const int fdUser, std::vector<std::string> parameter, Server *server)
 {
-    // Check parameters of join
+    // Get parameters of join
     std::vector<std::string> channel;
     std::vector<std::string> key;
 
     channel = getChannel(parameter);
-    std::vector<std::string>::iterator itChan = channel.begin();
-    std::string tmp = *itChan;
-    if (tmp.compare("0") == 0)
-    {
-        // function to part from all channels, peut etre ajouter une liste de channel auxquelle le user appartient
-        return (std::string("PART"));
-    }
-    if (channel.empty() == true)
-        return (reply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("JOIN"))));
     if (parameter.size() > 1)
         key = getKey(parameter);
 
     // Join channel
+    std::vector<std::string>::iterator itChan = channel.begin();
     itChan = channel.begin();
     for (; itChan != channel.end(); itChan++)
     {
+        //Check channelname
         std::string channelName = *itChan;
-        std::string channelTopic = getChannelTopic(channelName, server->_channelList);
+        if (checkChannel(channelName) == -1)
+            return (reply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("JOIN"))));
+        else if (checkChannel(channelName) == -2)
+            return (reply(server, fdUser, "403", ERR_NOSUCHCHANNEL(channelName)));
+        else if (checkChannel(channelName) == -3)
+            return (reply(server, fdUser, "476", ERR_BADCHANMASK(channelName)));
+        
+        // Case where channel already exists
         std::map<std::string, Channel *>::iterator itMap = channelAlreadyExists(server->_channelList,
             channelName);
-        // Case where channel already exists
         if (itMap != server->_channelList.end())
         {
             if (checkKey(itChan - channel.begin(), key, itMap) < 0)
@@ -125,13 +140,19 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
             if (checkBan(itMap, server->getUserByFd(fdUser)) <  0)
                 return (reply(server, fdUser, "474", ERR_BANNEDFROMCHAN(channelName)));
         }
+
         // Case where channel doesn't exist
         else if (itMap == server->_channelList.end())
             createChannel(channel, key, server->getUserByFd(fdUser), server);
     }
+
+    // Reply if the user successfully joined the channel
     std::string channelName = *itChan;
-    std::string channelTopic = getChannelTopic(channelName, server->_channelList);
-    if (channelTopic.empty() == false)
-        return (reply(server, fdUser, "332", RPL_TOPIC(channelName, channelTopic)));
-    return (reply(server, fdUser, "331", RPL_NOTOPIC(channelName)));
+    std::string event = eventChannel(server, fdUser, "JOIN", channelName);
+    std::string userList = replyList(server, fdUser, "353",
+        channelAlreadyExists(server->_channelList, channelName)->second->_users,
+        channelName);
+    std::string endOfNames = reply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
+    // Use send for all the user of a channel (vector of fd)
+    return (event + "\r\n" + userList + "\r\n" + endOfNames);
 }
