@@ -33,9 +33,7 @@ std::string kill(int fd, std::vector<std::string> params, Server *srv)
         return (reply(srv, fd, "481", ERR_NOPRIVILEGES(nickname)));
 
     // All is ok, execute the kill ------------------------------------------- /
-    int temp_fd = 5; // to change when getFd function is available
     try { srv->killConnection(target->getFd()); }
-    try { srv->killConnection(temp_fd); }
     catch (Server::pollDelException &e) { printError(e.what(), 1, true); }
     catch (Server::invalidFdException &e) { printError(e.what(), 1, false); }
 
