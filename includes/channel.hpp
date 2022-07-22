@@ -33,10 +33,11 @@ class Channel
 
 /** Getters **/
 
-    std::string getTopic(void) const;
-    std::string getChannelName(void) const;
-    std::string getKey(void) const;
-    int getLimitNumberOfUsers(void) const;
+    std::string         getTopic(void) const;
+    std::string         getChannelName(void) const;
+    std::string         getKey(void) const;
+    std::deque<User*>   getUsers(void) const;
+    int                 getLimitNumberOfUsers(void) const;
 
 /** Setters **/
     
