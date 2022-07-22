@@ -19,11 +19,8 @@ SRCS		= srcs/main.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/utils/command_utils.cpp \
 			  srcs/user/user.cpp \
-<<<<<<< HEAD
-			  srcs/commands/kill.cpp
-=======
+			  srcs/commands/kill.cpp \
 			  srcs/user/usercmds.cpp 
->>>>>>> 9bda6cea350ab8af1d821be1a5d5d24f9d9688c0
 OBJS		= $(SRCS:.cpp=.o)
 
 # EXECUTABLES & LIBRARIES
