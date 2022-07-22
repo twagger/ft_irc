@@ -82,9 +82,10 @@ std::string nick(const int fd, std::vector<std::string> params, Server *irc) {
 		else if (forbiddenCharInName(params.front()) == true) {
 			replyMsg = reply(irc, fd, "432", ERR_ERRONEUSNICKNAME(params.front()));
 		}
-		// else if (irc->getUserByNick(params.front())) {							// wait for getuserbynick
+		// else if (irc->getUserByNick(params.front())) {								// waiting for getuserbynick()
 		// 	replyMsg = reply(irc, fd, "433", ERR_NICKNAMEINUSE(params.front()));
 		// }
+		//else if ()
 
 	}
 	return replyMsg;
