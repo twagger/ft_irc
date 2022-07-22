@@ -17,6 +17,7 @@
 #include "../../includes/Server.hpp"
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
+#include "../../includes/commands.hpp"
 
 #define BACKLOG 10
 #define BUF_SIZE 4096
@@ -74,6 +75,18 @@ User*		Server::getUserByFd(const int &fd) const
 	if (this->_userList.find(fd) != ite)
 		return (this->_userList.find(fd)->second);
 	return (NULL);
+}
+
+User*		Server::getUserByNickname(const std::string &nick) const
+{
+	std::map<int, User *>::const_iterator it;
+
+    for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+	{
+        if (it->second->getNickname() == nick)
+            return (it->second);
+    }
+    return (NULL);
 }
 
 /* ************************************************************************** */
@@ -151,13 +164,12 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
 
     // create a new empty user 
     this->_userList[newfd] = new User(newfd, inet_ntoa(client_addr.sin_addr));
-    std::cout << inet_ntoa(client_addr.sin_addr) << std::endl;
 
     // add the new fd to the poll
     ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = newfd;
     if (epoll_ctl(pollfd, EPOLL_CTL_ADD, newfd, &ev) == -1)
-        throw Server::acceptException();
+        throw Server::pollAddException();
 }
 
 void    Server::_handleNewMessage(struct epoll_event event)
@@ -202,12 +214,13 @@ void    Server::_handleNewMessage(struct epoll_event event)
 
 void    Server::_initCommandList(void) // functions to complete
 {
-    this->_cmdList["-PASS"] = NULL;
-    this->_cmdList["-NICK"] = NULL;
+    this->_cmdList["KILL"] = &kill;
+    this->_cmdList["PASS"] = &pass;
+    this->_cmdList["NICK"] = &nick;
     this->_cmdList["-USER"] = NULL;
 }
 
-void    Server::_executeCommands(int fd, std::vector<Command> cmds)
+void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
 {
     std::vector<Command>::iterator                  it;
     std::map<std::string, CmdFunction>::iterator    it_cmd;
@@ -261,6 +274,7 @@ void    Server::start(void)
     // socket creation and param --------------------------------------------- /
     try { sockfd = this->_createSocket(); }
     catch (Server::socketException &e){ printError(e.what(), 1, true); return;}
+    this->_sockfd = sockfd;
 
     // binding to ip address + port and switch to passive mode --------------- /
     try { this->_bindSocket(sockfd, &srv_addr); }
@@ -269,6 +283,7 @@ void    Server::start(void)
     // poll creation --------------------------------------------------------- /
     try { pollfd = this->_createPoll(sockfd); }
     catch (Server::pollException &e) { printError(e.what(), 1, true); return; }
+    this->_pollfd = pollfd;
 
     // server loop ----------------------------------------------------------- /
     while (1)
@@ -303,6 +318,22 @@ void    Server::start(void)
     }
 }
 
+void    Server::killConnection(int fd)
+{
+    // check if fd exists using the userlist --------------------------------- /
+    if (this->_userList.find(fd) == this->_userList.end())
+        throw Server::invalidFdException();
+
+    // fd exists, clean all -------------------------------------------------- /
+    // remove user from list
+    this->_userList.erase(fd);
+    // remove user's fd from the poll
+    if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
+        throw Server::pollDelException();
+    // close the socket
+    // I don't know yet how to do it without close(fd);
+}
+
 /* ************************************************************************** */
 /* Exceptions                                                                 */
 /* ************************************************************************** */
@@ -321,8 +352,14 @@ const char	*Server::pollWaitException::what() const throw()
 const char	*Server::pollAddException::what() const throw()
 { return ("Poll add error: "); }
 
+const char	*Server::pollDelException::what() const throw()
+{ return ("Poll del error: "); }
+
 const char	*Server::acceptException::what() const throw()
 { return ("Accept error: "); }
 
 const char	*Server::passwordException::what() const throw()
 { return ("Password error: please provide a correct password"); }
+
+const char	*Server::invalidFdException::what() const throw()
+{ return ("Fd error: please provide a valid fd"); }

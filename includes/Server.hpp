@@ -3,8 +3,10 @@
 
 #include <vector>
 #include <map>
+#include <set>
 #include "channel.hpp"
 #include "user.hpp"
+#include "usercmds.hpp"
 
 #define MAX_CMD_LEN 512
 
@@ -43,10 +45,11 @@ class Server
 		std::string	getName(void) const;
 		std::string getHostname(void) const;
 		User*		getUserByFd(const int &fd) const;
+        User*		getUserByNickname(const std::string &nick) const;
 
         // Member functions
         void    start(void);
-        void    stop(void); // quit all clients with a message
+        void    killConnection(int fd);
 
         // exceptions
         class socketException : public std::exception
@@ -64,11 +67,21 @@ class Server
         class pollAddException : public std::exception
         { public: virtual const char *what() const throw(); };
 
+        class pollDelException : public std::exception
+        { public: virtual const char *what() const throw(); };
+
         class acceptException : public std::exception
         { public: virtual const char *what() const throw(); };
         
         class passwordException : public std::exception
         { public: virtual const char *what() const throw(); };
+
+        class invalidFdException : public std::exception
+        { public: virtual const char *what() const throw(); };
+ 
+        std::map<std::string, Channel *>    _channelList;
+        std::map<std::string, CmdFunction>  _cmdList;
+        std::set<std::string>               _unavailableNicknames;
 
     private:
         // Cannot be default construct
@@ -86,13 +99,15 @@ class Server
         void    _executeCommands(int fd, std::vector<Command> cmds);
 
         // Member attributes
-        int         _port;
-        std::string _password;
-        std::string _name;
-        std::string _hostname;
-        
-        std::map<int, User *>               _userList;
-        std::map<std::string, CmdFunction>  _cmdList;
+        int                     _port;
+        std::string             _password;
+        std::string             _name;
+        std::string             _hostname;
+
+        int                     _pollfd;
+        int                     _sockfd;
+
+        std::map<int, User *>   _userList;
 };
 
 #endif

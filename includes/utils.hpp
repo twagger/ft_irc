@@ -15,7 +15,6 @@ std::vector<Command>        splitCmds(std::vector<std::string> cmd_strings);
 # include "Server.hpp"
 
 // Util functions
-int         print_error(std::string message, int code, bool with_errno);
 std::string reply(Server *irc, const int &fd, std::string code, std::string replyMsg);
 std::string get_next_tokn(std::string *str, std::string delimiter);
 
