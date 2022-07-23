@@ -1,12 +1,13 @@
 #include "../../includes/channel.hpp"
 #include "../../includes/replies.hpp"
 #include "../../includes/utils.hpp"
+#include "../../includes/commands.hpp"
 
 std::vector<std::string> getChannel(std::vector<std::string> parameter)
 {
     std::vector<std::string> channel;
     std::vector<std::string>::iterator it = parameter.begin();
-    
+
     channel = splitByComma(*it);
     return (channel);
 }

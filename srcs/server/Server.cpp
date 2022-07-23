@@ -224,6 +224,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["KILL"] = &kill;
     this->_cmdList["PASS"] = &pass;
     this->_cmdList["NICK"] = &nick;
+    this->_cmdList["JOIN"] = &join;
     this->_cmdList["-USER"] = NULL;
 }
 

@@ -10,5 +10,6 @@ class Server;
 std::string kill(const int fd, std::vector<std::string> cmds, Server *srv);
 std::string ping(const int fd, std::vector<std::string> cmds, Server *srv);
 std::string pong(const int fd, std::vector<std::string> cmds, Server *srv);
+std::string join(const int fd, std::vector<std::string> cmds, Server *srv);
 
 #endif
