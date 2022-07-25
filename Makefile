@@ -19,9 +19,13 @@ SRCS		= srcs/main.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/channel/join.cpp \
 			  srcs/utils/command_utils.cpp \
+			  srcs/user/modt.cpp \
+			  srcs/user/nick.cpp \
+			  srcs/user/pass.cpp \
+			  srcs/user/User.Class.cpp \
 			  srcs/user/user.cpp \
-			  srcs/commands/kill.cpp
-			  srcs/user/usercmds.cpp 
+			  srcs/user/welcome.cpp \
+			  srcs/commands/kill.cpp 
 			  
 OBJS		= $(SRCS:.cpp=.o)
 
@@ -47,7 +51,7 @@ endif
 
 # RULES
 ################################################################################
-.c.o:
+.cpp.o:
 			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS)
 
 $(NAME):	$(OBJS)

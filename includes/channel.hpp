@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "user.hpp"
+#include "User.Class.hpp"
 
 class Channel
 {
