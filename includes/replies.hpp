@@ -19,6 +19,11 @@
 	#define	RPL_WELCOME(nick, username, clientHost)				("Welcome to the Internet Relay Network " + nick + "!" + username + "@" + clientHost + "\r\n")	// 001
 	#define	RPL_YOURHOST(serverName, version)				("Your host is " + serverName + ", running version " + version + "\r\n")					// 002
 	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")												// 003
+	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic)																// 332
+	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set")															// 331
+	#define RPL_NAMREPLY(channelName, nickname)																											// 353
+	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list")														// 366
+
 	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " " + userModes + " " + channelModes)				// 004
 
 	// NICK
@@ -40,10 +45,10 @@
 	#define ERR_TOOMANYTARGETS(target, errorCode, AbortMsg)	(target + " :" + errorCode + " recipients. "+ AbortMsg + "\r\n")							// 407
 	#define ERR_CHANNELISFULL(channel)						(channel + " :Cannot join channel (+l)" + "\r\n")											// 471
 	#define ERR_INVITEONLYCHAN(channel)						(channel + " :Cannot join channel (+i)" + "\r\n")											// 473
-	#define ERR_BANNEDFROMCHAN 								(channel + " :Cannot join channel (+b)" + "\r\n")											// 474
-	#define ERR_BADCHANNELKEY 								(channel + " :Cannot join channel (+k)" + "\r\n")											// 475
-	#define ERR_BADCHANMASK 								(channel + " :Bad Channel Mask" + "\r\n")													// 476
-	// #define ERR_NEEDMOREPARAMS 461
+	#define ERR_BANNEDFROMCHAN(channel) 					(channel + " :Cannot join channel (+b)" + "\r\n")											// 474
+	#define ERR_BADCHANNELKEY(channel) 						(channel + " :Cannot join channel (+k)" + "\r\n")											// 475
+	#define ERR_BADCHANMASK(channel) 						(channel + " :Bad Channel Mask" + "\r\n")													// 476
+	#define ERR_NOTONCHANNEL(channel)						(channel + " :You're not on that channel" + "\r\n")											// 442
 
 	// USER
 	// #define ERR_NEEDMOREPARAMS 461
@@ -63,8 +68,9 @@
 
 
 	// OTHER ERRORS:
-	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel"+ "\r\n")												// 401
-	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command"+ "\r\n") 													// 421
+	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator")							// 481
+	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel")														// 401
+	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command") 															// 421
 	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
 
 

@@ -1,6 +1,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <signal.h>
 
 #include "../includes/irc.hpp"
 #include "../includes/utils.hpp"
