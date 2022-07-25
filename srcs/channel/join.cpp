@@ -23,14 +23,16 @@ void createChannel(std::vector<std::string> channel, std::vector<std::string> ke
         if (key.empty() == false || it2 != key.end())
         {
             Channel newChannel(channelName, channelKey, currentUser);
-            server->_channelList.insert(std::pair<std::string, Channel*>(channelName, &newChannel));
+            server->_channelList.insert(std::pair<std::string, Channel*>(channelName,
+                &newChannel));
             currentUser->addChannelJoined(channelName);
             it2++;
         }
         else
         {
             Channel newChannel(channelName, currentUser);
-            server->_channelList.insert(std::pair<std::string, Channel*>(channelName, &newChannel));
+            server->_channelList.insert(std::pair<std::string, Channel*>(channelName,
+                &newChannel));
             currentUser->addChannelJoined(channelName);
         }
     }
@@ -117,7 +119,7 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
         }
 
         // Case where channel doesn't exist
-        else if (itMap == server->_channelList.end())
+        else
             createChannel(channel, key, server->getUserByFd(fdUser), server);
     }
 
