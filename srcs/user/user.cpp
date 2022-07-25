@@ -3,7 +3,7 @@
 
 // CONSTRUCTORS
 User::User(const int fd, std::string hostname) : _fd(fd), _nickname("*"), 
-			_hostname(hostname), _mode(0), _authenticated(false), 
+			_hostname(hostname), _mode(0), _authenticated(false), _channelsJoined(), 
 			_status(ST_ALIVE) { }
 
 User::User(const User &src) : _fd(src._fd) {
@@ -23,6 +23,7 @@ User& User::operator=(User const &rhs) {
 		this->_mode = rhs._mode;
 		this->_password = rhs._password;
 		this->_authenticated = rhs._authenticated;
+		this->_channelsJoined = rhs._channelsJoined;
 	}
 	return *this;
 }
@@ -48,7 +49,10 @@ void User::setNickname(std::string nickname) { this->_nickname = nickname; }
 void User::setUsername(std::string username) { this->_username = username; }
 void User::setFullname(std::string fullname) { this->_fullname = fullname; }
 void User::setHostname(std::string hostname) { this->_hostname = hostname; }
-void User::setMode(uint16_t mode) { this->_mode = mode; }
+void User::setMode(uint16_t mode) { 
+	if (mode < 8) 
+		this->_mode = mode; 
+}
 void User::setPassword(bool password) { this->_password = password; }
 void User::setAuthenticated(bool authenticated) { 
 	this->_authenticated = authenticated; 
@@ -68,7 +72,7 @@ bool User::addChannelJoined(std::string channelName) {
 	return true;
 }
 
-bool User::deleteChannelJoined(std::string channelName) {
+bool User::removeChannelJoined(std::string channelName) {
 	std::vector<std::string>::iterator it;
 	std::vector<std::string>::iterator ite = this->_channelsJoined.end();
 

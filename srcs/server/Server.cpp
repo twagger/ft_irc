@@ -46,6 +46,9 @@ Server  &Server::operator=(Server const &rhs)
         this->_userList = rhs._userList;
         this->_channelList = rhs._channelList;
         this->_cmdList = rhs._cmdList;
+		this->_hostname = rhs._hostname;
+		this->_version = rhs._version;
+		this->_date = rhs._date;
     }
     return (*this);
 }
@@ -64,6 +67,12 @@ std::string Server::getName(void) const
 
 std::string Server::getHostname(void) const
 { return this->_hostname; }
+
+std::string Server::getVersion(void) const
+{ return this->_version; }
+
+std::string Server::getDate(void) const
+{ return this->_date; }
 
 User*		Server::getUserByFd(const int &fd) const
 {
@@ -223,7 +232,7 @@ void    Server::_initCommandList(void) // functions to complete
 {
     this->_cmdList["KILL"] = &kill;
     this->_cmdList["PASS"] = &pass;
-    this->_cmdList["NICK"] = &nick;
+    this->_cmdList["-NICK"] = NULL;
     this->_cmdList["-USER"] = NULL;
 }
 
@@ -257,7 +266,7 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
         }
         else // the command is unknown, send something to the client
         {
-            reply_str = reply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command));
+            reply_str = numericReply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command));
             ret = send(fd, reply_str.c_str(), reply_str.length(), 0);
             if (ret == -1)
                 throw Server::sendException();

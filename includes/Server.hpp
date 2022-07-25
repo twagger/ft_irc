@@ -46,6 +46,8 @@ class Server
 		std::string	getPassword(void) const;
 		std::string	getName(void) const;
 		std::string getHostname(void) const;
+		std::string getVersion(void) const;
+		std::string getDate(void) const;
 		User*		getUserByFd(const int &fd) const;
         User*		getUserByNickname(const std::string &nick) const;
 
@@ -119,12 +121,19 @@ class Server
         std::string             _password;
         std::string             _name;
         std::string             _hostname;
+		std::string             _version;
+		std::string             _date;			// expected format: 19:52:09 Aug 12 2013
         time_t                  _lastPingTime;
 
         int                     _pollfd;
         int                     _sockfd;
 
         std::map<const int, User *>   _userList;
+
+		// <hostname> has a maximum length of 63 characters. If name is longer than 63
+        // characters are registered using the host (numeric) address instead of the host name.
+		// hostname   =  shortname *( "." shortname )
+		// hostaddr   =  ip4addr / ip6addr
 };
 
 #endif
