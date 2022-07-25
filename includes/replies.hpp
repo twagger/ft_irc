@@ -3,15 +3,20 @@
 
 #include <iostream>
 # include <string>
-// LIST OF ERRORS
+
+#define USERMODES "iorx"
+#define CHANNELMODES ""
+#define NAMESPECIALS ";[]`_^{|}\\"
+
+// LIST OF SERVER REPLIES
 // find them here: https://datatracker.ietf.org/doc/html/rfc2812#section-5.1
 
-// USE AS: reply(irc, fd, "461", ERR_NEEDMOREPARAMS(std::string("CMD")));
+// USE AS: numericReply(irc, fd, "461", ERR_NEEDMOREPARAMS(std::string("CMD")));
 
 // CONNECTION REGISTRATION
 
-	// REPLY
-	#define	RPL_WELCOME(nick, user, clientHost)				("Welcome to the Internet Relay Network " + nick + "!" + user + "@" + clientHost + "\r\n")	// 001
+	// CONNECTION REGISTRATION REPLY
+	#define	RPL_WELCOME(nick, username, clientHost)				("Welcome to the Internet Relay Network " + nick + "!" + username + "@" + clientHost + "\r\n")	// 001
 	#define	RPL_YOURHOST(serverName, version)				("Your host is " + serverName + ", running version " + version + "\r\n")					// 002
 	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")												// 003
 	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic)																// 332
@@ -19,13 +24,14 @@
 	#define RPL_NAMREPLY(channelName, nickname)																											// 353
 	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list")														// 366
 
+	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " " + userModes + " " + channelModes)				// 004
 
 	// NICK
 	#define ERR_NONICKNAMEGIVEN								(":No nickname given\r\n")																	// 431
 	#define ERR_ERRONEUSNICKNAME(nick)						(nick + " :Erroneous nickname" + "\r\n")													// 432
 	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :Nickname is already in use" + "\r\n")											// 433
 	//#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")				// 436
-	#define ERR_UNAVAILRESOURCE(nickChannel) 				(nickChannel + " :Nick/channel is temporarily unavailable" + "\r\n")						// 437
+	#define ERR_UNAVAILRESOURCE(nickOrChannel) 				(nickOrChannel + " :Nick/channel is temporarily unavailable" + "\r\n")						// 437
 	#define ERR_RESTRICTED 									(":Your connection is restricted!\r\n")														// 484
 
 	// PASS
@@ -66,5 +72,14 @@
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel")														// 401
 	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command") 															// 421
 	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
+
+
+
+	// LIST OF CLIENT ORIGINATED REPLIES
+
+	// Use as: clientReply()
+
+	//ADDITIONAL CLIENT REPLIES
+	#define CLIENT_NICK(nickname)							("NICK " + nickname + "\r\n")
 
 #endif
