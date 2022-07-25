@@ -50,10 +50,11 @@ endif
 # RULES
 ################################################################################
 .cpp.o:
-			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS) -DHOSTNAME=\"$(HOSTNAME)\"
+			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS) \
+			-DHOSTNAME=\"$(HOSTNAME)\"
 
 $(NAME):	$(OBJS)
-			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) $(HEADERS) -DHOSTNAME=$(HOSTNAME)
+			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) $(HEADERS)
 
 all:		$(NAME)
 
@@ -65,4 +66,4 @@ fclean:		clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean c.o re
+.PHONY:		all clean fclean cpp.o re

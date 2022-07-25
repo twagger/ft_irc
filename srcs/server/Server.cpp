@@ -21,6 +21,10 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+#ifndef HOSTNAME
+# define HOSTNAME "localhost"
+#endif
+
 /* ************************************************************************** */
 /* Constructors & destructor                                                  */
 /* ************************************************************************** */
@@ -330,7 +334,7 @@ void    Server::_pingClients(void)
                 this->_userList.erase(it++);
             }
         }
-        else    
+        else
             ++it;
     }
 }

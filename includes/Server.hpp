@@ -1,23 +1,33 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+// Standard headers
 #include <vector>
 #include <map>
 #include <set>
 #include <ctime>
+
+// Custom headers
 #include "channel.hpp"
 #include "user.hpp"
 #include "usercmds.hpp"
 
+// Sockets & packets params
 #define MAX_CMD_LEN 512
 #define BACKLOG 10
 #define BUF_SIZE 4096
 #define MAX_EVENTS 10
+
+// Client check params
 #define PING_TIMEOUT 120 // in seconds
 #define PONG_TIMEOUT 20 // in seconds
-#define WAIT_TIMEOUT 10000 // in milliseconds
-#define	PING(hostname) (":" + hostname + " PING " + hostname + "\r\n")
+#define WAIT_TIMEOUT 3000 // in milliseconds
 
+// Non numeric replies
+#define	PING(hostname) (":" + hostname + " PING " + hostname + "\r\n")
+#define	PONG(hostname) (":" + hostname + " PONG " + hostname + "\r\n")
+
+// Utility structure
 struct Command
 {
     std::string                 command;
@@ -28,6 +38,7 @@ struct Command
             std::vector<std::string> params = std::vector<std::string>());
 };
 
+// Server class
 class Server
 {
     public:

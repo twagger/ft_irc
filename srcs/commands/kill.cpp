@@ -10,7 +10,8 @@ std::string kill(const int fd, std::vector<std::string> params, Server *srv)
     // param check ----------------------------------------------------------- /
     // check nb of param
     if (params.size() != 2)
-        return (numericReply(srv, fd, "461", ERR_NEEDMOREPARAMS(std::string("KILL")))); 
+        return (\
+		numericReply(srv, fd, "461", ERR_NEEDMOREPARAMS(std::string("KILL")))); 
     nickname = params[0];
     comment = params[1];
     // check if nickname exists
@@ -26,7 +27,7 @@ std::string kill(const int fd, std::vector<std::string> params, Server *srv)
     catch (Server::pollDelException &e) { printError(e.what(), 1, true); }
     catch (Server::invalidFdException &e) { printError(e.what(), 1, false); }
 
-    // add the nickname to the list of unavailable nicknames
+    // add the nickname to the list of unavailable nicknames with a timer
     srv->_unavailableNicknames[nickname] = time(NULL);
 
     // no specific reply on success
