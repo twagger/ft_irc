@@ -15,7 +15,6 @@ std::vector<Command>        splitCmds(std::vector<std::string> cmd_strings);
 # include "Server.hpp"
 
 // Util functions
-std::string reply(Server *irc, const int &fd, std::string code, std::string replyMsg);
 std::string replyList(Server *irc, const int &fd, std::string code,
     std::deque<User *> userList, std::string channelName);
 std::string eventChannel(Server *irc, const int &fd, std::string eventType,

@@ -20,8 +20,10 @@ SRCS		= srcs/main.cpp \
 			  srcs/channel/join.cpp \
 			  srcs/utils/command_utils.cpp \
 			  srcs/user/user.cpp \
-			  srcs/commands/kill.cpp
-			  srcs/user/usercmds.cpp 
+			  srcs/user/usercmds.cpp \
+			  srcs/commands/kill.cpp \
+			  srcs/commands/ping.cpp \
+			  srcs/commands/pong.cpp
 			  
 OBJS		= $(SRCS:.cpp=.o)
 

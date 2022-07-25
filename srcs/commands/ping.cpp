@@ -3,12 +3,21 @@
 
 std::string ping(int fd, std::vector<std::string> params, Server *srv)
 {
-    // param check ----------------------------------------------------------- /
+    std::string hostname;
+    std::string reply = "";
+
     // check nb of param
-    if (params.size() == 0)
-        return (reply(srv, fd, "461", ERR_NEEDMOREPARAMS(std::string("KILL"))));
-    if (params.size() != 2)
-        return (reply(srv, fd, "461", ERR_NEEDMOREPARAMS(std::string("KILL"))));
-    return (NULL);
-    
+    if (params.size() == 1) // only hostname is expected
+    {
+        hostname = params[0];
+        // check if hostname is the one of the server
+        if (srv->getHostname() != hostname)
+            return (numericReply(srv, fd, "402", ERR_NOSUCHSERVER(hostname)));
+        // answer with a pong
+        reply.append(":").append(hostname)
+             .append(" PONG ").append(hostname)
+             .append(" :").append(hostname);
+        return (reply);
+    }
+    return (NULL); 
 }

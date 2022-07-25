@@ -3,21 +3,15 @@
 
 std::string pong(int fd, std::vector<std::string> params, Server *srv)
 {
-    std::string hostname;
-    std::string reply = "";
+    std::string clientname;
 
+    (void)fd;
+    (void)srv;
     // check nb of param
-    if (params.size() == 1) // only hostname is expected
+    if (params.size() == 1) // only clientname is expected
     {
-        hostname = params[0];
-        // check if hostname is the one of the server
-        if (srv->getHostname() != hostname)
-            return (numericReply(srv, fd, "402", ERR_NOSUCHSERVER(hostname)));
-        // answer with a pong
-        reply.append(":").append(hostname)
-             .append(" PONG ").append(hostname)
-             .append(" :").append(hostname);
-        return (reply);
+        clientname = params[0];
+        std::cout << "client : "  << clientname << std::endl;
     }
     return (NULL);
 }

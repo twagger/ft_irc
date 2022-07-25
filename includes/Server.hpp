@@ -13,8 +13,9 @@
 #define BACKLOG 10
 #define BUF_SIZE 4096
 #define MAX_EVENTS 10
-#define PING_DELAY 5 // in minutes
-#define	PING(hostname) ("PING " + hostname + "\r\n")
+#define PING_TIMEOUT 120 // in seconds
+#define PONG_TIMEOUT 20 // in seconds
+#define	PING(hostname) (":" + hostname + " PING " + hostname + "\r\n")
 
 struct Command
 {
