@@ -9,7 +9,7 @@ std::string pong(int fd, std::vector<std::string> params, Server *srv)
     // check nb of param
     if (params.size() == 1) // only clientname is expected
     {
-        clientname = params[0];
+        clientname = params.front();
         // update client status ---------------------------------------------- /
         if ((user = srv->getUserByFd(fd)) == NULL)
         {

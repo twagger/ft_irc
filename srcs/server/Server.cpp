@@ -155,7 +155,7 @@ int Server::_pollWait(int pollfd, struct epoll_event **events, int max_events)
 {
     int nfds;
 
-    nfds = epoll_wait(pollfd, *events, max_events, -1);
+    nfds = epoll_wait(pollfd, *events, max_events, WAIT_TIMEOUT);
     if (nfds == -1)
         throw Server::pollWaitException();
     return (nfds);

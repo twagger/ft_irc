@@ -15,6 +15,7 @@
 #define MAX_EVENTS 10
 #define PING_TIMEOUT 120 // in seconds
 #define PONG_TIMEOUT 20 // in seconds
+#define WAIT_TIMEOUT 10000 // in milliseconds
 #define	PING(hostname) (":" + hostname + " PING " + hostname + "\r\n")
 
 struct Command
