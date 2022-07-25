@@ -3,13 +3,6 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
-std::vector<std::string> getChannelKey(std::vector<std::string> parameter)
-{
-    std::vector<std::string>::iterator it = parameter.end();
-
-    return (splitByComma(*it));
-}
-
 void createChannel(std::vector<std::string> channel, std::vector<std::string> key,
                    User *currentUser, Server *server)
 {
@@ -36,13 +29,6 @@ void createChannel(std::vector<std::string> channel, std::vector<std::string> ke
             currentUser->addChannelJoined(channelName);
         }
     }
-}
-
-std::map<std::string, Channel *>::iterator channelAlreadyExists(std::map<std::string,
-        Channel *> channelList, std::string channelName)
-{
-    std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
-    return (it);
 }
 
 int checkKey(size_t pos, std::vector<std::string> key,
@@ -106,7 +92,7 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
             return (reply(server, fdUser, "476", ERR_BADCHANMASK(channelName)));
         
         // Case where channel already exists
-        std::map<std::string, Channel *>::iterator itMap = channelAlreadyExists(server->_channelList,
+        std::map<std::string, Channel *>::iterator itMap = findChannel(server->_channelList,
             channelName);
         if (itMap != server->_channelList.end())
         {
@@ -127,7 +113,7 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
     std::string channelName = *itChan;
     std::string event = eventChannel(server, fdUser, "JOIN", channelName);
     std::string userList = replyList(server, fdUser, "353",
-        channelAlreadyExists(server->_channelList, channelName)->second->_users,
+        findChannel(server->_channelList, channelName)->second->_users,
         channelName);
     std::string endOfNames = reply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
     // Use send for all the user of a channel (vector of fd)

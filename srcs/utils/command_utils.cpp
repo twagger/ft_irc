@@ -135,3 +135,17 @@ std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg;
 	return (reply);
 }
+
+std::vector<std::string> getChannelKey(std::vector<std::string> parameter)
+{
+    std::vector<std::string>::iterator it = parameter.end();
+
+    return (splitByComma(*it));
+}
+
+std::map<std::string, Channel *>::iterator findChannel(std::map<std::string,
+        Channel *> channelList, std::string channelName)
+{
+    std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
+    return (it);
+}

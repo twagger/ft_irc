@@ -48,7 +48,7 @@
 	#define ERR_BANNEDFROMCHAN(channel) 					(channel + " :Cannot join channel (+b)" + "\r\n")											// 474
 	#define ERR_BADCHANNELKEY(channel) 						(channel + " :Cannot join channel (+k)" + "\r\n")											// 475
 	#define ERR_BADCHANMASK(channel) 						(channel + " :Bad Channel Mask" + "\r\n")													// 476
-	// #define ERR_NEEDMOREPARAMS 461
+	#define ERR_NOTONCHANNEL(channel)						(channel + " :You're not on that channel" + "\r\n")											// 442
 
 	// USER
 	// #define ERR_NEEDMOREPARAMS 461
