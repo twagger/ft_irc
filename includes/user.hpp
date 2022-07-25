@@ -12,14 +12,15 @@
 # define ST_CHECKING 2
 
 //   The available modes are as follows:
-//		none											=> 0	000
-//		a - user is flagged as away;					=> 1	001			
-//     	i - marks a users as invisible; 				=> 2	010
-//      w - user receives wallops; 						=> 3	011
-//      r - restricted user connection; 				=> 4	100
-//      o - operator flag; 								=> 5	101 
-//      O - local operator flag; 						=> 6	110	
-//      s - marks a user for receipt of server notices. => 7	111
+//		none ?												=> 0	0000 0000
+//		a - user is flagged as away;						=> 1	0000 0001
+//		w - user receives wallops;							=> 2	0000 0010			
+//     	i - marks a users as invisible; 					=> 3	0000 0100
+//      o - operator flag;  								=> 4	0000 1000
+//      O - local operator flag;							=> 5	0001 0000
+//      s - marks a user for receipt of server notices.		=> 6	0010 0000
+//      r - restricted user connection;	 					=> 7	0100 0000
+
 
 class User {
 

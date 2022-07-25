@@ -32,13 +32,11 @@ std::string	pass(const int fd, std::vector<std::string> params, Server *irc) {
 		}
 		else if (!user->getPassword() && irc->getPassword()
 			== params[0]) {	
-			// never authenticated with a password + password given is OK
 			user->setPassword(true);
 		}
 	}
 	// if wrong password but not authenticated, do nothing >> TO BE CHECKED
-	// if user not find, will return null as well - should never happen as 
-	// we create user for every fd
+	std::cout << "[DEBUG] PWD: " << user->getPassword() << "/ NICK: " << user->getNickname() << "/ USERNAME: " << user->getUsername() << "/ FULLNAME: " << user->getFullname() << "/ auth: " << user->getAuthenticated() << std::endl;
 	return replyMsg;
 }
 
@@ -54,7 +52,7 @@ bool	forbiddenNick(std::string param)
 				== std::string::npos)										
 				//&& param[0] != 92 ?
 		return true;
-	else if (param.length() > 9)
+	else if (param.length() > 9)												// to be check if > 9 >> erroneous nickname msg
 		return true;
 	else {
 		for (unsigned int i = 0; i < param.length(); i++) {
@@ -63,6 +61,7 @@ bool	forbiddenNick(std::string param)
 				return true;
 		}
 	}
+	std::cout << "[DEBUG] valid params " << std::endl;
 	return false;
 }
 
@@ -84,19 +83,20 @@ std::string nick(const int fd, std::vector<std::string> params, Server *irc)
 		}
 		// else if (// nick is in kill list)											// waiting for killlist
 		// 	replyMsg = numericReply(irc, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
-		else if (user->getMode() != 0 && user->getMode() == 4) {		// waiting for user mode in bitshift
+		else if (user->getMode() != 0 && user->getMode() == 7) {		// waiting for user mode in bitshift
 			replyMsg = numericReply(irc, fd, "484", ERR_RESTRICTED);
 		}
-		else if (user->getNickname().empty()) {
+		else if (user->getNickname() == "*") {
 			user->setNickname(params[0]);
 			// No reply message when no NICK defined yet
 		}
 		else {
-			user->setNickname(params[0]);
 			replyMsg = clientReply(irc, fd, CLIENT_NICK(params[0]));			
+			user->setNickname(params[0]);
 		}
-		//authenticateUser(fd, irc, replyMsg);
+		authenticateUser(fd, irc, replyMsg);
 	}
+	std::cout << "[DEBUG] PWD: " << user->getPassword() << "/ NICK: " << user->getNickname() << "/ USERNAME: " << user->getUsername() << "/ FULLNAME: " << user->getFullname() << "/ auth: " << user->getAuthenticated() << std::endl;
 	return replyMsg;
 }
 
@@ -125,16 +125,14 @@ bool	forbiddenUsername(std::string param)
 bool areValidParams(std::vector<std::string> params) 
 {	
 	for (unsigned int i = 0; i < params.size(); i++) {
-		if (params[i].empty())
+		if (params[i].empty()) 	
 			return false;
 	}
 	if (forbiddenUsername(params[0]) || params[0].find(32) != std::string::npos)
 		return false;
-	else if (isdigit(params[1][0]) == 0 && (params[1][0] < 0 || params[1][0] > 7))
+	else if (isdigit(params[1][0]) == 0 || params[1][0] < '0' || params[1][0] > '7')
 		return false;
-	else if (params[2][0] != '*')
-		return false;
-	else if (params[3].size() < 1 && forbiddenUsername(params[3]))
+	else if (params[3].size() < 1 || forbiddenUsername(params[3]))
 		return false;
 	return true;
 }
@@ -158,8 +156,9 @@ std::string user(const int fd, std::vector<std::string> params, Server *irc)
 			user->setMode(params[1][0]);
 			user->setFullname(params[3]);
 		}
-		//authenticateUser(fd, irc, replyMsg);
+		authenticateUser(fd, irc, replyMsg);
 	}
+	std::cout << "[DEBUG] PWD: " << user->getPassword() << "/ NICK: " << user->getNickname() << "/ USERNAME: " << user->getUsername() << "/ FULLNAME: " << user->getFullname() << "/ auth: " << user->getAuthenticated() << std::endl;
 	return (replyMsg);
 }
 
@@ -169,7 +168,7 @@ bool	isAuthenticatable(User *user)
 		return false;
 	else if (user->getPassword() == false)
 		return false;
-	else if (user->getNickname().empty() || user->getUsername().empty())
+	else if (user->getNickname() == "*" || user->getUsername().empty())
 		return false;
 	return true;
 }
@@ -179,6 +178,7 @@ std::string authenticateUser(const int fd, Server *irc, std::string replyMsg)
 	User		*user = irc->getUserByFd(fd);
 
 	if (isAuthenticatable(user)) {
+		std::cout << "[DEBUG] valid params in auth " << std::endl;
 		replyMsg.append(numericReply(irc, fd, "001",
 			RPL_WELCOME(user->getNickname(), user->getUsername(), user->getHostname())));
 		replyMsg.append(numericReply(irc, fd, "002",
@@ -187,29 +187,31 @@ std::string authenticateUser(const int fd, Server *irc, std::string replyMsg)
 			RPL_CREATED(irc->getDate())));
 		replyMsg.append(numericReply(irc, fd, "004",
 			RPL_MYINFO(irc->getHostname(), irc->getVersion(), USERMODES, CHANNELMODES)));
-		replyMsg.append(clientReply(irc, fd, 
-			"Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - benvinguts - velkommen"));
-		replyMsg.append(clientReply(irc, fd, "		           .       .                   .       .      .     .      .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "          .    .         .    .            .     ______                    \r\n"));
-		replyMsg.append(clientReply(irc, fd, "      .           .             .               ////////\r\n"));
-		replyMsg.append(clientReply(irc, fd, "                .    .   ________   .  .      /////////     .    .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "           .            |.____.  /\\        ./////////    .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "    .                 .//      \\/  |\\     /////////\r\n"));
-		replyMsg.append(clientReply(irc, fd, "       .       .    .//          \\ |  \\ /////////       .     .   .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "                    ||.    .    .| |  ///////// .     .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "     .    .         ||           | |//`,/////                .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "             .      \\\\        ./ //  /  \\/   .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "  .                   \\\\.___./ //\\` '   ,_\\     .     .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "          .           .     \\ //////\\ , /   \\                 .    .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "                       .    ///////// \\|  '  |    .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "      .        .          ///////// .   \\ _ /          .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "                        /////////                              .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "                 .   ./////////     .     .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "         .           --------   .                  ..             .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "  .               .        .         .                       .\r\n"));
-		replyMsg.append(clientReply(irc, fd, "                        ________________________\r\n"));
-		replyMsg.append(clientReply(irc, fd, "____________------------                        -------------_________\r\n"));
-		replyMsg.append(clientReply(irc, fd, "Des bisous de la Space team <3\r\n"));
+		// replyMsg.append(clientReply(irc, fd, 
+		// 	"Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - benvinguts - velkommen"));
+		// replyMsg.append(clientReply(irc, fd, "		           .       .                   .       .      .     .      .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "          .    .         .    .            .     ______                    \r\n"));
+		// replyMsg.append(clientReply(irc, fd, "      .           .             .               ////////\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "                .    .   ________   .  .      /////////     .    .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "           .            |.____.  /\\        ./////////    .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "    .                 .//      \\/  |\\     /////////\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "       .       .    .//          \\ |  \\ /////////       .     .   .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "                    ||.    .    .| |  ///////// .     .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "     .    .         ||           | |//`,/////                .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "             .      \\\\        ./ //  /  \\/   .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "  .                   \\\\.___./ //\\` '   ,_\\     .     .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "          .           .     \\ //////\\ , /   \\                 .    .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "                       .    ///////// \\|  '  |    .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "      .        .          ///////// .   \\ _ /          .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "                        /////////                              .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "                 .   ./////////     .     .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "         .           --------   .                  ..             .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "  .               .        .         .                       .\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "                        ________________________\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "____________------------                        -------------_________\r\n"));
+		// replyMsg.append(clientReply(irc, fd, "Des bisous de la Space team <3\r\n"));
+		std::cout << "[DEBUG] buffer " << replyMsg << std::endl;
+		user->setAuthenticated(true);																								// is client answering smth?
 	}
 	return (replyMsg);
 }
