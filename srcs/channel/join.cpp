@@ -3,16 +3,7 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
-std::vector<std::string> getChannel(std::vector<std::string> parameter)
-{
-    std::vector<std::string> channel;
-    std::vector<std::string>::iterator it = parameter.begin();
-
-    channel = splitByComma(*it);
-    return (channel);
-}
-
-std::vector<std::string> getKey(std::vector<std::string> parameter)
+std::vector<std::string> getChannelKey(std::vector<std::string> parameter)
 {
     std::vector<std::string>::iterator it = parameter.end();
 
@@ -33,8 +24,8 @@ void createChannel(std::vector<std::string> channel, std::vector<std::string> ke
         {
             Channel newChannel(channelName, channelKey, currentUser);
             server->_channelList.insert(std::pair<std::string, Channel*>(channelName, &newChannel));
-            it2++;
             currentUser->addChannelJoined(channelName);
+            it2++;
         }
         else
         {
@@ -64,27 +55,11 @@ int checkKey(size_t pos, std::vector<std::string> key,
     return (0);
 }
 
-int checkInvite(std::map<std::string, Channel *>::iterator itMap, User *currentUser)
+int checkInviteBan(std::deque<User *> listOfUser, User *currentUser)
 {
-    std::deque<User *> listOfInvitees = itMap->second->_invitees;
-    std::deque<User *>::iterator it = listOfInvitees.begin();
+    std::deque<User *>::iterator it = listOfUser.begin();
 
-    for (; it != listOfInvitees.end(); it++)
-    {
-        if (currentUser == *it)
-        {
-            return (0);
-        }
-    }
-    return (-1);
-}
-
-int checkBan(std::map<std::string, Channel *>::iterator itMap, User *currentUser)
-{
-    std::deque<User *> listOfInvitees = itMap->second->_bannedUsers;
-    std::deque<User *>::iterator it = listOfInvitees.begin();
-
-    for (; it != listOfInvitees.end(); it++)
+    for (; it != listOfUser.end(); it++)
     {
         if (currentUser == *it)
         {
@@ -111,11 +86,10 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
     std::vector<std::string> channel;
     std::vector<std::string> key;
 
-    channel = getChannel(parameter);
+    channel = getChannelKey(parameter);
     if (parameter.size() > 1)
-        key = getKey(parameter);
+        key = getChannelKey(parameter);
 
-    // Join channel
     std::vector<std::string>::iterator itChan = channel.begin();
     itChan = channel.begin();
     for (; itChan != channel.end(); itChan++)
@@ -136,9 +110,9 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
         {
             if (checkKey(itChan - channel.begin(), key, itMap) < 0)
                 return (reply(server, fdUser, "475", ERR_BADCHANNELKEY(channelName)));
-            if (checkInvite(itMap, server->getUserByFd(fdUser)) < 0)
+            if (checkInviteBan(itMap->second->_invitees, server->getUserByFd(fdUser)) < 0)
                 return (reply(server, fdUser, "473", ERR_INVITEONLYCHAN(channelName)));
-            if (checkBan(itMap, server->getUserByFd(fdUser)) <  0)
+            if (checkInviteBan(itMap->second->_bannedUsers, server->getUserByFd(fdUser)) <  0)
                 return (reply(server, fdUser, "474", ERR_BANNEDFROMCHAN(channelName)));
         }
 
