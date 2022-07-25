@@ -4,7 +4,7 @@
 std::string ping(int fd, std::vector<std::string> params, Server *srv)
 {
     std::string hostname;
-    std::string reply = "";
+    std::string reply = std::string();
 
     // check nb of param
     if (params.size() == 1) // only hostname is expected
@@ -16,7 +16,7 @@ std::string ping(int fd, std::vector<std::string> params, Server *srv)
         // answer with a pong
         reply.append(":").append(hostname)
              .append(" PONG ").append(hostname)
-             .append(" :").append(hostname);
+             .append(" :").append(hostname).append("\r\n");
         return (reply);
     }
     return (NULL); 

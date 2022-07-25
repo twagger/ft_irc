@@ -330,6 +330,8 @@ void    Server::_pingClients(void)
                 this->_userList.erase(it++);
             }
         }
+        else    
+            ++it;
     }
 }
 
