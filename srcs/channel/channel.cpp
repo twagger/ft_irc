@@ -1,15 +1,15 @@
 #include "../../includes/channel.hpp"
 
 Channel::Channel(std::string name, User *currentUser): _topic(0), _channelName(name), _key(0), _mode(0),
-            _operators(0), _bannedUsers(0), _invitees(0), _limitNumberOfUsers(-1)
+            _operators(0), _bannedUsers(0), _invitees(0)
             {
                 addUser(currentUser);
             }
 
 Channel::Channel(std::string name, std::string key, User *currentUser): _topic(0), _channelName(name), _key(key),
-            _operators(0), _bannedUsers(0), _invitees(0), _limitNumberOfUsers(-1)
+            _operators(0), _bannedUsers(0), _invitees(0)
             {
-                addUser(currentUser);
+                addOperator(currentUser);
                 this->_mode.push_back('k');
             }
 
@@ -23,11 +23,6 @@ std::string Channel::getChannelName(void) const { return (this->_channelName); }
 
 std::string Channel::getKey(void) const { return (this->_key); }
 
-std::deque<User*>   Channel::getUsers(void) const { return (this->_users); }
-
-int Channel::getLimitNumberOfUsers(void) const { return (this->_limitNumberOfUsers); }
-
-
 /** Setters **/
 
 void Channel::setTopic(std::string topic) { this->_topic = topic; }
@@ -35,9 +30,6 @@ void Channel::setTopic(std::string topic) { this->_topic = topic; }
 void Channel::setKey(std::string key) { this->_key = key; }
 
 void Channel::setMode(char mode) { this->_mode.push_back(mode); }
-
-void Channel::setLimitNumberofUsers(int limitNumberOfUsers) { this->_limitNumberOfUsers = limitNumberOfUsers; }
-
 
 /**
  * @brief Remove a mode in the channel
