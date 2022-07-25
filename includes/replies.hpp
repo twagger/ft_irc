@@ -70,9 +70,10 @@
 	// OTHER ERRORS:
 	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator")							// 481
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel")														// 401
+    #define	ERR_NOSUCHSERVER(servername)					(servername + " :No such server"+ "\r\n")												    // 402
 	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command") 															// 421
 	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
-
+    #define ERR_NOORIGIN									(":No origin specified\r\n")																// 409
 
 
 	// LIST OF CLIENT ORIGINATED REPLIES

@@ -260,9 +260,11 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
             // send the result to the client if it is not empty
             if (!result.empty())
             {
-                ret = send(fd, result.c_str(), result.length(), 0);
-                if (ret == -1)
-                    throw Server::sendException();
+                try { this->sendClient(fd, result); }
+                catch (Server::invalidFdException &e)
+                { printError(e.what(), 1, false); }
+                catch (Server::sendException &e)
+                { printError(e.what(), 1, true); return; }
             }
         }
         else // the command is unknown, send something to the client
@@ -270,7 +272,10 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
             reply_str = numericReply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command));
             ret = send(fd, reply_str.c_str(), reply_str.length(), 0);
             if (ret == -1)
-                throw Server::sendException();
+            {
+                printError("Send error: ", 1, true);
+                return;
+            }
         }
     }
 }
@@ -300,9 +305,9 @@ void    Server::_pingClients(void)
             if (user->getStatus() == ST_ALIVE)
             {
                 ping_cmd = PING(this->_hostname);
-                ret = send(userFd, ping_cmd.c_str(), ping_cmd.length(), 0);
-                if (ret == -1)
-                    throw Server::sendException();
+                try { this->sendClient(userFd, ping_cmd); }
+                catch (Server::sendException &e)
+                { printError(e.what(), 1, true); return; }
                 user->setStatus(ST_CHECKING);
                 ++it;
             }
@@ -365,8 +370,6 @@ void    Server::start(void)
 
         // send a PING to active fds (if delay since last ping is ok) -------- /
         try { this->_pingClients(); }
-        catch (Server::sendException &e)
-        { printError(e.what(), 1, true); return; }
         catch (Server::pollDelException &e)
         { printError(e.what(), 1, true); return; }
 

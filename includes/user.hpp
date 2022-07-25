@@ -33,6 +33,7 @@ class User {
 		bool						_password;
 		bool						_authenticated;
 		std::vector<std::string>	_channelsJoined;
+        time_t                      _lastActivity;
 		int							_status;
 
 
@@ -53,6 +54,8 @@ class User {
 		bool 						getAuthenticated(void) const;
 		std::vector<std::string>	getChannelsJoined(void) const;
 		int							getStatus(void) const;
+        time_t  					getLastActivity(void) const;
+
 
 		void setNickname(std::string nickname);
 		void setUsername(std::string username);

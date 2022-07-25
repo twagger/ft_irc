@@ -96,9 +96,9 @@ class Server
         class readException : public std::exception
         { public: virtual const char *what() const throw(); };
  
-        std::map<std::string, Channel *>    _channelList;
-        std::map<std::string, CmdFunction>  _cmdList;
-        std::set<std::string>               _unavailableNicknames;
+        std::map<std::string, Channel *>   _channelList;
+        std::map<std::string, CmdFunction> _cmdList;
+        std::map<std::string, time_t>      _unavailableNicknames;
 
     private:
         // Cannot be default construct

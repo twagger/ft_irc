@@ -4,9 +4,9 @@
 // CONSTRUCTORS
 User::User(const int fd, std::string hostname) : _fd(fd), _nickname("*"), 
 			_hostname(hostname), _mode(0), _authenticated(false), _channelsJoined(), 
-			_status(ST_ALIVE) { }
+			_status(ST_ALIVE), _lastActivity(time(NULL)){ }
 
-User::User(const User &src) : _fd(src._fd) {
+User::User(const User &src) : _fd(src._fd), _status(ST_ALIVE), _lastActivity(time(NULL)){
 	*this = src;
 }
 
@@ -43,6 +43,7 @@ std::vector<std::string>	User::getChannelsJoined(void) const {
 	return this->_channelsJoined;
 }
 int							User::getStatus(void) const { return this->_status; }
+time_t  					User::getLastActivity(void) const { return this->_lastActivity; }
 
 // SETTERS
 void User::setNickname(std::string nickname) { this->_nickname = nickname; }
