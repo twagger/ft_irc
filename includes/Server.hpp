@@ -124,7 +124,6 @@ class Server
         std::string             _hostname;
 		std::string             _version;
 		std::string             _date;			// expected format: 19:52:09 Aug 12 2013
-        time_t                  _lastPingTime;
 
         int                     _pollfd;
         int                     _sockfd;

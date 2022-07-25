@@ -186,4 +186,3 @@ std::string authenticateUser(const int fd, Server *irc, std::string replyMsg)
 	}
 	return (replyMsg);
 }
-

@@ -25,7 +25,7 @@
 /* Constructors & destructor                                                  */
 /* ************************************************************************** */
 Server::Server(int port, std::string password, std::string name)
-: _port(port), _password(password), _name(name), _lastPingTime(time(NULL))
+: _port(port), _password(password), _name(name), _hostname(HOSTNAME)
 { this->_initCommandList(); }
 
 Server::Server(Server const &src)

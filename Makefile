@@ -49,11 +49,11 @@ endif
 
 # RULES
 ################################################################################
-.c.o:
-			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS)
+.cpp.o:
+			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS) -DHOSTNAME=\"$(HOSTNAME)\"
 
 $(NAME):	$(OBJS)
-			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) $(HEADERS)
+			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) $(HEADERS) -DHOSTNAME=$(HOSTNAME)
 
 all:		$(NAME)
 
