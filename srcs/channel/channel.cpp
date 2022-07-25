@@ -23,6 +23,10 @@ std::string Channel::getChannelName(void) const { return (this->_channelName); }
 
 std::string Channel::getKey(void) const { return (this->_key); }
 
+std::deque<User*>	Channel::getUsers(void) const {
+	return (this->_users);
+}
+
 /** Setters **/
 
 void Channel::setTopic(std::string topic) { this->_topic = topic; }

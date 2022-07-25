@@ -79,17 +79,21 @@ std::string nick(const int fd, std::vector<std::string> params, Server *irc)
 		else if (forbiddenNick(params[0]) == true) {
 			replyMsg = numericReply(irc, fd, "432", ERR_ERRONEUSNICKNAME(params[0]));
 		}
-		// else if (irc->getUserByNick(params[0]) != 0) {								// waiting for getuserbynick()
-		// 	replyMsg = numericReply(irc, fd, "433", ERR_NICKNAMEINUSE(params[0]));
-		// }
+		else if (irc->getUserByNickname(params[0]) != 0) {
+			replyMsg = numericReply(irc, fd, "433", ERR_NICKNAMEINUSE(params[0]));
+		}
 		// else if (// nick is in kill list)											// waiting for killlist
 		// 	replyMsg = numericReply(irc, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
-		else if (user->getMode() != 0 && user->getMode() == 3) {		// waiting for user mode in bitshift
+		else if (user->getMode() != 0 && user->getMode() == 4) {		// waiting for user mode in bitshift
 			replyMsg = numericReply(irc, fd, "484", ERR_RESTRICTED);
+		}
+		else if (user->getNickname().empty()) {
+			user->setNickname(params[0]);
+			// No reply message when no NICK defined yet
 		}
 		else {
 			user->setNickname(params[0]);
-			replyMsg = clientReply(irc, fd, CLIENT_NICK(params[0]));
+			replyMsg = clientReply(irc, fd, CLIENT_NICK(params[0]));			
 		}
 		//authenticateUser(fd, irc, replyMsg);
 	}
@@ -118,12 +122,15 @@ bool	forbiddenUsername(std::string param)
 	return false;
 }
 
-bool areValidParams(std::vector<std::string> params) {
-	
-	// check params[0-3].empty() 
+bool areValidParams(std::vector<std::string> params) 
+{	
+	for (unsigned int i = 0; i < params.size(); i++) {
+		if (params[i].empty())
+			return false;
+	}
 	if (forbiddenUsername(params[0]) || params[0].find(32) != std::string::npos)
 		return false;
-	else if (isdigit(params[1][0]) == 0 && (params[1][1] < 0 || params[1][1] > 7))
+	else if (isdigit(params[1][0]) == 0 && (params[1][0] < 0 || params[1][0] > 7))
 		return false;
 	else if (params[2][0] != '*')
 		return false;
@@ -132,7 +139,7 @@ bool areValidParams(std::vector<std::string> params) {
 	return true;
 }
 
-std::string user(const int fd, std::vector<std::string> params, Server *irc)
+std::string user(const int fd, std::vector<std::string> params, Server *irc) 
 {
 	std::string replyMsg;
 	User *user = irc->getUserByFd(fd);
@@ -182,27 +189,27 @@ std::string authenticateUser(const int fd, Server *irc, std::string replyMsg)
 			RPL_MYINFO(irc->getHostname(), irc->getVersion(), USERMODES, CHANNELMODES)));
 		replyMsg.append(clientReply(irc, fd, 
 			"Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - benvinguts - velkommen"));
-		replyMsg.append(clientReply(irc, fd, "		           .       .                   .       .      .     .      ."));
-		replyMsg.append(clientReply(irc, fd, "          .    .         .    .            .     ______                    "));
-		replyMsg.append(clientReply(irc, fd, "      .           .             .               ////////"));
-		replyMsg.append(clientReply(irc, fd, "                .    .   ________   .  .      /////////     .    ."));
-		replyMsg.append(clientReply(irc, fd, "           .            |.____.  /\\        ./////////    ."));
-		replyMsg.append(clientReply(irc, fd, "    .                 .//      \\/  |\\     /////////"));
-		replyMsg.append(clientReply(irc, fd, "       .       .    .//          \\ |  \\ /////////       .     .   ."));
-		replyMsg.append(clientReply(irc, fd, "                    ||.    .    .| |  ///////// .     ."));
-		replyMsg.append(clientReply(irc, fd, "     .    .         ||           | |//`,/////                ."));
-		replyMsg.append(clientReply(irc, fd, "             .      \\\\        ./ //  /  \\/   ."));
-		replyMsg.append(clientReply(irc, fd, "  .                   \\\\.___./ //\\` '   ,_\\     .     ."));
-		replyMsg.append(clientReply(irc, fd, "          .           .     \\ //////\\ , /   \\                 .    ."));
-		replyMsg.append(clientReply(irc, fd, "                       .    ///////// \\|  '  |    ."));
-		replyMsg.append(clientReply(irc, fd, "      .        .          ///////// .   \\ _ /          ."));
-		replyMsg.append(clientReply(irc, fd, "                        /////////                              ."));
-		replyMsg.append(clientReply(irc, fd, "                 .   ./////////     .     ."));
-		replyMsg.append(clientReply(irc, fd, "         .           --------   .                  ..             ."));
-		replyMsg.append(clientReply(irc, fd, "  .               .        .         .                       ."));
-		replyMsg.append(clientReply(irc, fd, "                        ________________________"));
-		replyMsg.append(clientReply(irc, fd, "____________------------                        -------------_________"));
-
+		replyMsg.append(clientReply(irc, fd, "		           .       .                   .       .      .     .      .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "          .    .         .    .            .     ______                    \r\n"));
+		replyMsg.append(clientReply(irc, fd, "      .           .             .               ////////\r\n"));
+		replyMsg.append(clientReply(irc, fd, "                .    .   ________   .  .      /////////     .    .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "           .            |.____.  /\\        ./////////    .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "    .                 .//      \\/  |\\     /////////\r\n"));
+		replyMsg.append(clientReply(irc, fd, "       .       .    .//          \\ |  \\ /////////       .     .   .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "                    ||.    .    .| |  ///////// .     .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "     .    .         ||           | |//`,/////                .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "             .      \\\\        ./ //  /  \\/   .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "  .                   \\\\.___./ //\\` '   ,_\\     .     .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "          .           .     \\ //////\\ , /   \\                 .    .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "                       .    ///////// \\|  '  |    .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "      .        .          ///////// .   \\ _ /          .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "                        /////////                              .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "                 .   ./////////     .     .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "         .           --------   .                  ..             .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "  .               .        .         .                       .\r\n"));
+		replyMsg.append(clientReply(irc, fd, "                        ________________________\r\n"));
+		replyMsg.append(clientReply(irc, fd, "____________------------                        -------------_________\r\n"));
+		replyMsg.append(clientReply(irc, fd, "Des bisous de la Space team <3\r\n"));
 	}
 	return (replyMsg);
 }

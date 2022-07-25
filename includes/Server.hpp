@@ -49,7 +49,7 @@ class Server
 		std::string getVersion(void) const;
 		std::string getDate(void) const;
 		User*		getUserByFd(const int &fd) const;
-        User*		getUserByNickname(const std::string &nick) const;
+		User*		getUserByNickname(const std::string &nick) const;
 
         // Member functions
         void    start(void);
