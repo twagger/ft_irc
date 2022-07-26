@@ -1,7 +1,7 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-std::string pong(int fd, std::vector<std::string> params, Server *srv)
+const std::string pong(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv)
 {
     std::string clientname;
     User        *user;

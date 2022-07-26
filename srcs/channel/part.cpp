@@ -27,7 +27,7 @@ int checkPartParameter(std::map<std::string, Channel *> channelList,
         return (-3);
 }
 
-std::string part(const int fdUser, std::vector<std::string> parameter, Server *server)
+const std::string part(const int &fdUser, const std::vector<std::string> &parameter, const std::string &, Server *server)
 {
     std::vector<std::string> channel;
 
@@ -38,11 +38,11 @@ std::string part(const int fdUser, std::vector<std::string> parameter, Server *s
     for (; it != channel.end(); it++)
     {
         if (checkPartParameter(server->_channelList, *it, server->getUserByFd()) == -1)
-            return (reply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("PART"))));
+            return (numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("PART"))));
         else if (checkPartParameter(server->_channelList, *it, server->getUserByFd()) == -2)
-            return (reply(server, fdUser, "403", ERR_NOSUCHCHANNEL(*it)));
+            return (numericReply(server, fdUser, "403", ERR_NOSUCHCHANNEL(*it)));
         else if (checkPartParameter(server->_channelList, *it, server->getUserByFd()) == -3)
-            return (reply(server, fdUser, "442", (*it)));
+            return (numericReply(server, fdUser, "442", (*it)));
 
         // Effectively part from channel
     }

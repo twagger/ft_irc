@@ -16,7 +16,7 @@
 
 //What should we do if user send PASS pwd1 pwd2 ? Is it wrong?
 
-std::string	pass(const int fd, std::vector<std::string> params, Server *irc) {
+const std::string	pass(const int &fd, const std::vector<std::string> &params, const std::string &, Server *irc) {
 	
 	std::string replyMsg;
 	User *user = irc->getUserByFd(fd);
@@ -67,7 +67,7 @@ bool	forbiddenNick(std::string param)
 }
 
 //NICk MUST BE DONE AFTER PWD
-std::string nick(const int fd, std::vector<std::string> params, Server *irc) 
+const std::string nick(const int &fd, const std::vector<std::string> &params, const std::string &, Server *irc) 
 {	
 	std::string replyMsg;
 	User *user = irc->getUserByFd(fd);
@@ -132,7 +132,7 @@ bool areValidParams(std::vector<std::string> params) {
 	return true;
 }
 
-std::string user(const int fd, std::vector<std::string> params, Server *irc)
+const std::string user(const int &fd, const std::vector<std::string> &params, const std::string &, Server *irc)
 {
 	std::string replyMsg;
 	User *user = irc->getUserByFd(fd);

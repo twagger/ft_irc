@@ -1,3 +1,4 @@
+// Standard headers
 #include <netinet/in.h>
 #include <cstring>
 #include <cstdlib>
@@ -15,11 +16,13 @@
 #include <map>
 #include <vector>
 
+// Custom headers
 #include "../../includes/Server.hpp"
 #include "../../includes/channel.hpp"
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
+#include "../../includes/usercmds.hpp"
 
 #ifndef HOSTNAME
 # define HOSTNAME "localhost"
@@ -268,7 +271,7 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
             // update client timers
             user = this->getUserByFd(fd);
             user->setLastActivityTime();
-            result = exec_command(fd, it->params, this);
+            result = exec_command(fd, it->params, it->prefix, this);
             // send the result to the client if it is not empty
             if (!result.empty())
             {
