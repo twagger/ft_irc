@@ -10,10 +10,10 @@
 class Server;
 class User;
 
-std::string	pass(int &fd, const std::vector<std::string> &params, Server *irc);
+const std::string	pass(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *irc);
 
 bool	forbiddenNick(std::string param);
-std::string nick(const int fd, std::vector<std::string> params, Server *irc);
+const std::string nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *irc);
 
 bool	forbiddenUsername(std::string param);
 

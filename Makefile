@@ -14,8 +14,8 @@ GCLONE		= git clone
 ################################################################################
 SRCS		= srcs/main.cpp \
 			  srcs/server/Server.cpp \
-			  srcs/utils/print_error.cpp \
-			  srcs/utils/string_utils.cpp \
+			  srcs/utils/errors.cpp \
+			  srcs/utils/parsing.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/channel/join.cpp \
 			  srcs/utils/command_utils.cpp \
@@ -49,8 +49,9 @@ endif
 
 # RULES
 ################################################################################
-.c.o:
-			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS)
+.cpp.o:
+			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS) \
+			-DHOSTNAME=\"$(HOSTNAME)\"
 
 $(NAME):	$(OBJS)
 			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) $(HEADERS)
@@ -65,4 +66,4 @@ fclean:		clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean c.o re
+.PHONY:		all clean fclean cpp.o re

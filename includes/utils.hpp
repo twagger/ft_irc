@@ -5,17 +5,18 @@
 
 # include <string>
 # include <vector>
-
-// Util functions
-int                         printError(std::string message, int code, \
-                                        bool with_errno);
-std::vector<std::string>    splitBy(std::string str, std::string delimiter);
-std::vector<Command>        splitCmds(std::vector<std::string> cmd_strings);
 # include "replies.hpp"
 # include "Server.hpp"
 
 // Util functions
-std::string reply(Server *irc, const int &fd, std::string code, std::string replyMsg);
+int                         printError(std::string message, int code, \
+                                        bool with_errno);
+
+// parsing
+std::vector<std::string> splitBy(std::string str, const std::string &delimiter);
+const std::vector<Command>     splitCmds(std::vector<std::string> cmd_strings);
+
+// Util functions
 std::string replyList(Server *irc, const int &fd, std::string code,
     std::deque<User *> userList, std::string channelName);
 std::string eventChannel(Server *irc, const int &fd, std::string eventType,

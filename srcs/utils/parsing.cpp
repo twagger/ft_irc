@@ -1,0 +1,117 @@
+#include "../../includes/Server.hpp"
+#include "../../includes/utils.hpp"
+
+// Split a string by irc message delimiter (\n\r) and return a string vector
+std::vector<std::string>    splitBy(std::string str, const std::string &delimiter)
+{
+    std::vector<std::string>    result;
+    size_t                      end;
+
+    // first check 
+    end = str.find(delimiter);
+    if (end == std::string::npos)
+        throw std::runtime_error("IRC message must end with CRLF");
+
+    // save first command in vector
+    if (end + delimiter.length() > MAX_CMD_LEN)
+        throw std::runtime_error("IRC message shall not exceed 512 characters");
+    result.push_back(str.substr(0, end));
+    
+    // update str
+    str.erase(0, end + delimiter.length());
+
+    // loop for other commands
+    end = str.find(delimiter);
+    while (end != std::string::npos)
+    {
+        if (end + delimiter.length() > MAX_CMD_LEN)
+            throw std::runtime_error(\
+                                 "IRC message shall not exceed 512 characters");
+        result.push_back(str.substr(0, end));
+        str.erase(0, end + delimiter.length());
+        end = str.find(delimiter);
+    }
+    return (result);
+}
+
+/**
+ * @brief Convert a vector of strings into a vector of Command by splitting 
+ *        parameters and command
+ * 
+ * @param cmd_strings Vector of commands, not splitted by space
+ * @return vector of Command where [ PREFIX ], CMD and PARAMS are separated
+ */
+const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
+{
+    std::vector<Command>                result;
+    std::vector<std::string>::iterator  mess;
+    size_t                              end;
+    std::string                         prefix;
+
+    for (mess = cmd_strings.begin(); mess != cmd_strings.end(); ++mess)
+    {
+        // extract CMD name
+        end = mess->find(' ');
+        if (end == std::string::npos) // only the command
+        {
+            if (mess->find(':') == 0) // the only token is a prefix :'(
+                throw std::runtime_error("IRC message must have a command");
+            result.push_back(*(new Command(mess->substr(0, end))));
+        }
+        else // CMD + params
+        {
+            // CMD WITH PREFIX
+            if (mess->find(':') == 0)
+            {
+                prefix = mess->substr(1, end);
+                mess->erase(0, end + 1);
+                end = mess->find(' ');
+                if (end == std::string::npos)
+                {
+                    result.push_back(*(new Command(*mess, prefix)));
+                    mess->clear();
+                }
+                else
+                {
+                    result.push_back(*(new Command(mess->substr(0, end), prefix)));
+                    mess->erase(0, end + 1);
+                }
+            }
+            else // CMD WITH NO PREFIX
+            { 
+                result.push_back(*(new Command(mess->substr(0, end))));
+                end = mess->find(' ');
+                if (end == std::string::npos)
+                    mess->clear();
+                else
+                    mess->erase(0, end + 1);
+            }
+            // PARAMS
+            if (!mess->empty())
+            {
+                while (end != std::string::npos)
+                {
+                    // if long param starting with ":"
+                    if (mess->find(':') == 0)
+                    {
+                        result.back().params.push_back(mess->substr(1, mess->length() - 1));
+                        end = std::string::npos;
+                    }
+                    else
+                    {
+                        end = mess->find(' ');
+                        if (end == std::string::npos)
+                            result.back().params.push_back(*mess);
+                        else
+                        {
+                            result.back().params.push_back(mess->substr(0, end));
+                            mess->erase(0, end + 1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    return (result);
+}
