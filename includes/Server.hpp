@@ -42,9 +42,9 @@ class Server
         Server  &operator=(Server const &rhs);
         
         // Getters
-		int			getPort(void) const;
-		std::string	getPassword(void) const;
-		std::string	getName(void) const;
+		int         getPort(void) const;
+		std::string getPassword(void) const;
+		std::string getName(void) const;
 		std::string getHostname(void) const;
 		std::string getVersion(void) const;
 		std::string getDate(void) const;

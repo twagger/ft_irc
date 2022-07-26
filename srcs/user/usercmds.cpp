@@ -16,7 +16,7 @@
 
 //What should we do if user send PASS pwd1 pwd2 ? Is it wrong?
 
-std::string	pass(const int fd, std::vector<std::string> params, Server *irc) {
+const std::string pass(const int &fd, const std::vector<std::string> &params, Server *irc) {
 	
 	std::string replyMsg;
 	User *user = irc->getUserByFd(fd);

@@ -120,14 +120,6 @@ std::string replyList(Server *irc, const int &fd, std::string code,
 	return (reply);
 }
 
-std::string eventChannel(Server *irc, const int &fd, std::string eventType,
-    std::string channelName)
-{
-    std::string event = ":" + irc->getUserByFd(fd)->getNickname() + "!"
-        + irc->getUserByFd(fd)->getUsername() + "@::" + irc->getHostname() + " "
-        + eventType + channelName; 
-    return (event);
-}
 std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"

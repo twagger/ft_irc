@@ -1,7 +1,7 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-std::string ping(int fd, std::vector<std::string> params, Server *srv)
+const std::string ping(const int &fd, const std::vector<std::string> &cmds, Server *srv);
 {
     // Todo
     return (NULL);

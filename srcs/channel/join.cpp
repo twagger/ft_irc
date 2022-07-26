@@ -68,7 +68,7 @@ int checkChannel(std::string channel)
     return (0);
 }
 
-std::string join(const int fdUser, std::vector<std::string> parameter, Server *server)
+const std::string join(const int &fdUser, const std::vector<std::string> &parameter, Server *server)
 {
     // Get parameters of join
     std::vector<std::string> channel;
@@ -111,7 +111,7 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
 
     // Reply if the user successfully joined the channel
     std::string channelName = *itChan;
-    std::string event = eventChannel(server, fdUser, "JOIN", channelName);
+    std::string event = clientReply(server, fdUser, "JOIN", channelName);
     std::string userList = replyList(server, fdUser, "353",
         findChannel(server->_channelList, channelName)->second->_users,
         channelName);
