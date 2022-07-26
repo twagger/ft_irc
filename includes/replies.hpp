@@ -88,6 +88,7 @@
 	// Use as: clientReply()
 
 	//ADDITIONAL CLIENT REPLIES
-	#define CLIENT_NICK(nickname)							("NICK " + nickname + "\r\n")
+	#define CLIENT_NICK(prefix, nickname)							(prefix + " " + nickname + "\r\n")
+	#define CLIENT_QUIT(msg, preferredMsg)					(prefix + " " + msg + "\r\n")
 
 #endif
