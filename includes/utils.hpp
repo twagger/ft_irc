@@ -14,7 +14,7 @@ int                         printError(std::string message, int code, \
 
 // parsing
 std::vector<std::string> splitBy(std::string str, const std::string &delimiter);
-std::vector<Command>     splitCmds(std::vector<std::string> cmd_strings);
+const std::vector<Command>     splitCmds(std::vector<std::string> cmd_strings);
 
 // Util functions
 std::string replyList(Server *irc, const int &fd, std::string code,

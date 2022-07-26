@@ -41,7 +41,7 @@ std::vector<std::string>    splitBy(std::string str, const std::string &delimite
  * @param cmd_strings Vector of commands, not splitted by space
  * @return vector of Command where [ PREFIX ], CMD and PARAMS are separated
  */
-std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
+const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
 {
     std::vector<Command>                result;
     std::vector<std::string>::iterator  mess;
