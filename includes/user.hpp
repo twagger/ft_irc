@@ -9,7 +9,7 @@
 
 # define ST_ALIVE 1
 # define ST_DEAD 0
-# define ST_CHECKING 2
+# define ST_PINGED 2
 
 //   The available modes are as follows:
 //		none								=> 0	000
@@ -34,6 +34,8 @@ class User {
 		bool						_authenticated;
 		std::vector<std::string>	_channelsJoined;
 		int							_status;
+        time_t                      _lastActivityTime;
+        time_t                      _pingTime;
 
 
 	public:
@@ -53,6 +55,9 @@ class User {
 		bool 						getAuthenticated(void) const;
 		std::vector<std::string>	getChannelsJoined(void) const;
 		int							getStatus(void) const;
+        time_t  					getLastActivityTime(void) const;
+        time_t  					getPingTime(void) const;
+
 
 		void setNickname(std::string nickname);
 		void setUsername(std::string username);
@@ -62,6 +67,8 @@ class User {
 		void setPassword(bool pass);
 		void setAuthenticated(bool authenticated);
 		void setStatus(int status);
+		void setLastActivityTime(void);
+		void setPingTime(void);
 		
 		bool addChannelJoined(std::string channelName);			// if channel is already in the list, return false, else add + return true 
 		bool removeChannelJoined(std::string channelName);		// if channel is found in the list, erase it + return true, else do nothing and return false

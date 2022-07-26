@@ -1,3 +1,4 @@
+// Standard headers
 #include <netinet/in.h>
 #include <cstring>
 #include <cstdlib>
@@ -15,16 +16,23 @@
 #include <map>
 #include <vector>
 
+// Custom headers
 #include "../../includes/Server.hpp"
+#include "../../includes/channel.hpp"
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
+#include "../../includes/usercmds.hpp"
+
+#ifndef HOSTNAME
+# define HOSTNAME "localhost"
+#endif
 
 /* ************************************************************************** */
 /* Constructors & destructor                                                  */
 /* ************************************************************************** */
 Server::Server(int port, std::string password, std::string name)
-: _port(port), _password(password), _name(name), _lastPingTime(time(NULL))
+: _port(port), _password(password), _name(name), _hostname(HOSTNAME)
 { this->_initCommandList(); }
 
 Server::Server(Server const &src)
@@ -154,7 +162,7 @@ int Server::_pollWait(int pollfd, struct epoll_event **events, int max_events)
 {
     int nfds;
 
-    nfds = epoll_wait(pollfd, *events, max_events, -1);
+    nfds = epoll_wait(pollfd, *events, max_events, WAIT_TIMEOUT);
     if (nfds == -1)
         throw Server::pollWaitException();
     return (nfds);
@@ -234,6 +242,8 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["PASS"] = &pass;
     this->_cmdList["NICK"] = &nick;
     this->_cmdList["JOIN"] = &join;
+    this->_cmdList["PING"] = &ping;
+    this->_cmdList["PONG"] = &pong;
     this->_cmdList["-USER"] = NULL;
 }
 
@@ -245,7 +255,7 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
     std::string                                     result;
     CmdFunction                                     exec_command;
     std::string                                     reply_str;
-    int                                             ret;
+    User                                            *user;
 
     // for each command in the message
     for (it = cmds.begin(); it < cmds.end(); ++it)
@@ -256,21 +266,28 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
         {
             // execute the command
             exec_command = it_cmd->second;
-            result = exec_command(fd, it->params, this);
+            // control if the fd can execute the command (is auth ?)
+            // < code here ... >
+            // update client timers
+            user = this->getUserByFd(fd);
+            user->setLastActivityTime();
+            result = exec_command(fd, it->params, it->prefix, this);
             // send the result to the client if it is not empty
             if (!result.empty())
             {
-                ret = send(fd, result.c_str(), result.length(), 0);
-                if (ret == -1)
-                    throw Server::sendException();
+                try { this->sendClient(fd, result); }
+                catch (Server::invalidFdException &e)
+                { printError(e.what(), 1, false); }
+                catch (Server::sendException &e)
+                { printError(e.what(), 1, true); return; }
             }
         }
         else // the command is unknown, send something to the client
         {
             reply_str = numericReply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command));
-            ret = send(fd, reply_str.c_str(), reply_str.length(), 0);
-            if (ret == -1)
-                throw Server::sendException();
+            try { this->sendClient(fd, reply_str); }
+            catch (Server::sendException &e)
+            { printError(e.what(), 1, true); return; }
         }
     }
 }
@@ -278,37 +295,35 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
 // PING CLIENTS
 void    Server::_pingClients(void)
 {
-    int                             ret;
     int                             userFd;
     User                            *user;
     double                          seconds;
-    std::string                     ping_cmd;
+    std::string                     pingCmd;
     std::map<int, User *>::iterator it;
 
-    // Check time of last ping ----------------------------------------------- /
-    seconds = difftime(time(NULL), this->_lastPingTime);
-    if (seconds > (PING_DELAY * 60))
+    // loop on every active connection --------------------------------------- /
+    for (it = this->_userList.begin(); it != this->_userList.end();)
     {
-        // save the new ping time
-        this->_lastPingTime = time(NULL);
-        // loop on every active connection
-        for (it = this->_userList.begin(); it != this->_userList.end();)
+        userFd = it->first;
+        user = it->second;
+        // Check user's last activity time 
+        seconds = difftime(time(NULL), user->getLastActivityTime());
+        // case 1 : send a PING command if > 120sec -------------------------- /
+        if (user->getStatus() == ST_ALIVE && seconds > PING_TIMEOUT)
         {
-            userFd = it->first;
-            user = it->second;
-            // client was alive at last PING, PING it again ------------------ /
-            if (user->getStatus() == ST_ALIVE)
+            pingCmd = PING(this->_hostname);
+            try { this->sendClient(userFd, pingCmd); }
+            catch (Server::sendException &e)
+            { printError(e.what(), 1, true); return; }
+            user->setStatus(ST_PINGED);
+            ++it;
+        }
+        else if (user->getStatus() == ST_PINGED) 
+        {
+            seconds = difftime(time(NULL), user->getPingTime());
+            // case 2 : PONG timeout > Kill the client
+            if (seconds > PONG_TIMEOUT)
             {
-                ping_cmd = PING(this->_hostname);
-                ret = send(userFd, ping_cmd.c_str(), ping_cmd.length(), 0);
-                if (ret == -1)
-                    throw Server::sendException();
-                user->setStatus(ST_CHECKING);
-                ++it;
-            }
-            else // Client didn't respond to previous PING, KILL it ! -------- /
-            {
-                // cannot reuse killConnection as it invalidates iterator :(
                 // remove user's fd from the poll
                 if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, userFd, NULL) == -1)
                     throw Server::pollDelException();
@@ -317,11 +332,13 @@ void    Server::_pingClients(void)
 
                 // add the nickname to the list of unavailable nicknames and 
                 // remove user
-                this->_unavailableNicknames.insert(user->getNickname());
+                this->_unavailableNicknames[user->getNickname()] = time(NULL);
                 delete user;
                 this->_userList.erase(it++);
             }
         }
+        else
+            ++it;
     }
 }
 
@@ -363,10 +380,8 @@ void    Server::start(void)
         catch (Server::pollWaitException &e)
         { printError(e.what(), 1, true); return; }
 
-        // send a PING to active fds (if delay since last ping is ok) -------- /
+        // send a PING to fds that seems inactive ---------------------------- /
         try { this->_pingClients(); }
-        catch (Server::sendException &e)
-        { printError(e.what(), 1, true); return; }
         catch (Server::pollDelException &e)
         { printError(e.what(), 1, true); return; }
 

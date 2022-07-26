@@ -68,7 +68,7 @@ int checkChannel(std::string channel)
     return (0);
 }
 
-std::string join(const int fdUser, std::vector<std::string> parameter, Server *server)
+const std::string join(const int &fdUser, const std::vector<std::string> &parameter, const std::string &, Server *server)
 {
     // Get parameters of join
     std::vector<std::string> channel;
@@ -85,11 +85,11 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
         //Check channelname
         std::string channelName = *itChan;
         if (checkChannel(channelName) == -1)
-            return (reply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("JOIN"))));
+            return (numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("JOIN"))));
         else if (checkChannel(channelName) == -2)
-            return (reply(server, fdUser, "403", ERR_NOSUCHCHANNEL(channelName)));
+            return (numericReply(server, fdUser, "403", ERR_NOSUCHCHANNEL(channelName)));
         else if (checkChannel(channelName) == -3)
-            return (reply(server, fdUser, "476", ERR_BADCHANMASK(channelName)));
+            return (numericReply(server, fdUser, "476", ERR_BADCHANMASK(channelName)));
         
         // Case where channel already exists
         std::map<std::string, Channel *>::iterator itMap = findChannel(server->_channelList,
@@ -97,11 +97,11 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
         if (itMap != server->_channelList.end())
         {
             if (checkKey(itChan - channel.begin(), key, itMap) < 0)
-                return (reply(server, fdUser, "475", ERR_BADCHANNELKEY(channelName)));
+                return (numericReply(server, fdUser, "475", ERR_BADCHANNELKEY(channelName)));
             if (checkInviteBan(itMap->second->_invitees, server->getUserByFd(fdUser)) < 0)
-                return (reply(server, fdUser, "473", ERR_INVITEONLYCHAN(channelName)));
+                return (numericReply(server, fdUser, "473", ERR_INVITEONLYCHAN(channelName)));
             if (checkInviteBan(itMap->second->_bannedUsers, server->getUserByFd(fdUser)) <  0)
-                return (reply(server, fdUser, "474", ERR_BANNEDFROMCHAN(channelName)));
+                return (numericReply(server, fdUser, "474", ERR_BANNEDFROMCHAN(channelName)));
         }
 
         // Case where channel doesn't exist
@@ -115,7 +115,7 @@ std::string join(const int fdUser, std::vector<std::string> parameter, Server *s
     std::string userList = replyList(server, fdUser, "353",
         findChannel(server->_channelList, channelName)->second->_users,
         channelName);
-    std::string endOfNames = reply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
+    std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
     // Use send for all the user of a channel (vector of fd)
     return (event + "\r\n" + userList + "\r\n" + endOfNames);
 }
