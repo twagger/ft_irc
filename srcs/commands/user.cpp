@@ -27,7 +27,7 @@ bool areValidParams(const std::vector<std::string> &params)
 {	
 	if (forbiddenUsername(params[0]) || params[0].find(32) != std::string::npos)
 		return false;
-	else if (isdigit(params[1][0]) == 0 || params[1][0] < '0' || params[1][0] > '7')
+	else if (isdigit(params[1][0]) == 0 || params[1][0] < '0' || params[1][0] > '7' || params[1] == params[0])
 		return false;
 	else if (params[3].size() < 1 || forbiddenUsername(params[3]))
 		return false;
@@ -57,8 +57,12 @@ const std::string user(const int &fd, const std::vector<std::string> &params, co
 		}
 		else if (areValidParams(params) == true) {
 			user->setUsername(params[0]);
-			user->setMode(params[1][0]);
+			if (params[1] == params[0])
+				user->setMode(0);
+			else	
+				user->setMode(params[1][0]);
 			user->setFullname(params[3]);
+			std::cout << "[DEBUG] " << user->getFullname() << " / isauth " << user->getAuthenticated() << " / mode " << user->getMode() << std::endl; 
 			if (isAuthenticatable(user)) 
 				replyMsg = authenticateUser(fd, srv);
 		}

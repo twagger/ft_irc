@@ -397,7 +397,6 @@ void    Server::start(void)
                 { printError(e.what(), 1, true); return; }
                 catch (Server::passwordException &e)
                 { printError(e.what(), 1, true); }
-
             }
             else // new message from existing connection --------------------- /
             {

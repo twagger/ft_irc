@@ -9,7 +9,7 @@
 
 // Custom headers
 #include "channel.hpp"
-#include "User.Class.hpp"
+#include "User.hpp"
 #include "commands.hpp"
 
 // Sockets & packets params
