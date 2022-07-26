@@ -11,48 +11,47 @@
 // RPL_MOTD(text)
 // RPL_ENDOFMOTD
 
-// Util function : cut a string in multiple 510 char packets in a deque
-const std::deque<std::string>   splitByParts(std::string str, size_t partSize)
-{
-    std::deque<std::string> parts;
-    size_t                  len;
-
-    len = str.length();
-    while (len % partSize > 0)
-    {
-        parts.push_back(str.substr(0, partSize));
-        str.erase(0, partSize);
-        len -= partSize;
-    }
-    if (!str.empty())
-        parts.push_back(str);
-    return (parts);
+std::string createModtStr(Server *srv, const int &fd) {
+	std::string	replyMsg;
+	replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD("Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - benvinguts - velkommen")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("		           .       .RPL_MOTD(text)                   .       .      .     .      .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("          .    .         .    .            .     ______                    ")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("      .           .             .               ////////")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("                .    .   ________   .  .      /////////     .    .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("           .            |.____.  /\\        ./////////    .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("    .                 .//      \\/  |\\     /////////")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("       .       .    .//          \\ |  \\ /////////       .     .   .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("                    ||.    .    .| |  ///////// .     .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("     .    .         ||           | |//`,/////                .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("             .      \\\\        ./ //  /  \\/   .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("  .                   \\\\.___./ //\\` '   ,_\\     .     .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("          .           .     \\ //////\\ , /   \\                 .    .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("                       .    ///////// \\|  '  |    .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("      .        .          ///////// .   \\ _ /          .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("                        /////////                              .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("                 .   ./////////     .     .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("         .           --------   .                  ..             .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("  .               .        .         .                       .")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("                        ________________________")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("____________------------                        -------------_________")))
+	.append(numericReply(srv, fd, "372", RPL_MOTD("Des bisous de la Space team <3")));
+	return (replyMsg);
 }
 
 const std::string motd(const int &fd, const std::vector<std::string> &, \
                        const std::string &,Server *srv)
 {
-    size_t                                  len;
-    std::string                             motd = MOTD;
-    std::string                             tmpString;
-    std::deque<std::string>                 parts;
-    std::deque<std::string>::const_iterator it;
-
+    size_t      len;
+    std::string motd = MOTD;
+    std::string reply;
+    
     // ignore the params and send MOTD to requester fd
     if (!motd.empty())
     {
-        // start
-        srv->sendClient(fd, numericReply(srv, fd, "375", \
-                        RPL_MOTDSTART(srv->getHostname())));
-        // split motd in multiple 510 char parts
-        parts = splitByParts(motd, 510);
-        for (it = parts.begin(); it != parts.end(); ++it)
-        {
-            srv->sendClient(fd, numericReply(srv, fd, "372", RPL_MOTD(*it)));
-        }
-        // stop
-        srv->sendClient(fd, numericReply(srv, fd, "376", RPL_ENDOFMOTD));
-        return (NULL);
+        reply.append(numericReply(srv, fd, "375", RPL_MOTDSTART(srv->getHostname())))
+        .append(createModtStr(srv, fd))
+        .append(numericReply(srv, fd, "376", RPL_ENDOFMOTD));
+        return (reply);
     }
     else
         return (numericReply(srv, fd, "422", ERR_NOMOTD));

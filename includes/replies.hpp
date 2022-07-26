@@ -87,5 +87,7 @@
 
 	//ADDITIONAL CLIENT REPLIES
 	#define CLIENT_NICK(nickname)							("NICK " + nickname + "\r\n")
+    #define	PING(hostname)                                  (":" + hostname + " PING " + hostname + "\r\n")
+    #define	PONG(hostname)                                  (":" + hostname + " PONG " + hostname + "\r\n")
 
 #endif
