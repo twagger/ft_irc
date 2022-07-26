@@ -39,7 +39,7 @@ HEADERS		= -Iincludes -Isrcs/server
 # FLAGS
 ################################################################################
 CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic
-		:= -DHOSTNAME=\"$(HOSTNAME)\" -DMOTD=\"$(MOTD)\"
+CUSTOMDEF		:= -DHOSTNAME=\"$(HOSTNAME)\" -DMOTD=\"$(MOTD)\"
 
 ifeq ($(DEBUG), true)
 	CPPFLAGS	+= -fsanitize=address -g3 -O0
