@@ -244,6 +244,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["JOIN"] = &join;
     this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
+    this->_cmdList["CAP"] = &cap;
     this->_cmdList["-USER"] = NULL;
 }
 
@@ -436,7 +437,7 @@ void    Server::sendClient(int fd, std::string message) const
 {
     if (this->_userList.find(fd) == this->_userList.end())
         throw Server::invalidFdException();
-    if (send(fd, message.c_str(), message.length(), 0) == -1)
+    if (send(fd, message.c_str(), message.length(), MSG_NOSIGNAL) == -1)
         throw Server::sendException();
 }
 

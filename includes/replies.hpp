@@ -66,6 +66,11 @@
 	#define ERR_UMODEUNKNOWNFLAG 							(":Unknown MODE flag\r\n")																	// 501
 	// #define ERR_NEEDMOREPARAMS 461
 
+    // MOTD
+    #define ERR_NOMOTD                                      (":MOTD File is missing\r\n")                                                               // 422
+	#define RPL_MOTDSTART(server) 						    (":- " + server + " Message of the day - \r\n")											    // 375
+	#define RPL_MOTD(text) 						            (":- " + text + "\r\n")											                            // 372
+	#define RPL_ENDOFMOTD        						    (":End of MOTD command\r\n")											                    // 376
 
 	// OTHER ERRORS:
 	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator")							// 481
