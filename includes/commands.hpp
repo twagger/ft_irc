@@ -12,6 +12,7 @@ const std::string ping(const int &fd, const std::vector<std::string> &cmds, Serv
 const std::string pong(const int &fd, const std::vector<std::string> &cmds, Server *srv);
 const std::string join(const int &fd, const std::vector<std::string> &cmds, Server *srv);
 const std::string part(const int &fd, const std::vector<std::string> &cmds, Server *srv);
+const std::string invite(const int &fd, const std::vector<std::string> &cmds, Server *srv);
 
 
 #endif

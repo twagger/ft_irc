@@ -111,7 +111,7 @@ const std::string join(const int &fdUser, const std::vector<std::string> &parame
 
     // Reply if the user successfully joined the channel
     std::string channelName = *itChan;
-    std::string event = clientReply(server, fdUser, "JOIN", channelName);
+    std::string event = clientReply(server, fdUser, "has joined " + channelName);
     std::string userList = replyList(server, fdUser, "353",
         findChannel(server->_channelList, channelName)->second->_users,
         channelName);

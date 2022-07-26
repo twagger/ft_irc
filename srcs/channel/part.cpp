@@ -52,5 +52,5 @@ const std::string part(const int fdUser, const std::vector<std::string> &paramet
     std::string channelName = *it;
     return (eventChannel(server, fdUser, "PART", channelName));
     // Reply once user parted from channel
-
+    std::string event = clientReply(server, fdUser, "has left " + channelName);
 }
