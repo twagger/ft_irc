@@ -23,12 +23,8 @@ bool	forbiddenUsername(std::string param)
 	return false;
 }
 
-bool areValidParams(std::vector<std::string> params) 
+bool areValidParams(const std::vector<std::string> &params) 
 {	
-	for (unsigned int i = 0; i < params.size(); i++) {
-		if (params[i].empty()) 	
-			return false;
-	}
 	if (forbiddenUsername(params[0]) || params[0].find(32) != std::string::npos)
 		return false;
 	else if (isdigit(params[1][0]) == 0 || params[1][0] < '0' || params[1][0] > '7')
@@ -38,26 +34,33 @@ bool areValidParams(std::vector<std::string> params)
 	return true;
 }
 
-std::string user(const int fd, std::vector<std::string> params, Server *irc) 
+bool emptyParams(const std::vector<std::string> &params) {
+	for (unsigned int i = 0; i < params.size(); i++) {
+		if (params[i].empty()) 	
+			return true;
+	}
+	return false;
+}
+
+const std::string user(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
 {
 	std::string replyMsg;
-	User *user = irc->getUserByFd(fd);
+	User *user = srv->getUserByFd(fd);
 
 	if (user != 0 && user->getPassword() == true) {
-		if (params.empty() || params.size() < 4) {
-			// should check for empty params here? => to be tested
-			replyMsg = numericReply(irc, fd, "461",
+		if (params.empty() || params.size() < 4 || emptyParams(params)) {
+			replyMsg = numericReply(srv, fd, "461",
 				ERR_NEEDMOREPARAMS(std::string("USER")));
 		}
 		else if (!user->getUsername().empty()) {
-			replyMsg = numericReply(irc, fd, "462", ERR_ALREADYREGISTRED); 
+			replyMsg = numericReply(srv, fd, "462", ERR_ALREADYREGISTRED); 
 		}
 		else if (areValidParams(params) == true) {
 			user->setUsername(params[0]);
 			user->setMode(params[1][0]);
 			user->setFullname(params[3]);
 			if (isAuthenticatable(user)) 
-				replyMsg = authenticateUser(fd, irc);
+				replyMsg = authenticateUser(fd, srv);
 		}
 	}
 	return (replyMsg);

@@ -69,17 +69,18 @@
 
 	// USER MODE
 	#define RPL_UMODEIS(userModeStr) 						(userModeStr + "\r\n")																		// 221
-	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users\r\n")													// 502
 	#define ERR_UMODEUNKNOWNFLAG 							(":Unknown MODE flag\r\n")																	// 501
+	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users\r\n")													// 502
 	// #define ERR_NEEDMOREPARAMS 461
 
 
 	// OTHER ERRORS:
-	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator" + "\r\n")					// 481
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")												// 401
+    #define	ERR_NOSUCHSERVER(servername)					(servername + " :No such server" + "\r\n")												    // 402
+    #define ERR_NOORIGIN									(":No origin specified\r\n")																// 409
 	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command" + "\r\n") 													// 421
 	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
-
+	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator" + "\r\n")					// 481
 
 
 	// LIST OF CLIENT ORIGINATED REPLIES

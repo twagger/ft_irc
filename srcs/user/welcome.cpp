@@ -12,19 +12,19 @@ bool	isAuthenticatable(User *user)
 	return true;
 }
 
-std::string	authenticateUser(const int fd, Server *irc)
+std::string	authenticateUser(const int fd, Server *srv)
 {
 	std::string	replyMsg;
-	User		*user = irc->getUserByFd(fd);
+	User		*user = srv->getUserByFd(fd);
 
-	replyMsg.append(numericReply(irc, fd, "001",
+	replyMsg.append(numericReply(srv, fd, "001",
 		RPL_WELCOME(user->getNickname(), user->getUsername(), user->getHostname())));
-	replyMsg.append(numericReply(irc, fd, "002",
-		RPL_YOURHOST(irc->getHostname(), irc->getVersion())));
-	replyMsg.append(numericReply(irc, fd, "003",
-		RPL_CREATED(irc->getDate())));
-	replyMsg.append(numericReply(irc, fd, "004",
-		RPL_MYINFO(irc->getHostname(), irc->getVersion(), USERMODES, CHANNELMODES)));
+	replyMsg.append(numericReply(srv, fd, "002",
+		RPL_YOURHOST(srv->getHostname(), srv->getVersion())));
+	replyMsg.append(numericReply(srv, fd, "003",
+		RPL_CREATED(srv->getDate())));
+	replyMsg.append(numericReply(srv, fd, "004",
+		RPL_MYINFO(srv->getHostname(), srv->getVersion(), USERMODES, CHANNELMODES)));
 //	replyMsg.append(modt());
 	user->setAuthenticated(true);																								// is client answering smth?
 	return (replyMsg);

@@ -4,9 +4,9 @@
 // CONSTRUCTORS
 User::User(const int fd, std::string hostname) : _fd(fd), _nickname("*"), 
 			_hostname(hostname), _mode(0), _authenticated(false), _channelsJoined(), 
-			_status(ST_ALIVE) { }
+			_status(ST_ALIVE), _lastActivityTime(time(NULL)){ }
 
-User::User(const User &src) : _fd(src._fd) {
+User::User(const User &src) : _fd(src._fd), _status(ST_ALIVE), _lastActivityTime(time(NULL)){
 	*this = src;
 }
 
@@ -43,6 +43,8 @@ std::vector<std::string>	User::getChannelsJoined(void) const {
 	return this->_channelsJoined;
 }
 int							User::getStatus(void) const { return this->_status; }
+time_t  					User::getLastActivityTime(void) const { return this->_lastActivityTime; }
+time_t  					User::getPingTime(void) const { return this->_pingTime; }
 
 // SETTERS
 void User::setNickname(std::string nickname) { this->_nickname = nickname; }
@@ -58,6 +60,8 @@ void User::setAuthenticated(bool authenticated) {
 	this->_authenticated = authenticated; 
 }
 void User::setStatus(int status) { this->_status = status; }
+void User::setLastActivityTime(void) { this->_lastActivityTime = time(NULL); }
+void User::setPingTime(void) { this->_pingTime = time(NULL); }
 
 // CHANNEL JOINED MANAGEMENT
 bool User::addChannelJoined(std::string channelName) {

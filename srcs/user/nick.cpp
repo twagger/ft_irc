@@ -25,33 +25,33 @@ bool	forbiddenNick(std::string param)
 	return false;
 }
 
-std::string nick(const int fd, std::vector<std::string> params, Server *irc) 
+const std::string nick(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
 {	
 	std::string replyMsg;
-	User *user = irc->getUserByFd(fd);
+	User *user = srv->getUserByFd(fd);
 	if (user != 0 && user->getPassword() == true)
 	{
 		if (params.empty() || params[0].empty()) {
-			replyMsg = numericReply(irc, fd, "431", ERR_NONICKNAMEGIVEN);
+			replyMsg = numericReply(srv, fd, "431", ERR_NONICKNAMEGIVEN);
 		}
 		else if (forbiddenNick(params[0]) == true) {
-			replyMsg = numericReply(irc, fd, "432", ERR_ERRONEUSNICKNAME(params[0]));
+			replyMsg = numericReply(srv, fd, "432", ERR_ERRONEUSNICKNAME(params[0]));
 		}
-		else if (irc->getUserByNickname(params[0]) != 0) {
-			replyMsg = numericReply(irc, fd, "433", ERR_NICKNAMEINUSE(params[0]));
+		else if (srv->getUserByNickname(params[0]) != 0) {
+			replyMsg = numericReply(srv, fd, "433", ERR_NICKNAMEINUSE(params[0]));
 		}
 		// else if (// nick is in kill list)											// waiting for killlist
-		// 	replyMsg = numericReply(irc, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
+		// 	replyMsg = numericReply(srv, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
 		else if (user->getMode() != 0 && user->getMode() == 7) {		// waiting for user mode in bitshift
-			replyMsg = numericReply(irc, fd, "484", ERR_RESTRICTED);
+			replyMsg = numericReply(srv, fd, "484", ERR_RESTRICTED);
 		}
 		else if (user->getNickname() == "*") {
 			user->setNickname(params[0]);
 			if (isAuthenticatable(user)) 
-				replyMsg = authenticateUser(fd, irc);
+				replyMsg = authenticateUser(fd, srv);
 		}
 		else {
-			replyMsg = clientReply(irc, fd, CLIENT_NICK(params[0]));			
+			replyMsg = clientReply(srv, fd, CLIENT_NICK(params[0]));			
 			user->setNickname(params[0]);
 		}
 	}

@@ -68,7 +68,7 @@ int checkChannel(std::string channel)
     return (0);
 }
 
-std::string join(const int fdUser, std::vector<std::string> parameter, Server *server)
+const std::string join(const int &fdUser, const std::vector<std::string> &parameter, const std::string &, Server *server)
 {
     // Get parameters of join
     std::vector<std::string> channel;

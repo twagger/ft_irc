@@ -1,21 +1,33 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+// Standard headers
 #include <vector>
 #include <map>
 #include <set>
 #include <ctime>
+
+// Custom headers
 #include "channel.hpp"
 #include "User.Class.hpp"
 #include "commands.hpp"
 
+// Sockets & packets params
 #define MAX_CMD_LEN 512
 #define BACKLOG 10
 #define BUF_SIZE 4096
 #define MAX_EVENTS 10
-#define PING_DELAY 5 // in minutes
-#define	PING(hostname) ("PING " + hostname + "\r\n")
 
+// Client check params
+#define PING_TIMEOUT 120 // in seconds
+#define PONG_TIMEOUT 20 // in seconds
+#define WAIT_TIMEOUT 3000 // in milliseconds
+
+// Non numeric replies
+#define	PING(hostname) (":" + hostname + " PING " + hostname + "\r\n")
+#define	PONG(hostname) (":" + hostname + " PONG " + hostname + "\r\n")
+
+// Utility structure
 struct Command
 {
     std::string                 command;
@@ -26,12 +38,13 @@ struct Command
             std::vector<std::string> params = std::vector<std::string>());
 };
 
+// Server class
 class Server
 {
     public:
         // member type
         typedef \
-            std::string (*CmdFunction)(int, std::vector<std::string>, Server*); 
+            const std::string (*CmdFunction)(const int &, const std::vector<std::string> &, const std::string &, Server*); 
 
         // Constructors & destructor
         Server(int port, std::string password, std::string name = "Gunther");
@@ -96,9 +109,9 @@ class Server
         class readException : public std::exception
         { public: virtual const char *what() const throw(); };
  
-        std::map<std::string, Channel *>    _channelList;
-        std::map<std::string, CmdFunction>  _cmdList;
-        std::set<std::string>               _unavailableNicknames;
+        std::map<std::string, Channel *>   _channelList;
+        std::map<std::string, CmdFunction> _cmdList;
+        std::map<std::string, time_t>      _unavailableNicknames;
 
     private:
         // Cannot be default construct
@@ -123,7 +136,6 @@ class Server
         std::string             _hostname;
 		std::string             _version;
 		std::string             _date;			// expected format: 19:52:09 Aug 12 2013
-        time_t                  _lastPingTime;
 
         int                     _pollfd;
         int                     _sockfd;
