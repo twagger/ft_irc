@@ -1,4 +1,4 @@
-#include "../../includes/user.hpp"
+#include "../../includes/User.hpp"
 #include <ctime>
 
 // CONSTRUCTORS

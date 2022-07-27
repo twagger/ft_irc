@@ -11,26 +11,33 @@
 // LIST OF SERVER REPLIES
 // find them here: https://datatracker.ietf.org/doc/html/rfc2812#section-5.1
 
-// USE AS: numericReply(irc, fd, "461", ERR_NEEDMOREPARAMS(std::string("CMD")));
+// USE AS: 	numericReply(irc, fd, "461", ERR_NEEDMOREPARAMS(std::string("CMD")));
 
 // CONNECTION REGISTRATION
 
 	// CONNECTION REGISTRATION REPLY
-	#define	RPL_WELCOME(nick, username, clientHost)				("Welcome to the Internet Relay Network " + nick + "!" + username + "@" + clientHost + "\r\n")	// 001
-	#define	RPL_YOURHOST(serverName, version)				("Your host is " + serverName + ", running version " + version + "\r\n")					// 002
-	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")												// 003
-	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic)																// 332
-	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set")															// 331
-	#define RPL_NAMREPLY(channelName, nickname)																											// 353
-	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list")														// 366
+	#define	RPL_WELCOME(nick, username, clientHost)			("Welcome to the Internet Relay Network " + nick + "!" + username + "@" + clientHost + "\r\n")	// 001
+	#define	RPL_YOURHOST(serverName, version)				("Your host is " + serverName + ", running version " + version + "\r\n")							// 002
+	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")														// 003
+	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " " + userModes + " " + channelModes + "\r\n")				// 004
 
-	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " " + userModes + " " + channelModes)				// 004
+	#define RPL_MOTDSTART                   
+	#define	RPL_MOTD
+	#define RPL_ENDOFMOTD
+	#define ERR_NOMOTD
+	
+	// CHANNELS
+	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic)																				// 332
+	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set")																			// 331
+	#define RPL_NAMREPLY(cMode, channelName, nMode, nickName) (cMode + " " + channelName + ":" + nMode + " " + nickName + " *(" + nMode + " " + nickName " )" + "\r\n")	// 353
+	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list")																		// 366
+
 
 	// NICK
 	#define ERR_NONICKNAMEGIVEN								(":No nickname given\r\n")																	// 431
 	#define ERR_ERRONEUSNICKNAME(nick)						(nick + " :Erroneous nickname" + "\r\n")													// 432
-	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :Nickname is already in use" + "\r\n")											// 433
-	//#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")				// 436
+	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :TEST Nickname is already in use" + "\r\n")											// 433
+	//#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")			// 436
 	#define ERR_UNAVAILRESOURCE(nickOrChannel) 				(nickOrChannel + " :Nick/channel is temporarily unavailable" + "\r\n")						// 437
 	#define ERR_RESTRICTED 									(":Your connection is restricted!\r\n")														// 484
 
@@ -64,18 +71,18 @@
 
 	// USER MODE
 	#define RPL_UMODEIS(userModeStr) 						(userModeStr + "\r\n")																		// 221
-	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users\r\n")													// 502
 	#define ERR_UMODEUNKNOWNFLAG 							(":Unknown MODE flag\r\n")																	// 501
+	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users\r\n")													// 502
 	// #define ERR_NEEDMOREPARAMS 461
 
 
 	// OTHER ERRORS:
-	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator")							// 481
-	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel")														// 401
-    #define	ERR_NOSUCHSERVER(servername)					(servername + " :No such server"+ "\r\n")												    // 402
-	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command") 															// 421
-	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
+	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")												// 401
+    #define	ERR_NOSUCHSERVER(servername)					(servername + " :No such server" + "\r\n")												    // 402
     #define ERR_NOORIGIN									(":No origin specified\r\n")																// 409
+	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command" + "\r\n") 													// 421
+	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
+	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator" + "\r\n")					// 481
 
 
 	// LIST OF CLIENT ORIGINATED REPLIES
@@ -83,6 +90,7 @@
 	// Use as: clientReply()
 
 	//ADDITIONAL CLIENT REPLIES
-	#define CLIENT_NICK(nickname)							("NICK " + nickname + "\r\n")
+	#define CLIENT_NICK(prefix, nickname)							(prefix + " " + nickname + "\r\n")
+	#define CLIENT_QUIT(prefix, msg)								(prefix + " " + msg + "\r\n")
 
 #endif
