@@ -9,7 +9,7 @@ void	serverNotice(const int &fd,  Server *srv, const std::string &destNick, std:
 	{ printError(e.what(), 1, true); return; }
 }
 
-const std::string quit(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
+const std::string quit(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
 {
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -21,13 +21,13 @@ const std::string quit(const int &fd, const std::vector<std::string> &params, co
 		serverNotice(fd, srv, user->getNickname(), CLIENT_ERRORMSG(params[0]));	
 
 	// // Send a client reply from origin FD to all channels where the user was present
-	// std::vector<std::string> channelsToReplyTo = user->getChannelsJoined();
-	// std::vector<std::string>::iterator it;
-	// std::vector<std::string>::iterator ite = channelsToReplyTo.end();
-	// replyMsg = clientReply(srv, fd, CLIENT_QUIT(prefix, params[0]));
-	// for (it = channelsToReplyTo.begin(); it < ite; ++it) {
-	// 	srv->sendChannel(*it, replyMsg);
-	// }
+	std::vector<std::string> channelsToReplyTo = user->getChannelsJoined();
+	std::vector<std::string>::iterator it;
+	std::vector<std::string>::iterator ite = channelsToReplyTo.end();
+	replyMsg = clientReply(srv, fd, CLIENT_QUIT(prefix, params[0]));
+	for (it = channelsToReplyTo.begin(); it < ite; ++it) {
+		srv->sendChannel(*it, replyMsg);
+	}
 
 	//Try to kill the fd (should be done after sending reply to all channels?)
 	try { srv->killConnection(fd); }
