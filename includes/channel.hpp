@@ -30,6 +30,9 @@ class Channel
     Channel(std::string name, User *currentUser);
     Channel(std::string name, std::string key, User *currentUser);
     ~Channel(void);
+    Channel(const Channel &cpy);
+
+    Channel &operator=(Channel const &cpy);
 
 /** Getters **/
 

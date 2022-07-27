@@ -9,6 +9,7 @@ int checkParameter(std::vector<std::string> channel, std::vector<std::string> us
     // user and channel must not be empty
     if (user.empty() == true || channel.empty() == true)
         return (-1);
+    if (channel.size() > 1)
 
 }
 

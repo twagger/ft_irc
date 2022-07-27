@@ -34,5 +34,6 @@ std::string              getChannelTopic(std::string channelName, std::map<std::
     Channel *> channelList);
 std::vector<std::string> getChannelKey(std::vector<std::string> parameter);
 std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList, User *currentUser);
+std::vector<char>::iterator findMode(std::vector<char> listMode, char mode);
 
 #endif

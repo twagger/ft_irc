@@ -40,9 +40,12 @@ const std::string part(const int &fdUser, const std::vector<std::string> &parame
             return (numericReply(server, fdUser, "442", (*it)));
 
         // Effectively part from channel
-        std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(*it);
-        channelPos->second->removeUser(server->getUserByFd(fdUser));
-        server->getUserByFd(fdUser)->removeChannelJoined(*it);
+        if (server->_channelList.empty() == false)
+        {
+            std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(*it);
+            channelPos->second->removeUser(server->getUserByFd(fdUser));
+            server->getUserByFd(fdUser)->removeChannelJoined(*it);
+        }
     }
     std::string channelName = *it;
     // Reply once user parted from channel

@@ -3,17 +3,6 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
-std::vector<char>::iterator findMode(std::vector<char> listMode, char mode)
-{
-    std::vector<char>::iterator it = listMode.begin();
-    for (; it != listMode.end(); it++)
-    {
-        if (*it == mode)
-            return (it);
-    }
-    return (it);
-}
-
 int checkParameterInvite(std::string nickname, std::string channel, const int &fdUser, Server *server)
 {
     // Nickname and channel must not be empty
@@ -42,8 +31,6 @@ int checkParameterInvite(std::string nickname, std::string channel, const int &f
     return (0);   
 }
 
-// Que se passe-t-il si nous invitons un utilisateur dans un channel qui n'existe pas ? Il devient operateur de ce channel ainsi que l'utilisateur qui invite ?
-
 const std::string invite(const int &fdUser, const std::vector<std::string> &parameter, Server *server)
 {
     std::string nickname = parameter[0];
@@ -62,5 +49,10 @@ const std::string invite(const int &fdUser, const std::vector<std::string> &para
         return (numericReply(server, fdUser, "442", ERR_NOTONCHANNEL(channel)));
     if (checkParameterInvite(nickname, channel, fdUser, server) == -6)
         return (numericReply(server, fdUser, "482", ERR_CHANOPRIVSNEEDED(channel)));
-    return ("OK");
+    
+    // Add user to the list of invitee and return reply
+    std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(channel);
+    channelPos->second->addUser(server->getUserByNickname(nickname));
+    return (clientReply(server, fdUser, nickname + " has been invited to " +
+        channel + "by " + server->getUserByFd(fdUser)->getNickname()));
 }

@@ -14,9 +14,20 @@ bool isChannel(std::string channelName)
     return (false);
 }
 
-const std::vector<std::string> splitByComma(std::string parameter)
+std::vector<std::string> splitByComma(std::string parameter)
 {
     std::vector<std::string> tab;
+
+    // Case where no comma were found
+
+    if (parameter.find(',') == std::string::npos)
+    {
+        tab.push_back(parameter);
+        return (tab);
+    }
+
+    // Case where one comma was found
+
     std::string temp;
     std::istringstream stream(parameter);
     while (std::getline(stream, temp, ','))
@@ -63,6 +74,17 @@ std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList, User
     for (; it != userList.end(); it++)
     {
         if (*it == currentUser)
+            return (it);
+    }
+    return (it);
+}
+
+std::vector<char>::iterator findMode(std::vector<char> listMode, char mode)
+{
+    std::vector<char>::iterator it = listMode.begin();
+    for (; it != listMode.end(); it++)
+    {
+        if (*it == mode)
             return (it);
     }
     return (it);
