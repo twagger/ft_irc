@@ -4,16 +4,6 @@
 #include "../../includes/Server.hpp"
 #include <sys/socket.h>
 
-bool isChannel(std::string channelName)
-{
-    if (channelName.find("#") != std::string::npos
-        || channelName.find("&") != std::string::npos)
-        {
-            return (true);
-        }
-    return (false);
-}
-
 const std::vector<std::string> splitByComma(std::string parameter)
 {
     std::vector<std::string> tab;
@@ -25,6 +15,18 @@ const std::vector<std::string> splitByComma(std::string parameter)
         tab.push_back(temp);
     }
     return (tab);
+}
+
+// CHANNEL HELPERS
+
+bool isChannel(std::string channelName)
+{
+    if (channelName.find("#") != std::string::npos
+        || channelName.find("&") != std::string::npos)
+        {
+            return (true);
+        }
+    return (false);
 }
 
 std::string getChannelTopic(std::string channelName,
@@ -39,6 +41,23 @@ std::string getChannelTopic(std::string channelName,
     }
     return (0);
 }
+
+std::vector<std::string> getChannelKey(std::vector<std::string> parameter)
+{
+    std::vector<std::string>::iterator it = parameter.end();
+
+    return (splitByComma(*it));
+}
+
+std::map<std::string, Channel *>::iterator findChannel(std::map<std::string,
+        Channel *> channelList, std::string channelName)
+{
+    std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
+    return (it);
+}
+
+
+// REPLY HELPERS
 
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
@@ -76,18 +95,4 @@ std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 						+ irc->getUserByFd(originFd)->getUsername() + "@"
 						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg;
 	return (reply);
-}
-
-std::vector<std::string> getChannelKey(std::vector<std::string> parameter)
-{
-    std::vector<std::string>::iterator it = parameter.end();
-
-    return (splitByComma(*it));
-}
-
-std::map<std::string, Channel *>::iterator findChannel(std::map<std::string,
-        Channel *> channelList, std::string channelName)
-{
-    std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
-    return (it);
 }

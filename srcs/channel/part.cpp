@@ -37,11 +37,11 @@ const std::string part(const int &fdUser, const std::vector<std::string> &parame
     // Check part parameters
     for (; it != channel.end(); it++)
     {
-        if (checkPartParameter(server->_channelList, *it, server->getUserByFd()) == -1)
+        if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -1)
             return (numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("PART"))));
-        else if (checkPartParameter(server->_channelList, *it, server->getUserByFd()) == -2)
+        else if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -2)
             return (numericReply(server, fdUser, "403", ERR_NOSUCHCHANNEL(*it)));
-        else if (checkPartParameter(server->_channelList, *it, server->getUserByFd()) == -3)
+        else if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -3)
             return (numericReply(server, fdUser, "442", (*it)));
 
         // Effectively part from channel

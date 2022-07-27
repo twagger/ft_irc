@@ -244,6 +244,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["JOIN"] = &join;
     this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
+	this->_cmdList["QUIT"] = &quit;
 }
 
 // EXECUTE RECEIVED COMMANDS

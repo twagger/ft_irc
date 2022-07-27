@@ -29,6 +29,7 @@ const std::string nick(const int &fd, const std::vector<std::string> &params, co
 {	
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
+
 	if (user != 0 && user->getPassword() == true)
 	{
 		if (params.empty() || params[0].empty()) {
