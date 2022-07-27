@@ -17,13 +17,14 @@ std::vector<std::string> splitBy(std::string str, const std::string &delimiter);
 const std::vector<Command>     splitCmds(std::vector<std::string> cmd_strings);
 
 // Util functions
+std::string numericReply(Server *irc, const int &fd, std::string code,
+			std::string replyMsg);
+std::string	clientReply(Server *irc, const int &fd, std::string replyMsg);
 std::string replyList(Server *irc, const int &fd, std::string code,
-    std::deque<User *> userList, std::string channelName);
+    		std::deque<User *> userList, std::string channelName);
 std::string eventChannel(Server *irc, const int &fd, std::string eventType,
     std::string channelName);
 int         print_error(std::string message, int code, bool with_errno);
-std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg);
-std::string	clientReply(Server *irc, const int &fd, std::string replyMsg);
 std::string get_next_tokn(std::string *str, std::string delimiter);
 
 // Channel util functions

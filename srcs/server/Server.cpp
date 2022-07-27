@@ -22,7 +22,6 @@
 #include "../../includes/irc.hpp"
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
-#include "../../includes/usercmds.hpp"
 
 #ifndef HOSTNAME
 # define HOSTNAME "localhost"
@@ -239,9 +238,10 @@ void    Server::_handleNewMessage(struct epoll_event event)
 // INIT COMMAND LIST OF THE SERVER
 void    Server::_initCommandList(void) // functions to complete
 {
-    this->_cmdList["KILL"] = &kill;
     this->_cmdList["PASS"] = &pass;
     this->_cmdList["NICK"] = &nick;
+	this->_cmdList["USER"] = &user;
+    this->_cmdList["KILL"] = &kill;
     this->_cmdList["JOIN"] = &join;
     this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
@@ -401,7 +401,6 @@ void    Server::start(void)
                 { printError(e.what(), 1, true); return; }
                 catch (Server::passwordException &e)
                 { printError(e.what(), 1, true); }
-
             }
             else // new message from existing connection --------------------- /
             {

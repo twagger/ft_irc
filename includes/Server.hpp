@@ -9,8 +9,8 @@
 
 // Custom headers
 #include "channel.hpp"
-#include "user.hpp"
-#include "usercmds.hpp"
+#include "User.hpp"
+#include "commands.hpp"
 
 // Sockets & packets params
 #define MAX_CMD_LEN 512
@@ -74,7 +74,7 @@ class Server
 		std::string getVersion(void) const;
 		std::string getDate(void) const;
 		User*		getUserByFd(const int &fd) const;
-        User*		getUserByNickname(const std::string &nick) const;
+		User*		getUserByNickname(const std::string &nick) const;
 
         // Member functions
         void    start(void);
