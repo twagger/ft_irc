@@ -5,7 +5,6 @@ const std::string quit(const int &fd, const std::vector<std::string> &params, co
 {
 	std::string replyMsg;
 
-
 	try { srv->killConnection(fd); }
     catch (Server::pollDelException &e) { printError(e.what(), 1, true); }
     catch (Server::invalidFdException &e) { printError(e.what(), 1, false); }

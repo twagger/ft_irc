@@ -66,6 +66,7 @@ const std::string user(const int &fd, const std::vector<std::string> &params, co
 			user->setFullname(params[3]);
 			if (isAuthenticatable(user)) 
 				replyMsg = authenticateUser(fd, srv);
+			std::cout << "[DEBUG] " << user->getFullname() << " / isauth " << user->getAuthenticated() << " / mode " << user->getMode() << std::endl; 
 		}
 	}
 	return (replyMsg);
