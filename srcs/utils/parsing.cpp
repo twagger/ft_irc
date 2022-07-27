@@ -2,7 +2,7 @@
 #include "../../includes/utils.hpp"
 
 // Split a string by irc message delimiter (\n\r) and return a string vector
-std::vector<std::string>    splitBy(std::string str, const std::string &delimiter)
+std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
 {
     std::vector<std::string>    result;
     size_t                      end;
@@ -10,7 +10,8 @@ std::vector<std::string>    splitBy(std::string str, const std::string &delimite
     // first check 
     end = str.find(delimiter);
     if (end == std::string::npos)
-        throw std::runtime_error("IRC message must end with CRLF");
+        return (std::vector<std::string>()); // empty vector
+        //throw std::runtime_error("IRC message must end with CRLF");
 
     // save first command in vector
     if (end + delimiter.length() > MAX_CMD_LEN)
@@ -73,7 +74,8 @@ const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
                 }
                 else
                 {
-                    result.push_back(*(new Command(mess->substr(0, end), prefix)));
+                    result.push_back(*(new Command(mess->substr(0, end), \
+                                       prefix)));
                     mess->erase(0, end + 1);
                 }
             }
@@ -94,7 +96,8 @@ const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
                     // if long param starting with ":"
                     if (mess->find(':') == 0)
                     {
-                        result.back().params.push_back(mess->substr(1, mess->length() - 1));
+                        result.back().params.push_back(mess->substr(1, \
+                                                           mess->length() - 1));
                         end = std::string::npos;
                     }
                     else
@@ -104,7 +107,8 @@ const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
                             result.back().params.push_back(*mess);
                         else
                         {
-                            result.back().params.push_back(mess->substr(0, end));
+                            result.back().params
+                                .push_back(mess->substr(0, end));
                             mess->erase(0, end + 1);
                         }
                     }

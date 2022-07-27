@@ -19,6 +19,16 @@ const std::string user(const int &fd, const std::vector<std::string> &params, co
 bool		isAuthenticatable(User *user);
 std::string	authenticateUser(const int fd, Server *srv);
 
+// Commands to ignore
+const std::string cap(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+
+// Server queries and commands
+const std::string motd(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+const std::string time(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+const std::string version(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+const std::string admin(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+const std::string info(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+
 // Miscellaneous commands
 const std::string kill(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 const std::string ping(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
