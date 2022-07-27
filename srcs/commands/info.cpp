@@ -3,15 +3,15 @@
 #include "../../includes/replies.hpp"
 
 std::string createInfoStr(Server *srv, const int &fd) {
-	std::string	replyMsg;
-	replyMsg
+    std::string	replyMsg;
+    replyMsg
     .append(numericReply(srv, fd, "371", \
             RPL_INFO(std::string("Version: ").append(VERSION))))
     .append(numericReply(srv, fd, "371", \
             RPL_INFO(std::string("Version comment: ").append(VCOMMENT))))
-	.append(numericReply(srv, fd, "371", \
+    .append(numericReply(srv, fd, "371", \
             RPL_INFO(std::string("Compilation Date: ").append(COMPILDATE))));
-	return (replyMsg);
+    return (replyMsg);
 }
 
 const std::string info(const int &fd, const std::vector<std::string> &, \
