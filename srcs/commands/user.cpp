@@ -1,24 +1,17 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-// user =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
-//     ; any octet except NUL, CR, LF, " " and "@"
-//	0	00	NUL
-//	10	0A	LF
-//	13	0D	CR
-//	32	20	' '
-//	64	40	@
 bool	forbiddenUsername(std::string param) 
 {
     if (param.empty())
 		return true;
 	else if (param.find('\0') != std::string::npos)
 		return true;
-	else if (param.find(10) != std::string::npos)
+	else if (param.find('\n') != std::string::npos)
 		return true;
-	else if (param.find(13) != std::string::npos)
+	else if (param.find('\r') != std::string::npos)
 		return true;
-	else if (param.find(64) != std::string::npos)
+	else if (param.find('@') != std::string::npos)
 		return true;
 	return false;
 }
@@ -33,7 +26,7 @@ bool emptyParams(const std::vector<std::string> &params) {
 
 bool areValidParams(const std::vector<std::string> &params) 
 {	
-	if (forbiddenUsername(params[0]) || params[0].find(32) != std::string::npos)
+	if (forbiddenUsername(params[0]) || params[0].find(' ') != std::string::npos)
 		return false;
 	else if (isdigit(params[1][0]) > 0 && (params[1][0] < '0' || params[1][0] > '7'))
 		return false;
@@ -66,7 +59,6 @@ const std::string user(const int &fd, const std::vector<std::string> &params, co
 			user->setFullname(params[3]);
 			if (isAuthenticatable(user)) 
 				replyMsg = authenticateUser(fd, srv);
-			std::cout << "[DEBUG] " << user->getFullname() << " / isauth " << user->getAuthenticated() << " / mode " << user->getMode() << std::endl; 
 		}
 	}
 	return (replyMsg);

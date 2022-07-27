@@ -1,17 +1,12 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-// nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
-//  1 =>  A-Z / a-z ";" "[", "]", "\", "`", "_", "^", "{", "|", "}"
-//  8 => A-Z / a-z 0/9 ";" "[", "]", "\", "`", "_", "^", "{", "|", "}", "-"
-
 bool	forbiddenNick(std::string param)
 {
     if (param.empty())
 		return true;
 	else if (!isalpha(param[0]) && std::string(NAMESPECIALS).find(param[0])
 				== std::string::npos)										
-				//&& param[0] != 92 ?
 		return true;
 	else if (param.length() > 9)												// to be check if > 9 >> erroneous nickname msg
 		return true;
