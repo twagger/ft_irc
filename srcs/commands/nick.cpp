@@ -20,6 +20,22 @@ bool	forbiddenNick(std::string param)
 	return false;
 }
 
+bool isInKillList(Server *srv, std::string nick) {
+	
+	std::map<std::string, time_t>::iterator it = srv->_unavailableNicknames.find(nick);
+	std::map<std::string, time_t>::iterator ite = srv->_unavailableNicknames.end();
+
+	if (it != ite) {
+		if (time(NULL) - (srv->_unavailableNicknames.find(nick))->second < KILLTIME)
+			return (true);
+		else {
+			srv->_unavailableNicknames.erase(it);
+			return (false);			
+		}
+	}
+	return (false);
+}
+
 const std::string nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
 {	
 	std::string replyMsg;
@@ -35,8 +51,9 @@ const std::string nick(const int &fd, const std::vector<std::string> &params, co
 		else if (srv->getUserByNickname(params[0]) != 0) {
 			replyMsg = numericReply(srv, fd, "433", ERR_NICKNAMEINUSE(params[0]));
 		}
-		// else if (// nick is in kill list)											// waiting for killlist
-		// 	replyMsg = numericReply(srv, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
+		else if (isInKillList(srv, params[0])) {
+			replyMsg = numericReply(srv, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
+		}
 		else if (user->hasMode(MOD_RESTRICTED)) {
 			replyMsg = numericReply(srv, fd, "484", ERR_RESTRICTED);
 		}

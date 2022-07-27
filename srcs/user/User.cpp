@@ -1,6 +1,16 @@
 #include "../../includes/User.hpp"
 #include <ctime>
 
+//   The available modes are as follows:
+//		none ?												=> 0	0000 0000
+//		a - user is flagged as away;						=> 2	0000 0001
+//		w - user receives wallops;							=> 4	0000 0010			
+//     	i - marks a users as invisible; 					=> 8	0000 0100
+//      o - operator flag;  								=> 16	0000 1000
+//      O - local operator flag;							=> 32	0001 0000
+//      s - marks a user for receipt of server notices.		=> 64	0010 0000
+//      r - restricted user connection;	 					=> 128	0100 0000
+
 // CONSTRUCTORS
 User::User(const int fd, std::string hostname) : _fd(fd), _nickname("*"), 
 			_hostname(hostname), _mode(0), _authenticated(false), _channelsJoined(), 

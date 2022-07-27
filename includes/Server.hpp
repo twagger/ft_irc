@@ -22,6 +22,7 @@
 #define PING_TIMEOUT 120 // in seconds
 #define PONG_TIMEOUT 20 // in seconds
 #define WAIT_TIMEOUT 3000 // in milliseconds
+#define KILLTIME 1500
 
 // Non numeric replies
 #define	PING(hostname) (":" + hostname + " PING " + hostname + "\r\n")
