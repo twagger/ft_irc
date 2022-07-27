@@ -38,12 +38,11 @@ const std::string nick(const int &fd, const std::vector<std::string> &params, co
 			replyMsg = numericReply(srv, fd, "432", ERR_ERRONEUSNICKNAME(params[0]));
 		}
 		else if (srv->getUserByNickname(params[0]) != 0) {
-			std::cout << "[DEBUG] nick not ok" << std::endl;
 			replyMsg = numericReply(srv, fd, "433", ERR_NICKNAMEINUSE(params[0]));
 		}
 		// else if (// nick is in kill list)											// waiting for killlist
 		// 	replyMsg = numericReply(srv, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
-		else if (user->getMode() != 0 && user->getMode() == 7) {		// waiting for user mode in bitshift
+		else if (user->hasMode(MOD_RESTRICTED)) {
 			replyMsg = numericReply(srv, fd, "484", ERR_RESTRICTED);
 		}
 		else if (user->getNickname() == "*") {
