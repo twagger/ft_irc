@@ -18,11 +18,12 @@ SRCS		= srcs/main.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/channel/join.cpp \
+			  srcs/channel/part.cpp \
+			  srcs/channel/invite.cpp \
+			  srcs/channel/kick.cpp \
 			  srcs/utils/command_utils.cpp \
 			  srcs/user/user.cpp \
 			  srcs/commands/kill.cpp \
-			  srcs/commands/part.cpp \
-			  srcs/commands/invite.cpp \
 			  srcs/user/usercmds.cpp 
 			  
 OBJS		= $(SRCS:.cpp=.o)

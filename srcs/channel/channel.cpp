@@ -48,7 +48,10 @@ void Channel::removeMode(char mode)
     }
 }
 
-// Question: comment savoir l'id de l'utilisateur qui envoie la requete JOIN 
+void Channel::addMode(char mode)
+{
+    this->_mode.push_back(mode);
+}
 
 void Channel::addUser(User *newUser)
 {

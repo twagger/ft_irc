@@ -13,5 +13,6 @@ const std::string pong(const int &fd, const std::vector<std::string> &params, co
 const std::string join(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 const std::string part(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 const std::string invite(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+const std::string kick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
 #endif

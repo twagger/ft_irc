@@ -15,11 +15,11 @@ class Channel
     std::string             _topic;
     std::string             _channelName;
     std::string             _key;
-    std::vector<char>       _mode;   
 
     public:
 
 /** Public attributes **/
+    std::vector<char>       _mode;   
     std::deque<User*>       _operators;
     std::deque<User*>       _users;
     std::deque<User*>       _bannedUsers;
@@ -48,6 +48,7 @@ class Channel
 /** Member functions **/
 
     void removeMode(char mode);
+    void addMode(char mode);
     void addUser(User *newUser);
     void removeUser(User *userToDelete);
     void addOperator(User *newOperator);

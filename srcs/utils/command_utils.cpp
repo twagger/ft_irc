@@ -27,19 +27,6 @@ const std::vector<std::string> splitByComma(std::string parameter)
     return (tab);
 }
 
-std::string getChannelTopic(std::string channelName,
-                        std::map<std::string, Channel *> channelList)
-{
-    std::map<std::string, Channel*>::iterator  i;
-
-    i = channelList.find(channelName);
-    if (i != channelList.end())
-    {
-        return (i->second->getTopic());
-    }
-    return (0);
-}
-
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
@@ -69,16 +56,14 @@ std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 	return (reply);
 }
 
-std::vector<std::string> getChannelKey(std::vector<std::string> parameter)
+std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList, User *currentUser)
 {
-    std::vector<std::string>::iterator it = parameter.end();
+    std::deque<User *>::iterator it = userList.begin();
 
-    return (splitByComma(*it));
-}
-
-std::map<std::string, Channel *>::iterator findChannel(std::map<std::string,
-        Channel *> channelList, std::string channelName)
-{
-    std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
+    for (; it != userList.end(); it++)
+    {
+        if (*it == currentUser)
+            return (it);
+    }
     return (it);
 }

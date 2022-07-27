@@ -32,7 +32,6 @@ bool                     isChannel(std::string channel_name);
 std::string              getChannelTopic(std::string channelName, std::map<std::string,
     Channel *> channelList);
 std::vector<std::string> getChannelKey(std::vector<std::string> parameter);
-std::map<std::string, Channel *>::iterator findChannel(std::map<std::string,
-        Channel *> channelList, std::string channelName);
+std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList, User *currentUser);
 
 #endif

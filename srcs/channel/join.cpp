@@ -74,9 +74,9 @@ const std::string join(const int &fdUser, const std::vector<std::string> &parame
     std::vector<std::string> channel;
     std::vector<std::string> key;
 
-    channel = getChannelKey(parameter);
+    channel = splitByComma(parameter[0]);
     if (parameter.size() > 1)
-        key = getChannelKey(parameter);
+        key = splitByComma(parameter[1]);
 
     std::vector<std::string>::iterator itChan = channel.begin();
     itChan = channel.begin();
@@ -92,8 +92,7 @@ const std::string join(const int &fdUser, const std::vector<std::string> &parame
             return (numericReply(server, fdUser, "476", ERR_BADCHANMASK(channelName)));
         
         // Case where channel already exists
-        std::map<std::string, Channel *>::iterator itMap = findChannel(server->_channelList,
-            channelName);
+        std::map<std::string, Channel *>::iterator itMap = server->_channelList.find(channelName);
         if (itMap != server->_channelList.end())
         {
             if (checkKey(itChan - channel.begin(), key, itMap) < 0)
@@ -113,8 +112,7 @@ const std::string join(const int &fdUser, const std::vector<std::string> &parame
     std::string channelName = *itChan;
     std::string event = clientReply(server, fdUser, "has joined " + channelName);
     std::string userList = replyList(server, fdUser, "353",
-        findChannel(server->_channelList, channelName)->second->_users,
-        channelName);
+        server->_channelList.find(channelName)->second->_users, channelName);
     std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
     // Use send for all the user of a channel (vector of fd)
     return (event + "\r\n" + userList + "\r\n" + endOfNames);
