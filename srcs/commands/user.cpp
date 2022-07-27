@@ -23,23 +23,27 @@ bool	forbiddenUsername(std::string param)
 	return false;
 }
 
-bool areValidParams(const std::vector<std::string> &params) 
-{	
-	if (forbiddenUsername(params[0]) || params[0].find(32) != std::string::npos)
-		return false;
-	else if (isdigit(params[1][0]) == 0 || params[1][0] < '0' || params[1][0] > '7' || params[1] == params[0])
-		return false;
-	else if (params[3].size() < 1 || forbiddenUsername(params[3]))
-		return false;
-	return true;
-}
-
 bool emptyParams(const std::vector<std::string> &params) {
 	for (unsigned int i = 0; i < params.size(); i++) {
 		if (params[i].empty()) 	
 			return true;
 	}
 	return false;
+}
+
+bool areValidParams(const std::vector<std::string> &params) 
+{	
+	if (forbiddenUsername(params[0]) || params[0].find(32) != std::string::npos)
+		return false;
+	else if (isdigit(params[1][0]) > 0 && (params[1][0] < '0' || params[1][0] > '7'))
+		return false;
+	else if (isdigit(params[1][0]) > 0 && params[1].size() > 1)
+		return false;
+	else if (isdigit(params[1][0]) == 0 && params[1] != params[0])
+		return false;
+	else if (params[3].size() < 1 || forbiddenUsername(params[3]))
+		return false;
+	return true;
 }
 
 const std::string user(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
@@ -62,9 +66,9 @@ const std::string user(const int &fd, const std::vector<std::string> &params, co
 			else	
 				user->setMode(params[1][0]);
 			user->setFullname(params[3]);
-			std::cout << "[DEBUG] " << user->getFullname() << " / isauth " << user->getAuthenticated() << " / mode " << user->getMode() << std::endl; 
 			if (isAuthenticatable(user)) 
 				replyMsg = authenticateUser(fd, srv);
+			std::cout << "[DEBUG] " << user->getFullname() << " / isauth " << user->getAuthenticated() << " / mode " << user->getMode() << std::endl; 
 		}
 	}
 	return (replyMsg);
