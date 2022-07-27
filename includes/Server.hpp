@@ -23,6 +23,17 @@
 #define PONG_TIMEOUT 20 // in seconds
 #define WAIT_TIMEOUT 3000 // in milliseconds
 
+// Program infos
+#ifndef VERSION
+# define VERSION "1"
+#endif
+#ifndef VCOMMENT
+# define VCOMMENT "No comment"
+#endif
+#ifndef COMPILDATE
+# define COMPILDATE "Sun 25 Sep 1983 10:00:00 AM CEST"
+#endif
+
 // Non numeric replies
 #define	PING(hostname) (":" + hostname + " PING " + hostname + "\r\n")
 #define	PONG(hostname) (":" + hostname + " PONG " + hostname + "\r\n")
@@ -44,7 +55,8 @@ class Server
     public:
         // member type
         typedef \
-            const std::string (*CmdFunction)(const int &, const std::vector<std::string> &, const std::string &, Server*); 
+            const std::string (*CmdFunction)(const int &, \
+            const std::vector<std::string> &, const std::string &, Server*); 
 
         // Constructors & destructor
         Server(int port, std::string password, std::string name = "Gunther");

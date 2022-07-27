@@ -1,7 +1,8 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-const std::string pong(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv)
+const std::string pong(const int &fd, const std::vector<std::string> &params, \
+                       const std::string &, Server *srv)
 {
     std::string clientname;
     User        *user;
@@ -18,5 +19,5 @@ const std::string pong(const int &fd, const std::vector<std::string> &params, co
         }
         user->setStatus(ST_ALIVE);
     }
-    return (NULL);
+    return (std::string());
 }

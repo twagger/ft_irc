@@ -1,7 +1,8 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-const std::string kill(const int &fd, const std::vector<std::string> &params, const std::string &,Server *srv)
+const std::string kill(const int &fd, const std::vector<std::string> &params, \
+                       const std::string &,Server *srv)
 {
     std::string nickname;
     std::string comment;
@@ -31,5 +32,5 @@ const std::string kill(const int &fd, const std::vector<std::string> &params, co
     srv->_unavailableNicknames[nickname] = time(NULL);
 
     // no specific reply on success
-    return (NULL);
+    return (std::string());
 }

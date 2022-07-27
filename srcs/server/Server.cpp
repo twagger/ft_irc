@@ -177,6 +177,7 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
 
     // accept the connect request
     memset(&client_addr, 0, sizeof(struct sockaddr_in));
+    memset(&sin_size, 0, sizeof(socklen_t));
     newfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&client_addr), \
         &sin_size);
     if (newfd == -1)
@@ -244,6 +245,12 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["JOIN"] = &join;
     this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
+    this->_cmdList["MOTD"] = &motd;
+    this->_cmdList["VERSION"] = &version;
+    this->_cmdList["TIME"] = &time;
+    this->_cmdList["INFO"] = &info;
+    this->_cmdList["CAP"] = &cap;
+    this->_cmdList["-USER"] = NULL;
 }
 
 // EXECUTE RECEIVED COMMANDS
@@ -314,6 +321,8 @@ void    Server::_pingClients(void)
             try { this->sendClient(userFd, pingCmd); }
             catch (Server::sendException &e)
             { printError(e.what(), 1, true); return; }
+            catch (Server::invalidFdException &e)
+            { printError(e.what(), 1, false); return; }
             user->setStatus(ST_PINGED);
             ++it;
         }
@@ -379,11 +388,6 @@ void    Server::start(void)
         catch (Server::pollWaitException &e)
         { printError(e.what(), 1, true); return; }
 
-        // send a PING to fds that seems inactive ---------------------------- /
-        try { this->_pingClients(); }
-        catch (Server::pollDelException &e)
-        { printError(e.what(), 1, true); return; }
-
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
         {
@@ -405,6 +409,11 @@ void    Server::start(void)
                 { printError(e.what(), 1, true); }
             }
         }
+
+        // send a PING to fds that seems inactive ---------------------------- /
+        try { this->_pingClients(); }
+        catch (Server::pollDelException &e)
+        { printError(e.what(), 1, true); return; }
     }
 }
 
@@ -434,7 +443,7 @@ void    Server::sendClient(int fd, std::string message) const
 {
     if (this->_userList.find(fd) == this->_userList.end())
         throw Server::invalidFdException();
-    if (send(fd, message.c_str(), message.length(), 0) == -1)
+    if (send(fd, message.c_str(), message.length(), MSG_NOSIGNAL) == -1)
         throw Server::sendException();
 }
 
