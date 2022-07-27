@@ -148,7 +148,7 @@ const std::string user(const int &fd, const std::vector<std::string> &params, co
 		}
 		else if (areValidParams(params) == true) {
 			user->setUsername(params[0]);
-			user->setMode(params[1][0]);
+			user->addMode(params[1][0]);
 			user->setFullname(params[3]);
 		}
 		//authenticateUser(fd, irc, replyMsg);

@@ -72,6 +72,12 @@
 	#define RPL_MOTD(text) 						            (":- " + text + "\r\n")											                            // 372
 	#define RPL_ENDOFMOTD        						    (":End of MOTD command\r\n")											                    // 376
 
+    // SERVER COMMANDS
+    #define RPL_VERSION(vers, debuglvl, server, comments)   (vers + "." + debuglvl + " " + server + " :" + comments + "\r\n")                           // 351
+    #define RPL_TIME(server, time)                          (server + " :" + time + "\r\n")                                                             // 391
+    #define RPL_INFO(string)                                (": " + string + "\r\n")                                                                    // 371
+    #define RPL_ENDOFINFO                                   (":End of INFO list\r\n")                                                                   // 374
+
 	// OTHER ERRORS:
 	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator")							// 481
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel")														// 401

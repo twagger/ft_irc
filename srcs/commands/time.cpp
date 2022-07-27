@@ -1,7 +1,18 @@
-#include "../../includes/commands.hpp"
+#include <sstream>
 
-const std::string time(const int &fd, const std::vector<std::string> &params, \
-                       const std::string &,Server *srv)
+#include "../../includes/commands.hpp"
+#include "../../includes/Server.hpp"
+#include "../../includes/utils.hpp"
+
+const std::string time(const int &fd, \
+        const std::vector<std::string> &, const std::string &,Server *srv)
 {
-    return (NULL);
+    time_t      rawtime = time(NULL);
+    struct tm   *timeinfo;
+    std::string strTime;
+
+    timeinfo = localtime(&rawtime);
+    strTime = std::string(asctime(timeinfo));
+    return (numericReply(srv, fd, "391", \
+                         RPL_TIME(srv->getHostname(), strTime)));
 }

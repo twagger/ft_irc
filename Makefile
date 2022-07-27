@@ -1,6 +1,9 @@
-
+# PROGRAM INFOS
+################################################################################
+VERSION		= "0.1"
+VCOMMENT	= "This version is almost perfect."
 HOSTNAME	= $(shell hostname)
-MOTD		= $(shell cat ./srcs/motd/motd.txt)
+COMPILDATE	= "$(shell date)"
 
 # COMMANDS
 ################################################################################
@@ -24,7 +27,12 @@ SRCS		= srcs/main.cpp \
 			  srcs/user/usercmds.cpp \
 			  srcs/commands/kill.cpp \
 			  srcs/commands/ping.cpp \
-			  srcs/commands/pong.cpp
+			  srcs/commands/pong.cpp \
+			  srcs/commands/motd.cpp \
+			  srcs/commands/cap.cpp \
+			  srcs/commands/version.cpp \
+			  srcs/commands/time.cpp \
+			  srcs/commands/info.cpp
 			  
 OBJS		= $(SRCS:.cpp=.o)
 
@@ -39,8 +47,9 @@ HEADERS		= -Iincludes -Isrcs/server
 # FLAGS
 ################################################################################
 CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic
-CUSTOMDEF		:= -DHOSTNAME=\"$(HOSTNAME)\" 
-
+PROGRAMVAR		:= -DHOSTNAME=\"$(HOSTNAME)\" -DVERSION=\"$(VERSION)\" \
+				   -DVCOMMENT=\"$(VCOMMENT)\" -DCOMPILDATE=\"$(COMPILDATE)\"
+				   
 ifeq ($(DEBUG), true)
 	CPPFLAGS	+= -fsanitize=address -g3 -O0
 endif
@@ -52,7 +61,7 @@ endif
 # RULES
 ################################################################################
 .cpp.o:
-			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS) $(CUSTOMDEF)
+			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS) $(PROGRAMVAR)
 
 $(NAME):	$(OBJS)
 			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) $(HEADERS)

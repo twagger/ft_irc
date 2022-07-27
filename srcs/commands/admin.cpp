@@ -3,5 +3,5 @@
 const std::string admin(const int &fd, const std::vector<std::string> &params, \
                         const std::string &,Server *srv)
 {
-    return (NULL);
+    return (std::string());
 }
