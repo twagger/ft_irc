@@ -55,7 +55,8 @@ class Server
     public:
         // member type
         typedef \
-            const std::string (*CmdFunction)(const int &, const std::vector<std::string> &, const std::string &, Server*); 
+            const std::string (*CmdFunction)(const int &, \
+            const std::vector<std::string> &, const std::string &, Server*); 
 
         // Constructors & destructor
         Server(int port, std::string password, std::string name = "Gunther");

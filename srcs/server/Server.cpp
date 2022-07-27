@@ -388,6 +388,14 @@ void    Server::start(void)
         catch (Server::pollWaitException &e)
         { printError(e.what(), 1, true); return; }
 
+<<<<<<< HEAD
+=======
+        // send a PING to fds that seems inactive ---------------------------- /
+        try { this->_pingClients(); }
+        catch (Server::pollDelException &e)
+        { printError(e.what(), 1, true); return; }
+
+>>>>>>> 15e04aa973dfb3006f93a72a268a80608c105024
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
         {

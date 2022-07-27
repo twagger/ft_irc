@@ -59,7 +59,6 @@ void User::setAuthenticated(bool authenticated) {
 void User::setStatus(int status) { this->_status = status; }
 void User::setLastActivityTime(void) { this->_lastActivityTime = time(NULL); }
 void User::setPingTime(void) { this->_pingTime = time(NULL); }
-
 void User::addMode(uint8_t mode) { this->_mode |= mode; }
 void User::removeMode(uint8_t mode) { this->_mode &= ~mode; }
 
