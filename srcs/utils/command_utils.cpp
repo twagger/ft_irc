@@ -43,7 +43,7 @@ std::string getChannelTopic(std::string channelName,
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
-						+ irc->getUserByFd(fd)->getNickname() + " :" + replyMsg;		
+						+ irc->getUserByFd(fd)->getNickname() + " " + replyMsg;		
 	return (reply);
 }
 
@@ -66,9 +66,10 @@ std::string eventChannel(Server *irc, const int &fd, std::string eventType,
 {
     std::string event = ":" + irc->getUserByFd(fd)->getNickname() + "!"
         + irc->getUserByFd(fd)->getUsername() + "@::" + irc->getHostname() + " "
-        + eventType + channelName; 
+        + eventType + channelName; 		// for @ shouldn't it be  irc->getUserByFd(fd)->getHostname() ?
     return (event);
 }
+
 std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"
