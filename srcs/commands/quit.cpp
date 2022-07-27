@@ -12,5 +12,5 @@ const std::string quit(const int &fd, const std::vector<std::string> &params, co
 	if (!params.empty()) {
 		replyMsg = clientReply(srv, fd, CLIENT_QUIT(prefix, params[0]));			
 	}
-	return replyMsg;
+	return (std::string());
 }

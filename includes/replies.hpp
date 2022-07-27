@@ -16,7 +16,7 @@
 // CONNECTION REGISTRATION
 
 	// CONNECTION REGISTRATION REPLY
-	#define	RPL_WELCOME(nick, username, clientHost)				("Welcome to the Internet Relay Network " + nick + "!" + username + "@" + clientHost + "\r\n")	// 001
+	#define	RPL_WELCOME(nick, username, clientHost)			("Welcome to the Internet Relay Network " + nick + "!" + username + "@" + clientHost + "\r\n")	// 001
 	#define	RPL_YOURHOST(serverName, version)				("Your host is " + serverName + ", running version " + version + "\r\n")							// 002
 	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")														// 003
 	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " " + userModes + " " + channelModes + "\r\n")				// 004

@@ -43,7 +43,7 @@ std::string getChannelTopic(std::string channelName,
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
-						+ irc->getUserByFd(fd)->getNickname() + " :" + replyMsg;		
+						+ irc->getUserByFd(fd)->getNickname() + " " + replyMsg;		
 	return (reply);
 }
 
