@@ -34,7 +34,7 @@ std::string					User::getNickname(void) const { return this->_nickname; }
 std::string					User::getUsername(void) const { return this->_username; }
 std::string					User::getFullname(void) const { return this->_fullname; }
 std::string					User::getHostname(void) const { return this->_hostname; }
-uint16_t					User::getMode(void) const { return this->_mode; }
+uint8_t				    	User::getMode(void) const { return this->_mode; }
 bool 						User::getPassword(void) const { return this->_password; }
 bool 						User::getAuthenticated(void) const {
 	return this->_authenticated;
@@ -45,16 +45,13 @@ std::vector<std::string>	User::getChannelsJoined(void) const {
 int							User::getStatus(void) const { return this->_status; }
 time_t  					User::getLastActivityTime(void) const { return this->_lastActivityTime; }
 time_t  					User::getPingTime(void) const { return this->_pingTime; }
+bool                        User::hasMode(uint8_t mode) { return ((this->_mode & mode) > 0); }
 
 // SETTERS
 void User::setNickname(std::string nickname) { this->_nickname = nickname; }
 void User::setUsername(std::string username) { this->_username = username; }
 void User::setFullname(std::string fullname) { this->_fullname = fullname; }
 void User::setHostname(std::string hostname) { this->_hostname = hostname; }
-void User::setMode(uint16_t mode) { 
-	if (mode < 8) 
-		this->_mode = mode; 
-}
 void User::setPassword(bool password) { this->_password = password; }
 void User::setAuthenticated(bool authenticated) { 
 	this->_authenticated = authenticated; 
@@ -62,6 +59,9 @@ void User::setAuthenticated(bool authenticated) {
 void User::setStatus(int status) { this->_status = status; }
 void User::setLastActivityTime(void) { this->_lastActivityTime = time(NULL); }
 void User::setPingTime(void) { this->_pingTime = time(NULL); }
+
+void User::addMode(uint8_t mode) { this->_mode |= mode; }
+void User::removeMode(uint8_t mode) { this->_mode &= ~mode; }
 
 // CHANNEL JOINED MANAGEMENT
 bool User::addChannelJoined(std::string channelName) {
