@@ -46,7 +46,7 @@ bool areValidParams(const std::vector<std::string> &params)
 	return true;
 }
 
-const std::string user(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
+void user(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
 {
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -66,8 +66,8 @@ const std::string user(const int &fd, const std::vector<std::string> &params, co
 			user->setFullname(params[3]);
 			if (isAuthenticatable(user)) 
 				replyMsg = authenticateUser(fd, srv);
-			std::cout << "[DEBUG] " << user->getFullname() << " / isauth " << user->getAuthenticated() << " / mode " << user->getMode() << std::endl; 
 		}
 	}
-	return (replyMsg);
+	srv->sendClient(fd, replyMsg);
+	return ;
 }
