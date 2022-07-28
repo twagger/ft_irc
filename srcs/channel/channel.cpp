@@ -1,19 +1,36 @@
 #include "../../includes/channel.hpp"
 
-Channel::Channel(std::string name, User *currentUser): _topic(0), _channelName(name), _key(0), _mode(0),
-            _operators(0), _bannedUsers(0), _invitees(0)
+Channel::Channel(std::string name, User *currentUser): _channelName(name)
             {
                 addUser(currentUser);
             }
 
-Channel::Channel(std::string name, std::string key, User *currentUser): _topic(0), _channelName(name), _key(key),
-            _operators(0), _bannedUsers(0), _invitees(0)
+Channel::Channel(std::string name, std::string key, User *currentUser): _channelName(name), _key(key)
             {
                 addOperator(currentUser);
                 this->_mode.push_back('k');
             }
 
 Channel::~Channel(void) {}
+
+Channel::Channel(const Channel &src): _topic(src._topic), _channelName(src._channelName),
+    _key(src._key), _mode(src._mode), _operators(src._operators), _bannedUsers(src._bannedUsers),
+    _invitees(src._invitees) { }
+
+Channel &Channel::operator=(Channel const &cpy)
+{
+    if (this != &cpy)
+    {
+        this->_topic = cpy._topic;
+        this->_channelName = cpy._channelName;
+        this->_key = cpy._key;
+        this->_mode = cpy._mode;
+        this->_operators = cpy._operators;
+        this->_bannedUsers = cpy._bannedUsers;
+        this->_invitees = cpy._invitees;
+    }
+    return (*this);
+}
 
 /** Getters **/
 
@@ -48,7 +65,10 @@ void Channel::removeMode(char mode)
     }
 }
 
-// Question: comment savoir l'id de l'utilisateur qui envoie la requete JOIN 
+void Channel::addMode(char mode)
+{
+    this->_mode.push_back(mode);
+}
 
 void Channel::addUser(User *newUser)
 {

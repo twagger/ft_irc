@@ -243,6 +243,7 @@ void    Server::_initCommandList(void) // functions to complete
 	this->_cmdList["USER"] = &user;
     this->_cmdList["KILL"] = &kill;
     this->_cmdList["JOIN"] = &join;
+    this->_cmdList["PART"] = &part;
     this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
     this->_cmdList["MOTD"] = &motd;

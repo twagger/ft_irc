@@ -17,9 +17,11 @@ GCLONE		= git clone
 # SOURCES
 ################################################################################
 SRCS		= srcs/main.cpp \
-			  srcs/server/Server.cpp \
+			srcs/server/Server.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/channel/join.cpp \
+			  srcs/channel/part.cpp \
+			  srcs/channel/invite.cpp \
 			  srcs/user/User.cpp \
 			  srcs/commands/kill.cpp \
 			  srcs/commands/modt.cpp \
@@ -37,13 +39,12 @@ SRCS		= srcs/main.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/utils/welcome.cpp \
-			  srcs/utils/command_utils.cpp 
-			  
+			  srcs/utils/command_utils.cpp 			  
 OBJS		= $(SRCS:.cpp=.o)
 
 # EXECUTABLES & LIBRARIES
 ################################################################################
-NAME		= server
+NAME		= ircserv
 
 # DIRECTORIES
 ################################################################################
@@ -51,7 +52,8 @@ HEADERS		= -Iincludes -Isrcs/server
 
 # FLAGS
 ################################################################################
-CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic
+CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic -g3 -fsanitize=address
+
 PROGRAMVAR		:= -DHOSTNAME=\"$(HOSTNAME)\" -DVERSION=\"$(VERSION)\" \
 				   -DVCOMMENT=\"$(VCOMMENT)\" -DCOMPILDATE=\"$(COMPILDATE)\"
 				   
