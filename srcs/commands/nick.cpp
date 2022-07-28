@@ -1,6 +1,10 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
+// nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
+//  1 =>  A-Z / a-z ";" "[", "]", "\", "`", "_", "^", "{", "|", "}"
+//  8 => A-Z / a-z 0/9 ";" "[", "]", "\", "`", "_", "^", "{", "|", "}", "-"
+
 bool	forbiddenNick(std::string param)
 {
     if (param.empty())
@@ -36,7 +40,7 @@ bool isInKillList(Server *srv, std::string nick) {
 	return (false);
 }
 
-const std::string nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
+void nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
 {	
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -67,5 +71,6 @@ const std::string nick(const int &fd, const std::vector<std::string> &params, co
 			user->setNickname(params[0]);
 		}
 	}
-	return replyMsg;
+	srv->sendClient(fd, replyMsg);
+	return ;
 }

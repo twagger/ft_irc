@@ -177,6 +177,7 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
 
     // accept the connect request
     memset(&client_addr, 0, sizeof(struct sockaddr_in));
+    memset(&sin_size, 0, sizeof(socklen_t));
     newfd = accept(sockfd, reinterpret_cast<struct sockaddr*>(&client_addr), \
         &sin_size);
     if (newfd == -1)
@@ -242,8 +243,14 @@ void    Server::_initCommandList(void) // functions to complete
 	this->_cmdList["USER"] = &user;
     this->_cmdList["KILL"] = &kill;
     this->_cmdList["JOIN"] = &join;
+    this->_cmdList["PART"] = &part;
     this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
+    this->_cmdList["MOTD"] = &motd;
+    this->_cmdList["VERSION"] = &version;
+    this->_cmdList["TIME"] = &time;
+    this->_cmdList["INFO"] = &info;
+    this->_cmdList["CAP"] = &cap;
 }
 
 // EXECUTE RECEIVED COMMANDS
@@ -270,21 +277,19 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
             // update client timers
             user = this->getUserByFd(fd);
             user->setLastActivityTime();
-            result = exec_command(fd, it->params, it->prefix, this);
-            // send the result to the client if it is not empty
-            if (!result.empty())
-            {
-                try { this->sendClient(fd, result); }
-                catch (Server::invalidFdException &e)
-                { printError(e.what(), 1, false); }
-                catch (Server::sendException &e)
-                { printError(e.what(), 1, true); return; }
-            }
+            try { exec_command(fd, it->params, it->prefix, this); }
+            // send exception
+            catch (Server::invalidFdException &e)
+            { printError(e.what(), 1, false); return; }
+            catch (Server::sendException &e)
+            { printError(e.what(), 1, true); return; }
         }
         else // the command is unknown, send something to the client
         {
-            reply_str = numericReply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command));
-            try { this->sendClient(fd, reply_str); }
+            try { this->sendClient(fd, \
+               numericReply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command)));}
+            catch (Server::invalidFdException &e)
+            { printError(e.what(), 1, false); return; }
             catch (Server::sendException &e)
             { printError(e.what(), 1, true); return; }
         }
@@ -314,6 +319,8 @@ void    Server::_pingClients(void)
             try { this->sendClient(userFd, pingCmd); }
             catch (Server::sendException &e)
             { printError(e.what(), 1, true); return; }
+            catch (Server::invalidFdException &e)
+            { printError(e.what(), 1, false); return; }
             user->setStatus(ST_PINGED);
             ++it;
         }
@@ -379,11 +386,6 @@ void    Server::start(void)
         catch (Server::pollWaitException &e)
         { printError(e.what(), 1, true); return; }
 
-        // send a PING to fds that seems inactive ---------------------------- /
-        try { this->_pingClients(); }
-        catch (Server::pollDelException &e)
-        { printError(e.what(), 1, true); return; }
-
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
         {
@@ -405,6 +407,11 @@ void    Server::start(void)
                 { printError(e.what(), 1, true); }
             }
         }
+
+        // send a PING to fds that seems inactive ---------------------------- /
+        try { this->_pingClients(); }
+        catch (Server::pollDelException &e)
+        { printError(e.what(), 1, true); return; }
     }
 }
 
@@ -434,7 +441,7 @@ void    Server::sendClient(int fd, std::string message) const
 {
     if (this->_userList.find(fd) == this->_userList.end())
         throw Server::invalidFdException();
-    if (send(fd, message.c_str(), message.length(), 0) == -1)
+    if (send(fd, message.c_str(), message.length(), MSG_NOSIGNAL) == -1)
         throw Server::sendException();
 }
 
@@ -444,13 +451,7 @@ void    Server::sendClient(std::set<int> &fds, std::string message) const
     std::set<int>::iterator it;
 
     for (it = fds.begin(); it != fds.end(); ++it)
-    {
-        try { this->sendClient(*it, message); }
-        catch (Server::sendException &e)
-        { throw Server::sendException(); }
-        catch (Server::invalidFdException &e)
-        { throw Server::invalidFdException(); }
-    }
+        this->sendClient(*it, message);
 }
 
 // SEND CHANNEL
@@ -465,13 +466,7 @@ void    Server::sendChannel(std::string channel, std::string message) const
         throw Server::invalidChannelException();
     userList = itChannel->second->getUsers();
     for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers)
-    {
-        try { this->sendClient((*itUsers)->getFd(), message); }
-        catch (Server::sendException &e)
-        { throw Server::sendException(); }
-        catch (Server::invalidFdException &e)
-        { throw Server::invalidFdException(); }
-    }
+        this->sendClient((*itUsers)->getFd(), message);
 }
 
 // BROADCAST
@@ -481,12 +476,10 @@ void    Server::broadcast(std::string message) const
     std::set<int>                               fds;
 
     for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+    {
         fds.insert(it->first);
-    try { sendClient(fds, message); }
-    catch (Server::sendException &e)
-    { throw Server::sendException(); }
-    catch (Server::invalidFdException &e)
-    { throw Server::invalidFdException(); }
+        this->sendClient(fds, message);
+    }
 }
 
 /* ************************************************************************** */

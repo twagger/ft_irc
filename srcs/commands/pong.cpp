@@ -1,7 +1,8 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-const std::string pong(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv)
+void pong(const int &fd, const std::vector<std::string> &params, \
+                       const std::string &, Server *srv)
 {
     std::string clientname;
     User        *user;
@@ -14,9 +15,8 @@ const std::string pong(const int &fd, const std::vector<std::string> &params, co
         if ((user = srv->getUserByFd(fd)) == NULL)
         {
             printError("Unknown user", 1, false);
-            return (NULL);
+            return;
         }
         user->setStatus(ST_ALIVE);
     }
-    return (NULL);
 }

@@ -44,7 +44,7 @@ std::string					User::getNickname(void) const { return this->_nickname; }
 std::string					User::getUsername(void) const { return this->_username; }
 std::string					User::getFullname(void) const { return this->_fullname; }
 std::string					User::getHostname(void) const { return this->_hostname; }
-uint8_t				    	User::getMode(void) const { return this->_mode; }
+uint8_t					    User::getMode(void) const { return this->_mode; }
 bool 						User::getPassword(void) const { return this->_password; }
 bool 						User::getAuthenticated(void) const {
 	return this->_authenticated;
@@ -69,7 +69,6 @@ void User::setAuthenticated(bool authenticated) {
 void User::setStatus(int status) { this->_status = status; }
 void User::setLastActivityTime(void) { this->_lastActivityTime = time(NULL); }
 void User::setPingTime(void) { this->_pingTime = time(NULL); }
-
 void User::addMode(uint8_t mode) { this->_mode |= mode; }
 void User::removeMode(uint8_t mode) { this->_mode &= ~mode; }
 

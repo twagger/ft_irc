@@ -1,7 +1,8 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-const std::string kill(const int &fd, const std::vector<std::string> &params, const std::string &,Server *srv)
+void    kill(const int &fd, const std::vector<std::string> &params, \
+                       const std::string &,Server *srv)
 {
     std::string nickname;
     std::string comment;
@@ -10,17 +11,28 @@ const std::string kill(const int &fd, const std::vector<std::string> &params, co
     // param check ----------------------------------------------------------- /
     // check nb of param
     if (params.size() != 2)
-        return (\
+    {
+        srv->sendClient(fd, \
 		numericReply(srv, fd, "461", ERR_NEEDMOREPARAMS(std::string("KILL")))); 
+        return;
+    }
     nickname = params[0];
     comment = params[1];
     // check if nickname exists
     target = srv->getUserByNickname(nickname);
     if (target == NULL)
-        return (numericReply(srv, fd, "401", ERR_NOSUCHNICK(nickname)));
+    {
+        srv->sendClient(fd, \
+            numericReply(srv, fd, "401", ERR_NOSUCHNICK(nickname)));
+        return;
+    }
     // check if user associated with the connection is Op
-    if (target->getMode() != 1)
-        return (numericReply(srv, fd, "481", ERR_NOPRIVILEGES(nickname)));
+    if (!target->hasMode(MOD_OPER))
+    {
+        srv->sendClient(fd, \
+            numericReply(srv, fd, "481", ERR_NOPRIVILEGES(nickname)));
+        return;
+    }
 
     // all is ok, execute the KILL ------------------------------------------- /
     try { srv->killConnection(target->getFd()); }
@@ -29,7 +41,4 @@ const std::string kill(const int &fd, const std::vector<std::string> &params, co
 
     // add the nickname to the list of unavailable nicknames with a timer
     srv->_unavailableNicknames[nickname] = time(NULL);
-
-    // no specific reply on success
-    return (NULL);
 }

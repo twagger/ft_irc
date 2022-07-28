@@ -21,7 +21,6 @@
 //      s - marks a user for receipt of server notices.		=> 6	0010 0000
 //      r - restricted user connection;	 					=> 7	0100 0000
 
-
 #define MOD_NONE        (0 << 0)
 #define MOD_AWAY        (1 << 0)
 #define MOD_WALLOPS     (1 << 2)
@@ -39,7 +38,7 @@ class User {
 		std::string					_username;			
 		std::string 				_fullname;
 		std::string					_hostname;
-		uint8_t				    	_mode;
+		uint8_t					    _mode;
 		bool						_password;
 		bool						_authenticated;
 		std::vector<std::string>	_channelsJoined;
@@ -78,10 +77,10 @@ class User {
 		void setStatus(int status);
 		void setLastActivityTime(void);
 		void setPingTime(void);
-		
+
         // mode
-        void addMode(uint8_t mode);
-        void removeMode(uint8_t mode);
+		void addMode(uint8_t mode);
+		void removeMode(uint8_t mode);
         bool hasMode(uint8_t mode);
 
 		bool addChannelJoined(std::string channelName);			// if channel is already in the list, return false, else add + return true 

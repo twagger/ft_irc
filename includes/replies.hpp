@@ -21,11 +21,6 @@
 	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")														// 003
 	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " " + userModes + " " + channelModes + "\r\n")				// 004
 
-	#define RPL_MOTDSTART                   
-	#define	RPL_MOTD
-	#define RPL_ENDOFMOTD
-	#define ERR_NOMOTD
-	
 	// CHANNELS
 	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic)																				// 332
 	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set")																			// 331
@@ -56,6 +51,8 @@
 	#define ERR_BADCHANNELKEY(channel) 						(channel + " :Cannot join channel (+k)" + "\r\n")											// 475
 	#define ERR_BADCHANMASK(channel) 						(channel + " :Bad Channel Mask" + "\r\n")													// 476
 	#define ERR_NOTONCHANNEL(channel)						(channel + " :You're not on that channel" + "\r\n")											// 442
+	#define ERR_USERONCHANNEL(user, channel)				(user + " " + channel + " :is already on channel" + "\r\n")									// 443
+	#define ERR_CHANOPRIVSNEEDED(channel)					(channel + " :You're not channel operator" + "\r\n")										// 482
 
 	// USER
 	// #define ERR_NEEDMOREPARAMS 461
@@ -73,6 +70,17 @@
 	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users\r\n")													// 502
 	// #define ERR_NEEDMOREPARAMS 461
 
+    // MOTD
+    #define ERR_NOMOTD                                      (":MOTD File is missing\r\n")                                                               // 422
+	#define RPL_MOTDSTART(server) 						    (":- " + server + " Message of the day - \r\n")											    // 375
+	#define RPL_MOTD(text) 						            (":- " + text + "\r\n")											                            // 372
+	#define RPL_ENDOFMOTD        						    (":End of MOTD command\r\n")											                    // 376
+
+    // SERVER COMMANDS
+    #define RPL_VERSION(vers, debuglvl, server, comments)   (vers + "." + debuglvl + " " + server + " :" + comments + "\r\n")                           // 351
+    #define RPL_TIME(server, time)                          (server + " :" + time + "\r\n")                                                             // 391
+    #define RPL_INFO(string)                                (": " + string + "\r\n")                                                                    // 371
+    #define RPL_ENDOFINFO                                   (":End of INFO list\r\n")                                                                   // 374
 
 	// OTHER ERRORS:
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")												// 401
@@ -88,6 +96,11 @@
 	// Use as: clientReply()
 
 	//ADDITIONAL CLIENT REPLIES
+<<<<<<< HEAD
+=======
+    #define	PING(hostname)                                  (":" + hostname + " PING " + hostname + "\r\n")
+    #define	PONG(hostname)                                  (":" + hostname + " PONG " + hostname + "\r\n")
+>>>>>>> a56857397801402dc1919ff165ff7d5217743b9b
 	#define CLIENT_NICK(prefix, nickname)							(prefix + " " + nickname + "\r\n")
 	#define CLIENT_QUIT(prefix, msg)								(prefix + " " + msg + "\r\n")
 

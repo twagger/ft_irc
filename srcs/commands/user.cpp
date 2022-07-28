@@ -1,6 +1,9 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
+// user =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
+//     ; any octet except NUL, CR, LF, " " and "@"
+
 bool	forbiddenUsername(std::string param) 
 {
     if (param.empty())
@@ -39,7 +42,7 @@ bool areValidParams(const std::vector<std::string> &params)
 	return true;
 }
 
-const std::string user(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
+void user(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
 {
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -61,5 +64,6 @@ const std::string user(const int &fd, const std::vector<std::string> &params, co
 				replyMsg = authenticateUser(fd, srv);
 		}
 	}
-	return (replyMsg);
+	srv->sendClient(fd, replyMsg);
+	return ;
 }

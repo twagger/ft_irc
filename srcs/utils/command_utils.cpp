@@ -14,9 +14,20 @@ bool isChannel(std::string channelName)
     return (false);
 }
 
-const std::vector<std::string> splitByComma(std::string parameter)
+std::vector<std::string> splitByComma(std::string parameter)
 {
     std::vector<std::string> tab;
+
+    // Case where no comma were found
+
+    if (parameter.find(',') == std::string::npos)
+    {
+        tab.push_back(parameter);
+        return (tab);
+    }
+
+    // Case where one comma was found
+
     std::string temp;
     std::istringstream stream(parameter);
     while (std::getline(stream, temp, ','))
@@ -25,19 +36,6 @@ const std::vector<std::string> splitByComma(std::string parameter)
         tab.push_back(temp);
     }
     return (tab);
-}
-
-std::string getChannelTopic(std::string channelName,
-                        std::map<std::string, Channel *> channelList)
-{
-    std::map<std::string, Channel*>::iterator  i;
-
-    i = channelList.find(channelName);
-    if (i != channelList.end())
-    {
-        return (i->second->getTopic());
-    }
-    return (0);
 }
 
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
@@ -61,15 +59,6 @@ std::string replyList(Server *irc, const int &fd, std::string code,
 	return (reply);
 }
 
-std::string eventChannel(Server *irc, const int &fd, std::string eventType,
-    std::string channelName)
-{
-    std::string event = ":" + irc->getUserByFd(fd)->getNickname() + "!"
-        + irc->getUserByFd(fd)->getUsername() + "@::" + irc->getHostname() + " "
-        + eventType + channelName; 		// for @ shouldn't it be  irc->getUserByFd(fd)->getHostname() ?
-    return (event);
-}
-
 std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"
@@ -78,16 +67,25 @@ std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 	return (reply);
 }
 
-std::vector<std::string> getChannelKey(std::vector<std::string> parameter)
+std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList, User *currentUser)
 {
-    std::vector<std::string>::iterator it = parameter.end();
+    std::deque<User *>::iterator it = userList.begin();
 
-    return (splitByComma(*it));
+    for (; it != userList.end(); it++)
+    {
+        if (*it == currentUser)
+            return (it);
+    }
+    return (it);
 }
 
-std::map<std::string, Channel *>::iterator findChannel(std::map<std::string,
-        Channel *> channelList, std::string channelName)
+std::vector<char>::iterator findMode(std::vector<char> listMode, char mode)
 {
-    std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
+    std::vector<char>::iterator it = listMode.begin();
+    for (; it != listMode.end(); it++)
+    {
+        if (*it == mode)
+            return (it);
+    }
     return (it);
 }

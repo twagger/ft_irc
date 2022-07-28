@@ -1,5 +1,9 @@
-
-HOSTNAME	=  $(shell hostname)
+# PROGRAM INFOS
+################################################################################
+VERSION		= "0.1"
+VCOMMENT	= "This version is almost perfect."
+HOSTNAME	= $(shell hostname)
+COMPILDATE	= "$(shell date)"
 
 # COMMANDS
 ################################################################################
@@ -13,9 +17,11 @@ GCLONE		= git clone
 # SOURCES
 ################################################################################
 SRCS		= srcs/main.cpp \
-			  srcs/server/Server.cpp \
+			srcs/server/Server.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/channel/join.cpp \
+			  srcs/channel/part.cpp \
+			  srcs/channel/invite.cpp \
 			  srcs/user/User.cpp \
 			  srcs/commands/kill.cpp \
 			  srcs/commands/modt.cpp \
@@ -23,18 +29,23 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/pass.cpp \
 			  srcs/commands/ping.cpp \
 			  srcs/commands/pong.cpp \
+			  srcs/commands/motd.cpp \
+			  srcs/commands/cap.cpp \
+			  srcs/commands/version.cpp \
+			  srcs/commands/time.cpp \
+			  srcs/commands/info.cpp \
 			  srcs/commands/quit.cpp \
 			  srcs/commands/user.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/utils/welcome.cpp \
-			  srcs/utils/command_utils.cpp 
-			  
+			  srcs/utils/command_utils.cpp 	
+			  		  
 OBJS		= $(SRCS:.cpp=.o)
 
 # EXECUTABLES & LIBRARIES
 ################################################################################
-NAME		= server
+NAME		= ircserv
 
 # DIRECTORIES
 ################################################################################
@@ -42,8 +53,11 @@ HEADERS		= -Iincludes -Isrcs/server
 
 # FLAGS
 ################################################################################
-CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic
+CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic -g3 -fsanitize=address
 
+PROGRAMVAR		:= -DHOSTNAME=\"$(HOSTNAME)\" -DVERSION=\"$(VERSION)\" \
+				   -DVCOMMENT=\"$(VCOMMENT)\" -DCOMPILDATE=\"$(COMPILDATE)\"
+				   
 ifeq ($(DEBUG), true)
 	CPPFLAGS	+= -fsanitize=address -g3 -O0
 endif
@@ -55,8 +69,7 @@ endif
 # RULES
 ################################################################################
 .cpp.o:
-			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS) \
-			-DHOSTNAME=\"$(HOSTNAME)\"
+			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o) $(HEADERS) $(PROGRAMVAR)
 
 $(NAME):	$(OBJS)
 			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) $(HEADERS)
