@@ -15,7 +15,7 @@ void		pass(const int &fd, const std::vector<std::string> &params, const std::str
 void		nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void		user(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 bool		isAuthenticatable(User *user);
-void		authenticateUser(const int fd, Server *srv);
+std::string	authenticateUser(const int fd, Server *srv);
 
 // Commands to ignore
 const std::string cap(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
