@@ -4,27 +4,42 @@
 #include "../../includes/commands.hpp"
 
 int checkPartParameter(std::map<std::string, Channel *> channelList,
-    std::string channelName, User *currentUser)
+    std::string channelName, User *currentUser, Server *server, const int &fdUser)
 {
-    // Not enough parameter
-    if (channelName.empty() == true)
-        return (-1);
     // Channel must exist
     std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
     if (it == channelList.end())
-        return (-2);
+    {
+        server->sendClient(fdUser, numericReply(server, fdUser, "403",
+            ERR_NOSUCHCHANNEL(channelName)));
+        return (-1);
+    }
     // Current user must be part of the channel
     if (findUserOnChannel(it->second->_users, currentUser) == it->second->_users.end())
-        return (-3);
+    {
+        server->sendClient(fdUser, numericReply(server, fdUser,
+            "442", ERR_NOTONCHANNEL(channelName)));
+        return (-2);
+    }
     return (0);
 }
 
-const std::string part(const int &fdUser, const std::vector<std::string> &parameter, const std::string &, Server *server)
+void part(const int &fdUser, const std::vector<std::string> &parameter,
+    const std::string &, Server *server)
 {
     std::vector<std::string> channel;
     std::string partMessage;
 
     channel = splitByComma(parameter[0]);
+    // Not enough parameter
+    if (channel.empty() == true)
+        return (server->sendClient(fdUser, numericReply(server, fdUser,
+        "461", ERR_NEEDMOREPARAMS(std::string("PART")))));
+    // If channel list is empty, you can't part from any channel
+    if (server->_channelList.empty() == true)
+        return (server->sendClient(fdUser, numericReply(server, fdUser, "403",
+            ERR_NOSUCHCHANNEL(channel[0]))));
+
     if (parameter.size() > 1)
         partMessage = parameter[1];
 
@@ -32,13 +47,9 @@ const std::string part(const int &fdUser, const std::vector<std::string> &parame
     // Check part parameters
     for (; it != channel.end(); it++)
     {
-        if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -1)
-            return (numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("PART"))));
-        else if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -2)
-            return (numericReply(server, fdUser, "403", ERR_NOSUCHCHANNEL(*it)));
-        else if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -3)
-            return (numericReply(server, fdUser, "442", (*it)));
-
+        if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser),
+            server, fdUser) < 0)
+            return ;
         // Effectively part from channel
         if (server->_channelList.empty() == false)
         {
@@ -49,5 +60,6 @@ const std::string part(const int &fdUser, const std::vector<std::string> &parame
     }
     std::string channelName = *it;
     // Reply once user parted from channel
-    return (clientReply(server, fdUser, "has left " + channelName + " " + partMessage));
+    server->sendChannel(channelName, clientReply(server, fdUser, "has left " +
+    channelName + " " + partMessage));
 }

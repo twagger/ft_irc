@@ -477,8 +477,10 @@ void    Server::broadcast(std::string message) const
     std::set<int>                               fds;
 
     for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+    {
         fds.insert(it->first);
         this->sendClient(fds, message);
+    }
 }
 
 /* ************************************************************************** */

@@ -26,7 +26,7 @@ std::string	authenticateUser(const int fd, Server *srv)
 		RPL_CREATED(srv->getDate())));
 	replyMsg.append(numericReply(srv, fd, "004",
 		RPL_MYINFO(srv->getHostname(), srv->getVersion(), USERMODES, CHANNELMODES)));
-	replyMsg.append(motd(fd, params, "MOTD", srv));
+	// replyMsg.append(motd(fd, params, "MOTD", srv));
 	// user mode +i
 	user->setAuthenticated(true);																								// is client answering smth?
 	return (replyMsg);
