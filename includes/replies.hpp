@@ -53,6 +53,7 @@
 	#define ERR_NOTONCHANNEL(channel)						(channel + " :You're not on that channel" + "\r\n")											// 442
 	#define ERR_USERONCHANNEL(user, channel)				(user + " " + channel + " :is already on channel" + "\r\n")									// 443
 	#define ERR_CHANOPRIVSNEEDED(channel)					(channel + " :You're not channel operator" + "\r\n")										// 482
+	#define ERR_USERNOTINCHANNEL(nickname, channel)			(nickname + " " + channel + " :They aren't on that channel" + "\r\n")						// 441
 
 	// USER
 	// #define ERR_NEEDMOREPARAMS 461

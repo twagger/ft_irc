@@ -3,6 +3,19 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+void channelReply(Server *server, const int &fdUser, std::string channelName)
+{
+        // Reply if the user successfully joined the channel
+        // Use send for all the user of a channel (vector of fd)
+        std::string event = clientReply(server, fdUser, "has joined " + channelName);
+        std::string userList = replyList(server, fdUser, "353",
+                                         server->_channelList.find(channelName)->second->_users,
+                                         channelName);
+        std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
+        server->sendChannel(channelName, event);
+        server->sendClient(fdUser, userList + "\r\n" + endOfNames);
+}
+
 void createChannel(std::string channelName, int pos, std::vector<std::string> key,
                    User *currentUser, Server *server)
 {
@@ -119,21 +132,14 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
             else
                 createChannel(*itChan, itChan - channel.begin(), key,
                               server->getUserByFd(fdUser), server);
+            channelReply(server, fdUser, *itChan);
         }
         // Case where channel doesn't exist
         else
         {
             createChannel(*itChan, itChan - channel.begin(), key,
                           server->getUserByFd(fdUser), server);
+            channelReply(server, fdUser, *itChan);
         }
-        // Reply if the user successfully joined the channel
-        // Use send for all the user of a channel (vector of fd)
-        std::string event = clientReply(server, fdUser, "has joined " + *itChan);
-        std::string userList = replyList(server, fdUser, "353",
-                                         server->_channelList.find(*itChan)->second->_users,
-                                         *itChan);
-        std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(*itChan));
-        server->sendChannel(*itChan, event);
-        server->sendClient(fdUser, userList + "\r\n" + endOfNames);
     }
 }
