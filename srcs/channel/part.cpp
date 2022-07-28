@@ -6,9 +6,6 @@
 int checkPartParameter(std::map<std::string, Channel *> channelList,
     std::string channelName, User *currentUser)
 {
-    // Not enough parameter
-    if (channelName.empty() == true)
-        return (-1);
     // Channel must exist
     std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
     if (it == channelList.end())
@@ -25,6 +22,12 @@ const std::string part(const int &fdUser, const std::vector<std::string> &parame
     std::string partMessage;
 
     channel = splitByComma(parameter[0]);
+    // Not enough parameter
+    if (channel.empty() == true)
+        return (numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("PART"))));
+    // If channel list is empty, you can't part from any channel
+    if (server->_channelList.empty() == true)
+        return (numericReply(server, fdUser, "403", ERR_NOSUCHCHANNEL(channel[0])));
     if (parameter.size() > 1)
         partMessage = parameter[1];
 
@@ -32,9 +35,7 @@ const std::string part(const int &fdUser, const std::vector<std::string> &parame
     // Check part parameters
     for (; it != channel.end(); it++)
     {
-        if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -1)
-            return (numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("PART"))));
-        else if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -2)
+        if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -2)
             return (numericReply(server, fdUser, "403", ERR_NOSUCHCHANNEL(*it)));
         else if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser)) == -3)
             return (numericReply(server, fdUser, "442", (*it)));

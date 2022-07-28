@@ -5,6 +5,9 @@
 
 int checkParameterInvite(std::string nickname, std::string channel, const int &fdUser, Server *server)
 {
+    // Channel list must not be empty
+    if (server->_channelList.empty() == true)
+        return (-1);
     // Nickname and channel must not be empty
     if (nickname.empty() == true || channel.empty() == true)
         return (-1);
