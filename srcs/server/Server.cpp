@@ -279,6 +279,7 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
             user = this->getUserByFd(fd);
             user->setLastActivityTime();
             try { exec_command(fd, it->params, it->prefix, this); }
+            // send exception
             catch (Server::invalidFdException &e)
             { printError(e.what(), 1, false); return; }
             catch (Server::sendException &e)
@@ -287,7 +288,7 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
         else // the command is unknown, send something to the client
         {
             try { this->sendClient(fd, \
-                numericReply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command)));}
+               numericReply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command)));}
             catch (Server::invalidFdException &e)
             { printError(e.what(), 1, false); return; }
             catch (Server::sendException &e)
