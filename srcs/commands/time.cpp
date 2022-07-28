@@ -4,7 +4,7 @@
 #include "../../includes/Server.hpp"
 #include "../../includes/utils.hpp"
 
-const std::string time(const int &fd, \
+void time(const int &fd, \
         const std::vector<std::string> &, const std::string &,Server *srv)
 {
     time_t      rawtime = time(NULL);
@@ -13,6 +13,6 @@ const std::string time(const int &fd, \
 
     timeinfo = localtime(&rawtime);
     strTime = std::string(asctime(timeinfo));
-    return (numericReply(srv, fd, "391", \
-                         RPL_TIME(srv->getHostname(), strTime)));
+    srv->sendClient(fd, \
+        numericReply(srv, fd, "391", RPL_TIME(srv->getHostname(), strTime)));
 }
