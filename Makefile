@@ -24,6 +24,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/channel/invite.cpp \
 			  srcs/user/User.cpp \
 			  srcs/commands/kill.cpp \
+			  srcs/commands/mode.cpp \
 			  srcs/commands/motd.cpp \
 			  srcs/commands/nick.cpp \
 			  srcs/commands/pass.cpp \

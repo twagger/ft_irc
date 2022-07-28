@@ -4,7 +4,7 @@
 #include <iostream>
 # include <string>
 
-#define USERMODES "iorx"
+#define USERMODES "aiwroOs"
 #define CHANNELMODES ""
 #define NAMESPECIALS ";[]`_^{|}\\"
 
@@ -68,6 +68,7 @@
 	#define RPL_UMODEIS(userModeStr) 						(userModeStr + "\r\n")																		// 221
 	#define ERR_UMODEUNKNOWNFLAG 							(":Unknown MODE flag\r\n")																	// 501
 	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users\r\n")													// 502
+	//	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")	
 	// #define ERR_NEEDMOREPARAMS 461
 
     // MOTD

@@ -35,7 +35,6 @@ void	authenticateUser(const int fd, Server *srv)
 		RPL_MYINFO(srv->getHostname(), srv->getVersion(), USERMODES, CHANNELMODES)));
 	srv->sendClient(fd, replyMsg);
 	motd(fd, params, "MOTD", srv);
-	// user mode +i
 	user->setAuthenticated(true);																								// is client answering smth?
 	return ;
 }

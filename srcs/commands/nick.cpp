@@ -68,7 +68,6 @@ void nick(const int &fd, const std::vector<std::string> &params, const std::stri
 			user->setNickname(params[0]);
 			if (isAuthenticatable(user)) 
 				authenticateUser(fd, srv);
-			std::cout << "[DEBUG] auth : " << user->getAuthenticated() << std::endl;
 			return ;
 		}
 		else {
