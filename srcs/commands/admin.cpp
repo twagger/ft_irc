@@ -1,7 +1,5 @@
 #include "../../includes/commands.hpp"
 
-const std::string admin(const int &fd, const std::vector<std::string> &params, \
+void admin(const int &fd, const std::vector<std::string> &params, \
                         const std::string &,Server *srv)
-{
-    return (std::string());
-}
+{}

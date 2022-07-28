@@ -20,19 +20,19 @@ bool		isAuthenticatable(User *user);
 std::string	authenticateUser(const int fd, Server *srv);
 
 // Commands to ignore
-const std::string cap(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void cap(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
 // Server queries and commands
-const std::string motd(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string time(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string version(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string admin(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string info(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void motd(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void time(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void version(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void admin(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void info(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
 // Miscellaneous commands
-const std::string kill(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string ping(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string pong(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void kill(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void ping(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void pong(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 const std::string join(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 const std::string part(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 const std::string invite(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);

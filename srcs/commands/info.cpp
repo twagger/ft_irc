@@ -14,7 +14,7 @@ std::string createInfoStr(Server *srv, const int &fd) {
     return (replyMsg);
 }
 
-const std::string info(const int &fd, const std::vector<std::string> &, \
+void    info(const int &fd, const std::vector<std::string> &, \
                        const std::string &,Server *srv)
 {
     std::string reply;
@@ -22,5 +22,5 @@ const std::string info(const int &fd, const std::vector<std::string> &, \
     reply
     .append(createInfoStr(srv, fd))
     .append(numericReply(srv, fd, "374", RPL_ENDOFINFO));
-    return (reply);
+    srv->sendClient(fd, reply);
 }

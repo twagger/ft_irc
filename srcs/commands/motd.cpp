@@ -30,7 +30,7 @@ std::string createModtStr(Server *srv, const int &fd) {
 	return (replyMsg);
 }
 
-const std::string motd(const int &fd, const std::vector<std::string> &, \
+void    motd(const int &fd, const std::vector<std::string> &, \
                        const std::string &,Server *srv)
 {
     std::string reply;
@@ -41,8 +41,8 @@ const std::string motd(const int &fd, const std::vector<std::string> &, \
         .append(numericReply(srv, fd, "375", RPL_MOTDSTART(srv->getHostname())))
         .append(createModtStr(srv, fd))
         .append(numericReply(srv, fd, "376", RPL_ENDOFMOTD));
-        return (reply);
+        srv->sendClient(fd, reply);
     }
     else
-        return (numericReply(srv, fd, "422", ERR_NOMOTD));
+        srv->sendClient(fd, numericReply(srv, fd, "422", ERR_NOMOTD));
 }
