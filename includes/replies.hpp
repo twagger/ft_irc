@@ -96,12 +96,9 @@
 	// Use as: clientReply()
 
 	//ADDITIONAL CLIENT REPLIES
-<<<<<<< HEAD
-=======
     #define	PING(hostname)                                  (":" + hostname + " PING " + hostname + "\r\n")
     #define	PONG(hostname)                                  (":" + hostname + " PONG " + hostname + "\r\n")
->>>>>>> a56857397801402dc1919ff165ff7d5217743b9b
-	#define CLIENT_NICK(prefix, nickname)							(prefix + " " + nickname + "\r\n")
-	#define CLIENT_QUIT(prefix, msg)								(prefix + " " + msg + "\r\n")
+	#define CLIENT_NICK(prefix, nickname)					(prefix + " " + nickname + "\r\n")
+	#define CLIENT_QUIT(prefix, msg)						(prefix + " " + msg + "\r\n")
 
 #endif

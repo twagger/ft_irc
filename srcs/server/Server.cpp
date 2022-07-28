@@ -242,6 +242,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["NICK"] = &nick;
 	this->_cmdList["USER"] = &user;
     this->_cmdList["KILL"] = &kill;
+	this->_cmdList["kill"] = &kill;
     this->_cmdList["JOIN"] = &join;
     this->_cmdList["PART"] = &part;
     this->_cmdList["PING"] = &ping;
@@ -272,17 +273,17 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
         {
             // execute the command
             exec_command = it_cmd->second;
-            // control if the fd can execute the command (is auth ?)
-            // < code here ... >
-            // update client timers
-            user = this->getUserByFd(fd);
-            user->setLastActivityTime();
-            try { exec_command(fd, it->params, it->prefix, this); }
-            // send exception
-            catch (Server::invalidFdException &e)
-            { printError(e.what(), 1, false); return; }
-            catch (Server::sendException &e)
-            { printError(e.what(), 1, true); return; }
+			user = this->getUserByFd(fd);
+			// update client timers
+			user->setLastActivityTime();
+            if (user->getAuthenticated() || isAuthenticationCmd(it_cmd->first)) {
+				try { exec_command(fd, it->params, it->prefix, this); }
+				// send exception
+				catch (Server::invalidFdException &e)
+				{ printError(e.what(), 1, false); return; }
+				catch (Server::sendException &e)
+				{ printError(e.what(), 1, true); return; }
+			}
         }
         else // the command is unknown, send something to the client
         {

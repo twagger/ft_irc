@@ -27,22 +27,32 @@ bool emptyParams(const std::vector<std::string> &params) {
 	return false;
 }
 
+bool isNumber(std::string num) {
+	for (unsigned int i = 0; i < num.size(); i++) {
+		if (isdigit(num[i]) == 0)
+			return false;
+	}
+	return true;
+}
+
 bool areValidParams(const std::vector<std::string> &params) 
 {	
+
 	if (forbiddenUsername(params[0]) || params[0].find(' ') != std::string::npos)
 		return false;
-	else if (isdigit(params[1][0]) > 0 && (params[1][0] < '0' || params[1][0] > '7'))
+	else if (isNumber(params[1]) == false)
 		return false;
-	else if (isdigit(params[1][0]) > 0 && params[1].size() > 1)
+	else if (isNumber(params[1]) && std::atol(params[1].c_str()) > 256)
 		return false;
-	else if (isdigit(params[1][0]) == 0 && params[1] != params[0])
+	else if (isNumber(params[1]) == false && params[1] != params[0])
 		return false;
 	else if (params[3].size() < 1 || forbiddenUsername(params[3]))
 		return false;
 	return true;
 }
 
-void user(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
+void user(const int &fd, const std::vector<std::string> &params, const std::string &, 
+		Server *srv) 
 {
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -58,12 +68,13 @@ void user(const int &fd, const std::vector<std::string> &params, const std::stri
 		else if (areValidParams(params) == true) {
 			user->setUsername(params[0]);
 			if (params[1] != params[0])
-				user->addMode(params[1][0]);
+				user->addMode(std::atol(params[1].c_str()));
 			user->setFullname(params[3]);
+			if (isAuthenticatable(user)) 
+				authenticateUser(fd, srv);
+			return ;
 		}
 	}
 	srv->sendClient(fd, replyMsg);
-	if (isAuthenticatable(user)) 
-		authenticateUser(fd, srv);
 	return ;
 }

@@ -12,7 +12,7 @@ bool	forbiddenNick(std::string param)
 	else if (!isalpha(param[0]) && std::string(NAMESPECIALS).find(param[0])
 				== std::string::npos)										
 		return true;
-	else if (param.length() > 9)												// to be check if > 9 >> erroneous nickname msg
+	else if (param.length() > 9)
 		return true;
 	else {
 		for (unsigned int i = 0; i < param.length(); i++) {
@@ -28,9 +28,11 @@ bool isInKillList(Server *srv, std::string nick) {
 	
 	std::map<std::string, time_t>::iterator it = srv->_unavailableNicknames.find(nick);
 	std::map<std::string, time_t>::iterator ite = srv->_unavailableNicknames.end();
+	double	seconds;
 
 	if (it != ite) {
-		if (time(NULL) - (srv->_unavailableNicknames.find(nick))->second < KILLTIME)
+		seconds = difftime(time(NULL), (srv->_unavailableNicknames.find(nick))->second);
+		if (seconds < KILLTIME)
 			return (true);
 		else {
 			srv->_unavailableNicknames.erase(it);
@@ -40,7 +42,8 @@ bool isInKillList(Server *srv, std::string nick) {
 	return (false);
 }
 
-void nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
+void nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix,
+			Server *srv) 
 {	
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -65,6 +68,8 @@ void nick(const int &fd, const std::vector<std::string> &params, const std::stri
 			user->setNickname(params[0]);
 			if (isAuthenticatable(user)) 
 				authenticateUser(fd, srv);
+			std::cout << "[DEBUG] auth : " << user->getAuthenticated() << std::endl;
+			return ;
 		}
 		else {
 			replyMsg = clientReply(srv, fd, CLIENT_NICK(prefix, params[0]));			

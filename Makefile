@@ -17,19 +17,18 @@ GCLONE		= git clone
 # SOURCES
 ################################################################################
 SRCS		= srcs/main.cpp \
-			srcs/server/Server.cpp \
+			  srcs/server/Server.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/channel/join.cpp \
 			  srcs/channel/part.cpp \
 			  srcs/channel/invite.cpp \
 			  srcs/user/User.cpp \
 			  srcs/commands/kill.cpp \
-			  srcs/commands/modt.cpp \
+			  srcs/commands/motd.cpp \
 			  srcs/commands/nick.cpp \
 			  srcs/commands/pass.cpp \
 			  srcs/commands/ping.cpp \
 			  srcs/commands/pong.cpp \
-			  srcs/commands/motd.cpp \
 			  srcs/commands/cap.cpp \
 			  srcs/commands/version.cpp \
 			  srcs/commands/time.cpp \
@@ -39,7 +38,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/utils/welcome.cpp \
-			  srcs/utils/command_utils.cpp 	
+			  srcs/utils/command_utils.cpp \
 			  		  
 OBJS		= $(SRCS:.cpp=.o)
 

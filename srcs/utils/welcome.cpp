@@ -1,6 +1,13 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
+bool 	isAuthenticationCmd(std::string cmd) {
+	if (cmd.compare("USER") == 0 || cmd.compare("NICK") == 0
+		|| cmd.compare("PASS") == 0)
+		return true;
+	return false;
+}
+
 bool	isAuthenticatable(User *user) 
 {
 	if (user->getAuthenticated() == true)

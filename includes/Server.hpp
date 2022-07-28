@@ -19,10 +19,10 @@
 #define MAX_EVENTS 10
 
 // Client check params
-#define PING_TIMEOUT 120 // in seconds
-#define PONG_TIMEOUT 20 // in seconds
-#define WAIT_TIMEOUT 3000 // in milliseconds
-#define KILLTIME 1500
+#define PING_TIMEOUT 120	// in seconds
+#define PONG_TIMEOUT 20		// in seconds
+#define WAIT_TIMEOUT 3000	// in milliseconds
+#define KILLTIME 3600		// in seconds = 1h
 
 // Program infos
 #ifndef VERSION
