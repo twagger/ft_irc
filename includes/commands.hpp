@@ -33,9 +33,9 @@ const std::string info(const int &fd, const std::vector<std::string> &params, co
 const std::string kill(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 const std::string ping(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 const std::string pong(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string join(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string part(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string invite(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-const std::string kick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void join(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void part(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void invite(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void kick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
 #endif

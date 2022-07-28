@@ -8,10 +8,16 @@ int checkParameter(std::vector<std::string> channel, std::vector<std::string> us
 {
     // user and channel must not be empty
     if (user.empty() == true || channel.empty() == true)
+    {
+        server->sendClient(fdUser, numericReply(server, fdUser,
+            "461", ERR_NEEDMOREPARAMS(std::string("KICK"))));
         return (-1);
+    }
     // channelList must not be empty
     if (server->_channelList.empty() == true)
+    {
         return (-2);
+    }
     // channel must exist
     std::vector<std::string>::iterator itVector = channel.begin();
     std::map<std::string, Channel *>::iterator itMap; 
@@ -25,7 +31,7 @@ int checkParameter(std::vector<std::string> channel, std::vector<std::string> us
 
 }
 
-const std::string oneChannelCase(std::vector<std::string> channel, std::vector<std::string> user,
+void oneChannelCase(std::vector<std::string> channel, std::vector<std::string> user,
     std::string kickMessage, Server *server, const int &fdUser)
 {
     std::map<std::string, Channel *>::iterator itMap = server->_channelList.find(channel[0]);
@@ -40,14 +46,14 @@ const std::string oneChannelCase(std::vector<std::string> channel, std::vector<s
 
 }
 
-const std::string multipleChannelCase(std::vector<std::string> channel, std::vector<std::string> user,
+void multipleChannelCase(std::vector<std::string> channel, std::vector<std::string> user,
     std::string kickMessage, Server *server, const int &fdUser)
 {
     if (channel.size() != user.size())
         return ("ERROR");
 }
 
-const std::string kick(const int &fdUser, const std::vector<std::string> &parameter, Server *server)
+void kick(const int &fdUser, const std::vector<std::string> &parameter, Server *server)
 {
     std::vector<std::string> channel;
     std::vector<std::string> user;
@@ -58,12 +64,10 @@ const std::string kick(const int &fdUser, const std::vector<std::string> &parame
         user = splitByComma(parameter[1]);
     if (parameter.size() > 2)
         kickMessage = parameter[3];
-    if (checkParameter(channel, user, server, fdUser) == -1)
-        return (numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("KICK"))));
-
+    if (checkParameter(channel, user, server, fdUser) < 0)
+        return ;
     if (channel.size() == 1)
         return (oneChannelCase(channel, user, kickMessage, server, fdUser));
     else
         return (multipleChannelCase(channel, user, kickMessage, server, fdUser));
-    return (kickMessage);   
 }
