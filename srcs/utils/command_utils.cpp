@@ -4,21 +4,6 @@
 #include "../../includes/Server.hpp"
 #include <sys/socket.h>
 
-const std::vector<std::string> splitByComma(std::string parameter)
-{
-    std::vector<std::string> tab;
-    std::string temp;
-    std::istringstream stream(parameter);
-    while (std::getline(stream, temp, ','))
-    {
-        transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
-        tab.push_back(temp);
-    }
-    return (tab);
-}
-
-// CHANNEL HELPERS
-
 bool isChannel(std::string channelName)
 {
     if (channelName.find("#") != std::string::npos
@@ -29,35 +14,29 @@ bool isChannel(std::string channelName)
     return (false);
 }
 
-std::string getChannelTopic(std::string channelName,
-                        std::map<std::string, Channel *> channelList)
+std::vector<std::string> splitByComma(std::string parameter)
 {
-    std::map<std::string, Channel*>::iterator  i;
+    std::vector<std::string> tab;
 
-    i = channelList.find(channelName);
-    if (i != channelList.end())
+    // Case where no comma were found
+
+    if (parameter.find(',') == std::string::npos)
     {
-        return (i->second->getTopic());
+        tab.push_back(parameter);
+        return (tab);
     }
-    return (0);
+
+    // Case where one comma was found
+
+    std::string temp;
+    std::istringstream stream(parameter);
+    while (std::getline(stream, temp, ','))
+    {
+        transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+        tab.push_back(temp);
+    }
+    return (tab);
 }
-
-std::vector<std::string> getChannelKey(std::vector<std::string> parameter)
-{
-    std::vector<std::string>::iterator it = parameter.end();
-
-    return (splitByComma(*it));
-}
-
-std::map<std::string, Channel *>::iterator findChannel(std::map<std::string,
-        Channel *> channelList, std::string channelName)
-{
-    std::map<std::string, Channel *>::iterator it = channelList.find(channelName);
-    return (it);
-}
-
-
-// REPLY HELPERS
 
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
@@ -80,19 +59,33 @@ std::string replyList(Server *irc, const int &fd, std::string code,
 	return (reply);
 }
 
-std::string eventChannel(Server *irc, const int &fd, std::string eventType,
-    std::string channelName)
-{
-    std::string event = ":" + irc->getUserByFd(fd)->getNickname() + "!"
-        + irc->getUserByFd(fd)->getUsername() + "@::" + irc->getHostname() + " "
-        + eventType + channelName; 		// for @ shouldn't it be  irc->getUserByFd(fd)->getHostname() ?
-    return (event);
-}
-
 std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"
 						+ irc->getUserByFd(originFd)->getUsername() + "@"
 						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg;
 	return (reply);
+}
+
+std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList, User *currentUser)
+{
+    std::deque<User *>::iterator it = userList.begin();
+
+    for (; it != userList.end(); it++)
+    {
+        if (*it == currentUser)
+            return (it);
+    }
+    return (it);
+}
+
+std::vector<char>::iterator findMode(std::vector<char> listMode, char mode)
+{
+    std::vector<char>::iterator it = listMode.begin();
+    for (; it != listMode.end(); it++)
+    {
+        if (*it == mode)
+            return (it);
+    }
+    return (it);
 }

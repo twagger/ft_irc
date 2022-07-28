@@ -1,7 +1,7 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-const std::string	pass(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) {
+void	pass(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) {
 	
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -20,5 +20,6 @@ const std::string	pass(const int &fd, const std::vector<std::string> &params, co
 			user->setPassword(true);
 		}
 	}
-	return replyMsg;
+	srv->sendClient(fd, replyMsg);
+	return ;
 }

@@ -4,12 +4,10 @@
 void	serverNotice(const int &fd,  Server *srv, const std::string &destNick, std::string msg) {
 	
 	std::string reply = ":" + srv->getHostname() + " NOTICE " + destNick + " " + ":" + msg;
-	try { srv->sendClient(fd, reply); }
-	catch (Server::sendException &e)
-	{ printError(e.what(), 1, true); return; }
+	srv->sendClient(fd, reply);
 }
 
-const std::string quit(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
+void	quit(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
 {
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -33,5 +31,5 @@ const std::string quit(const int &fd, const std::vector<std::string> &params, co
 	try { srv->killConnection(fd); }
     catch (Server::pollDelException &e) { printError(e.what(), 1, true); }
     catch (Server::invalidFdException &e) { printError(e.what(), 1, false); }
-	return (std::string());
+	return ;
 }

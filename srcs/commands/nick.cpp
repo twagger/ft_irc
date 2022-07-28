@@ -25,7 +25,7 @@ bool	forbiddenNick(std::string param)
 	return false;
 }
 
-const std::string nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
+void nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
 {	
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -56,5 +56,6 @@ const std::string nick(const int &fd, const std::vector<std::string> &params, co
 			user->setNickname(params[0]);
 		}
 	}
-	return replyMsg;
+	srv->sendClient(fd, replyMsg);
+	return ;
 }
