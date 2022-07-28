@@ -54,7 +54,7 @@ std::string replyList(Server *irc, const int &fd, std::string code,
         nicknameList = nicknameList + (*it)->getNickname() + "  ";
     }
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
-						+ irc->getUserByFd(fd)->getNickname() + "= "
+						+ irc->getUserByFd(fd)->getNickname() + " = "
                         + channelName + " :@" + nicknameList;		
 	return (reply);
 }

@@ -12,8 +12,11 @@ void channelReply(Server *server, const int &fdUser, std::string channelName)
                                          server->_channelList.find(channelName)->second->_users,
                                          channelName);
         std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
-        server->sendChannel(channelName, event);
-        server->sendClient(fdUser, userList + "\r\n" + endOfNames);
+        std::cout << server->getUserByFd(fdUser)->getHostname() << std::endl;
+        std::cout << event << std::endl;
+        // // server->sendChannel(channelName, event);
+        // server->sendClient(fdUser, userList);
+        // server->sendClient(fdUser, endOfNames);
 }
 
 void createChannel(std::string channelName, int pos, std::vector<std::string> key,
