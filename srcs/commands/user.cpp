@@ -60,10 +60,10 @@ void user(const int &fd, const std::vector<std::string> &params, const std::stri
 			if (params[1] != params[0])
 				user->addMode(params[1][0]);
 			user->setFullname(params[3]);
-			if (isAuthenticatable(user)) 
-				replyMsg = authenticateUser(fd, srv);
 		}
 	}
 	srv->sendClient(fd, replyMsg);
+	if (isAuthenticatable(user)) 
+		authenticateUser(fd, srv);
 	return ;
 }

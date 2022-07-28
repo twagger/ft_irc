@@ -12,7 +12,7 @@ bool	isAuthenticatable(User *user)
 	return true;
 }
 
-std::string	authenticateUser(const int fd, Server *srv)
+void	authenticateUser(const int fd, Server *srv)
 {
 	std::string					replyMsg;
 	std::vector<std::string>	params;
@@ -26,8 +26,9 @@ std::string	authenticateUser(const int fd, Server *srv)
 		RPL_CREATED(srv->getDate())));
 	replyMsg.append(numericReply(srv, fd, "004",
 		RPL_MYINFO(srv->getHostname(), srv->getVersion(), USERMODES, CHANNELMODES)));
-	// replyMsg.append(motd(fd, params, "MOTD", srv));
+	srv->sendClient(fd, replyMsg);
+	motd(fd, params, "MOTD", srv);
 	// user mode +i
 	user->setAuthenticated(true);																								// is client answering smth?
-	return (replyMsg);
+	return ;
 }

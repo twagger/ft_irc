@@ -38,6 +38,6 @@ std::vector<char>::iterator findMode(std::vector<char> listMode, char mode);
 
 // Authenticate users
 bool		isAuthenticatable(User *user);
-std::string	authenticateUser(const int fd, Server *srv);
+void		authenticateUser(const int fd, Server *srv);
 
 #endif

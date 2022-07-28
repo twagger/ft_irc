@@ -64,7 +64,7 @@ void nick(const int &fd, const std::vector<std::string> &params, const std::stri
 		else if (user->getNickname() == "*") {
 			user->setNickname(params[0]);
 			if (isAuthenticatable(user)) 
-				replyMsg = authenticateUser(fd, srv);
+				authenticateUser(fd, srv);
 		}
 		else {
 			replyMsg = clientReply(srv, fd, CLIENT_NICK(prefix, params[0]));			
