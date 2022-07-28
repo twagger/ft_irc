@@ -1,7 +1,7 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-void	pass(const int &fd, const std::vector<std::string> &params, const std::string &,
+void	pass(const int &fd, const std::vector<std::string> &params, const std::string &prefix,
 			Server *srv) 
 {	
 	std::string replyMsg;
@@ -11,7 +11,7 @@ void	pass(const int &fd, const std::vector<std::string> &params, const std::stri
 	{
 		if (params.empty() || params[0].empty()) {
 			replyMsg = numericReply(srv, fd, "461",
-				ERR_NEEDMOREPARAMS(std::string("PASS")));
+				ERR_NEEDMOREPARAMS(prefix));
 		}
 		else if (user->getPassword() == true) {
 			replyMsg = numericReply(srv, fd, "462", ERR_ALREADYREGISTRED); 

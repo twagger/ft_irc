@@ -4,6 +4,15 @@
 #include "../../includes/Server.hpp"
 #include <sys/socket.h>
 
+
+bool emptyParams(const std::vector<std::string> &params) {
+	for (unsigned int i = 0; i < params.size(); i++) {
+		if (params[i].empty()) 	
+			return true;
+	}
+	return false;
+}
+
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getHostname() + " " + code + " "

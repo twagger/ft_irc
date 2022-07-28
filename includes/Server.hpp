@@ -35,9 +35,6 @@
 # define COMPILDATE "Sun 25 Sep 1983 10:00:00 AM CEST"
 #endif
 
-// Non numeric replies
-#define	PING(hostname) (":" + hostname + " PING " + hostname + "\r\n")
-#define	PONG(hostname) (":" + hostname + " PONG " + hostname + "\r\n")
 
 // Utility structure
 struct Command

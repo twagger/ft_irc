@@ -19,14 +19,6 @@ bool	forbiddenUsername(std::string param)
 	return false;
 }
 
-bool emptyParams(const std::vector<std::string> &params) {
-	for (unsigned int i = 0; i < params.size(); i++) {
-		if (params[i].empty()) 	
-			return true;
-	}
-	return false;
-}
-
 bool isNumber(std::string num) {
 	for (unsigned int i = 0; i < num.size(); i++) {
 		if (isdigit(num[i]) == 0)
@@ -51,7 +43,7 @@ bool areValidParams(const std::vector<std::string> &params)
 	return true;
 }
 
-void user(const int &fd, const std::vector<std::string> &params, const std::string &, 
+void user(const int &fd, const std::vector<std::string> &params, const std::string &prefix, 
 		Server *srv) 
 {
 	std::string replyMsg;
@@ -60,7 +52,7 @@ void user(const int &fd, const std::vector<std::string> &params, const std::stri
 	if (user != 0 && user->getPassword() == true) {
 		if (params.empty() || params.size() < 4 || emptyParams(params)) {
 			replyMsg = numericReply(srv, fd, "461",
-				ERR_NEEDMOREPARAMS(std::string("USER")));
+				ERR_NEEDMOREPARAMS(prefix));
 		}
 		else if (!user->getUsername().empty()) {
 			replyMsg = numericReply(srv, fd, "462", ERR_ALREADYREGISTRED); 

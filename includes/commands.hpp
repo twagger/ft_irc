@@ -14,7 +14,8 @@ class User;
 void	pass(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void	nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void	user(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-void 	mode(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv); 
+void 	mode(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void	oper(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv); 
 
 // Server queries and commands
 void	motd(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);

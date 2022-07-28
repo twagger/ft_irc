@@ -23,7 +23,7 @@ std::string	userModesToStr(User *user)
 	return (modes);
 }
 
-void addMode(User *user, const std::string mode, int start, int stop) {
+void addModes(User *user, const std::string mode, int start, int stop) {
 	for (int i = start; i < stop; i++) {
 		switch (mode[i])
 		{
@@ -49,7 +49,7 @@ void addMode(User *user, const std::string mode, int start, int stop) {
 	}
 }
 
-void removeMode(User *user, const std::string mode, int start, int stop) {
+void removeModes(User *user, const std::string mode, int start, int stop) {
 	for (int i = start; i < stop; i++) {
 		switch (mode[i])
 		{
@@ -87,18 +87,18 @@ void	handleAddRemoveModes(User *user, const std::string modes)
 			add = ( modes.find('+') != std::string::npos ? modes.find('+') : modes.size() );
 			rem = ( modes.find('-') != std::string::npos ? modes.find('-') : modes.size() );
 			end = ( add < rem ? add : rem );
-			addMode(user, modes, i + 1, end);
+			addModes(user, modes, i + 1, end);
 		}
 		else if (modes[i] == '-') {
 			add = ( modes.find('+') != std::string::npos ? modes.find('+') : modes.size() );
 			rem = ( modes.find('-') != std::string::npos ? modes.find('-') : modes.size() );
 			end = ( add < rem ? add : rem );
-			removeMode(user, modes, i + 1, end);
+			removeModes(user, modes, i + 1, end);
 		}
 	}
 }
 
-void	mode(const int &fd, const std::vector<std::string> &params, const std::string &, 
+void	mode(const int &fd, const std::vector<std::string> &params, const std::string &prefix, 
 		Server *srv) {
 	
 	std::string replyMsg;
@@ -106,7 +106,7 @@ void	mode(const int &fd, const std::vector<std::string> &params, const std::stri
 
 	if (params.empty() || params[0].empty()) {
 			replyMsg = numericReply(srv, fd, "461",
-				ERR_NEEDMOREPARAMS(std::string("MODE")));
+				ERR_NEEDMOREPARAMS(prefix));
 	}
 	else if (params.size() == 1 && params[0] == user->getNickname())		// no nickname given
 		replyMsg = numericReply(srv, fd, "221", RPL_UMODEIS(userModesToStr(user)));
@@ -119,6 +119,6 @@ void	mode(const int &fd, const std::vector<std::string> &params, const std::stri
 	else if (!params[1].empty()) {
 		handleAddRemoveModes(user, params[1]);
 	} 	// we already checked above that param == user's own nickname
+	srv->sendClient(fd, replyMsg);
 	return ;
 }
-

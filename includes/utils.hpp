@@ -12,6 +12,7 @@
 // Util functions
 int                         printError(std::string message, int code,
 	bool with_errno);
+bool emptyParams(const std::vector<std::string> &params);
 
 // Parsing
 std::vector<std::string> splitBy(std::string str, const std::string &delimiter);
