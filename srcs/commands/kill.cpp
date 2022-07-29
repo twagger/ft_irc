@@ -26,6 +26,7 @@ void    kill(const int &fd, const std::vector<std::string> &params, \
             numericReply(srv, fd, "401", ERR_NOSUCHNICK(nickname)));
         return;
     }
+	// TO DO: add ERR_CANTKILLSERVER case
     // check if user associated with the connection is Op
     if (!target->hasMode(MOD_OPER))
     {

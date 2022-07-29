@@ -19,6 +19,13 @@ bool	isAuthenticatable(User *user)
 	return true;
 }
 
+void addModeXI(Server *srv, User *user, const int fd) {
+	std::vector<std::string> params;
+	params.push_back(user->getNickname());
+	params.push_back("+xi");
+	mode(fd, params, "MODE", srv);
+}
+
 void	authenticateUser(const int fd, Server *srv)
 {
 	std::string					replyMsg;
@@ -35,6 +42,8 @@ void	authenticateUser(const int fd, Server *srv)
 		RPL_MYINFO(srv->getHostname(), srv->getVersion(), USERMODES, CHANNELMODES)));
 	srv->sendClient(fd, replyMsg);
 	motd(fd, params, "MOTD", srv);
-	user->setAuthenticated(true);																								// is client answering smth?
+	info(fd, params, "INFO", srv);
+	// addModeXI(srv, user, fd);
+	user->setAuthenticated(true);																							// is client answering smth?
 	return ;
 }

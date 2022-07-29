@@ -90,7 +90,7 @@
 	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command" + "\r\n") 													// 421
 	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
 	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator" + "\r\n")					// 481
-
+	#define ERR_CANTKILLSERVER								(":You can't kill a server!\r\n")															// 483
 
 	// LIST OF CLIENT ORIGINATED REPLIES
 
