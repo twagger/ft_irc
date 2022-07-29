@@ -246,6 +246,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["PART"] = &part;
     this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
+	this->_cmdList["QUIT"] = &quit;
     this->_cmdList["MOTD"] = &motd;
     this->_cmdList["VERSION"] = &version;
     this->_cmdList["TIME"] = &time;
