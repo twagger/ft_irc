@@ -24,9 +24,7 @@ std::string	userModesToStr(User *user)
 }
 
 void addModes(User *user, const std::string mode, int start, int stop) {
-	std::cout << "[DEBUG] ADD function step 1 - start " << start << " stop " << stop << std::endl;
 	for (int i = start; i < stop; i++) {
-			std::cout << "[DEBUG] ADD function step 2 - mode " << i << " is " << mode[i] << std::endl;
 		switch (mode[i])
 		{
 			case 'a':
@@ -52,9 +50,7 @@ void addModes(User *user, const std::string mode, int start, int stop) {
 }
 
 void removeModes(User *user, const std::string mode, int start, int stop) {
-		std::cout << "[DEBUG] DELETE function step 1 - start " << start << " stop " << stop << std::endl;
 	for (int i = start; i < stop; i++) {
-		std::cout << "[DEBUG] DELETE function step 2 - mode " << i << " is " << mode[i] << std::endl;
 		switch (mode[i])
 		{
 			case 'a':
@@ -85,7 +81,6 @@ void findPair(const std::string modes, unsigned int i, std::pair <char, int> *pa
 	pair->second = i;
 
 	for (i = i + 1 ; i < modes.size(); i++) {
-		std::cout << "[DEBUG] find pair - i " << i  << " modes[i] " << modes[i] << std::endl;
 		if (modes[i] == '+' || modes[i] == '-')
 			break ;
 		else
@@ -98,7 +93,6 @@ void	handleAddRemoveModes(User *user, const std::string modes)
 {
 	std::pair <char, int> pair;	
 
-	std::cout << "[DEBUG] ADD/neg step 1 " << std::endl;
 	for (unsigned int i = 0; i < modes.size(); i++) {
 		if (modes[i] == '+' || modes[i] == '-') {
 			findPair(modes, i, &pair);

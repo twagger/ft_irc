@@ -23,7 +23,6 @@ void addModeI(Server *srv, User *user, const int fd) {
 	std::vector<std::string> params;
 	params.push_back(user->getNickname());
 	params.push_back("+i");
-	std::cout << "[DEBUG] test add mode in welcome" << std::endl;
 	mode(fd, params, "MODE", srv);
 }
 
