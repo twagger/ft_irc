@@ -62,7 +62,7 @@ std::string replyList(Server *irc, const int &fd, std::string code,
 std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"
-						+ irc->getUserByFd(originFd)->getUsername() + "@"
+						+ irc->getUserByFd(originFd)->getUsername() + "@:"
 						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg
                         + "\r\n";
 	return (reply);

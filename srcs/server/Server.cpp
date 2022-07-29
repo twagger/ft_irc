@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <map>
 #include <vector>
+#include <algorithm>
 
 // Custom headers
 #include "../../includes/Server.hpp"
@@ -273,7 +274,8 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
     for (it = cmds.begin(); it < cmds.end(); ++it)
     {
         // search if it is in the known commands list of the server
-        it_cmd = this->_cmdList.find(it->command);
+        it_cmd = this->_cmdList.find(std::transform(it->command.begin(), it->command.end(),
+            (it->command.begin(), ::toupper)));
         if (it_cmd != this->_cmdList.end())
         {
             // execute the command

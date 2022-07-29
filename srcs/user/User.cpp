@@ -39,7 +39,7 @@ bool 						User::getPassword(void) const { return this->_password; }
 bool 						User::getAuthenticated(void) const {
 	return this->_authenticated;
 }
-std::vector<std::string>	User::getChannelsJoined(void) const {
+std::deque<std::string>	User::getChannelsJoined(void) const {
 	return this->_channelsJoined;
 }
 int							User::getStatus(void) const { return this->_status; }
@@ -64,8 +64,8 @@ void User::removeMode(uint8_t mode) { this->_mode &= ~mode; }
 
 // CHANNEL JOINED MANAGEMENT
 bool User::addChannelJoined(std::string channelName) {
-	std::vector<std::string>::iterator it;
-	std::vector<std::string>::iterator ite = this->_channelsJoined.end();
+	std::deque<std::string>::iterator it;
+	std::deque<std::string>::iterator ite = this->_channelsJoined.end();
 
 	for (it = this->_channelsJoined.begin(); it < ite; ++it) {
 		if (*it == channelName)
@@ -76,8 +76,8 @@ bool User::addChannelJoined(std::string channelName) {
 }
 
 bool User::removeChannelJoined(std::string channelName) {
-	std::vector<std::string>::iterator it;
-	std::vector<std::string>::iterator ite = this->_channelsJoined.end();
+	std::deque<std::string>::iterator it;
+	std::deque<std::string>::iterator ite = this->_channelsJoined.end();
 
 	for (it = this->_channelsJoined.begin(); it < ite; ++it) {
 		if (*it == channelName) {

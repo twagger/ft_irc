@@ -51,14 +51,10 @@ void part(const int &fdUser, const std::vector<std::string> &parameter,
                                server, fdUser) < 0)
             return;
         // Effectively part from channel
-        if (server->_channelList.empty() == false)
-        {
-            std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(*it);
-            channelPos->second->removeUser(server->getUserByFd(fdUser));
-            server->getUserByFd(fdUser)->removeChannelJoined(*it);
-        }
+        std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(*it);
+        channelPos->second->removeUser(server->getUserByFd(fdUser));
+        server->getUserByFd(fdUser)->removeChannelJoined(*it);
         // Reply once user parted from channel
-        server->sendChannel(*it, clientReply(server, fdUser, "PART " +
-        *it + " :" + partMessage));
+        server->sendChannel(*it, clientReply(server, fdUser, "PART " + *it + " :" + partMessage));
     }
 }
