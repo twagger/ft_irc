@@ -2,14 +2,16 @@
 #include "../../includes/utils.hpp"
 
 bool isOperHost(User *user) {
-	char			*configFile = OPERCONF;
+	std::string		configFile = OPERCONF;
+	const char*			file;
 	std::ifstream	input;
 	std::string		str;
 
-	input.open(configFile, std::ios::in);
+	file = configFile.c_str();
+	input.open(file, std::ios::in);
 	try {input.is_open(); } 
     catch (std::ifstream::failure e)
-        { printError(e.what(), 1, true); return; }
+        { printError(e.what(), 1, true); return false; }
 	while (getline(input, str)) {
 		if (str == user->getHostname())
 			return true;

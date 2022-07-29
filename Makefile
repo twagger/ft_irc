@@ -27,6 +27,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/mode.cpp \
 			  srcs/commands/motd.cpp \
 			  srcs/commands/nick.cpp \
+			  srcs/commands/oper.cpp \
 			  srcs/commands/pass.cpp \
 			  srcs/commands/ping.cpp \
 			  srcs/commands/pong.cpp \
