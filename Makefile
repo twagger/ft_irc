@@ -25,7 +25,6 @@ SRCS		= srcs/main.cpp \
 			  srcs/channel/kick.cpp \
 			  srcs/user/User.cpp \
 			  srcs/commands/kill.cpp \
-			  srcs/commands/modt.cpp \
 			  srcs/commands/nick.cpp \
 			  srcs/commands/pass.cpp \
 			  srcs/commands/ping.cpp \

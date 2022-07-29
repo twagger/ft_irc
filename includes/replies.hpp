@@ -101,5 +101,7 @@
     #define	PONG(hostname)                                  (":" + hostname + " PONG " + hostname + "\r\n")
 	#define CLIENT_NICK(prefix, nickname)							(prefix + " " + nickname + "\r\n")
 	#define CLIENT_QUIT(prefix, msg)								(prefix + " " + msg + "\r\n")
+	#define	CLIENT_ERROR											("ERROR : \r\n")
+	#define	CLIENT_ERRORMSG(msg)									("ERROR :\"" + msg + "\"\r\n")
 
 #endif

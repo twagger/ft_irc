@@ -14,6 +14,7 @@ class User;
 void		pass(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void		nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void		user(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void		quit(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv); 
 bool		isAuthenticatable(User *user);
 std::string	authenticateUser(const int fd, Server *srv);
 
