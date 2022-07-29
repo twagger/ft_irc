@@ -7,13 +7,14 @@ void channelReply(Server *server, const int &fdUser, std::string channelName)
 {
         // Reply if the user successfully joined the channel
         // Use send for all the user of a channel (vector of fd)
-        std::string event = clientReply(server, fdUser, "has joined " + channelName);
+        std::string event = clientReply(server, fdUser, "JOIN " + channelName);
+        std::string topic = numericReply(server, fdUser, "331", RPL_NOTOPIC(channelName));
         std::string userList = replyList(server, fdUser, "353",
                                          server->_channelList.find(channelName)->second->_users,
                                          channelName);
         std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
         server->sendChannel(channelName, event);
-        server->sendClient(fdUser, userList + "\r\n" + endOfNames);
+        server->sendClient(fdUser, topic + userList + endOfNames);
 }
 
 void createChannel(std::string channelName, int pos, std::vector<std::string> key,
@@ -139,6 +140,12 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
         {
             createChannel(*itChan, itChan - channel.begin(), key,
                           server->getUserByFd(fdUser), server);
+            std::cout << "DEBUG" << std::endl;
+            std::map<std::string, Channel *>::iterator itMap = server->_channelList.find(*itChan);
+            std::deque<User *>::iterator itUser = itMap->second->_users.begin();
+            for (; itUser != itMap->second->_users.end(); itUser++)
+                std::cout << (*itUser)->getNickname() << std::endl;
+
             channelReply(server, fdUser, *itChan);
         }
     }

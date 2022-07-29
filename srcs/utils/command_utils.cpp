@@ -51,11 +51,11 @@ std::string replyList(Server *irc, const int &fd, std::string code,
     std::string nicknameList;
     for (std::deque<User *>::iterator it = userList.begin(); it != userList.end(); it++)
     {
-        nicknameList = nicknameList + (*it)->getNickname() + "  ";
+        nicknameList = nicknameList + (*it)->getNickname() + " ";
     }
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
-						+ irc->getUserByFd(fd)->getNickname() + "= "
-                        + channelName + " :@" + nicknameList;		
+						+ irc->getUserByFd(fd)->getNickname() + " = "
+                        + channelName + " :@" + nicknameList + "\r\n";		
 	return (reply);
 }
 
@@ -63,7 +63,8 @@ std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"
 						+ irc->getUserByFd(originFd)->getUsername() + "@"
-						+ "::ffff:" + irc->getUserByFd(originFd)->getHostname() + " " + replyMsg;
+						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg
+                        + "\r\n";
 	return (reply);
 }
 

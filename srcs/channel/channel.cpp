@@ -2,12 +2,14 @@
 
 Channel::Channel(std::string name, User *currentUser): _channelName(name)
             {
+                addOperator(currentUser);
                 addUser(currentUser);
             }
 
 Channel::Channel(std::string name, std::string key, User *currentUser): _channelName(name), _key(key)
             {
                 addOperator(currentUser);
+                addUser(currentUser);
                 this->_mode.push_back('k');
             }
 

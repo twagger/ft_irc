@@ -58,7 +58,7 @@ void part(const int &fdUser, const std::vector<std::string> &parameter,
             server->getUserByFd(fdUser)->removeChannelJoined(*it);
         }
         // Reply once user parted from channel
-        server->sendChannel(*it, clientReply(server, fdUser, "has left " +
-        *it + " " + partMessage));
+        server->sendChannel(*it, clientReply(server, fdUser, "PART " +
+        *it + " :" + partMessage));
     }
 }

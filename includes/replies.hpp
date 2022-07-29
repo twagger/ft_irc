@@ -22,10 +22,10 @@
 	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " " + userModes + " " + channelModes + "\r\n")				// 004
 
 	// CHANNELS
-	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic)																				// 332
-	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set")																			// 331
+	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic + "\r\n")																				// 332
+	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set" + "\r\n")																			// 331
 	#define RPL_NAMREPLY(cMode, channelName, nMode, nickName) (cMode + " " + channelName + ":" + nMode + " " + nickName + " *(" + nMode + " " + nickName " )" + "\r\n")	// 353
-	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list")																		// 366
+	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list" + "\r\n")																		// 366
 
 
 	// NICK
