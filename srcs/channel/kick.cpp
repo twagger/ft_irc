@@ -76,8 +76,8 @@ void oneChannelCase(std::string channel, std::vector<std::string> user,
             return;
         }
         // effectively kick user
-        server->sendChannel(channel, clientReply(server, fdUser, *itVector +
-        "KICK " + channel + " " + kickMessage));
+        server->sendChannel(channel, clientReply(server, fdUser,
+            "KICK " + channel + " " + *itVector + " :" + kickMessage));
         itMap->second->removeUser(server->getUserByNickname(*itVector));
         server->getUserByNickname(*itVector)->removeChannelJoined(channel);
     }

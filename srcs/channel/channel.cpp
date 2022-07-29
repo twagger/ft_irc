@@ -100,3 +100,13 @@ void Channel::removeUser(User *userToDelete)
         this->_users.erase(pos);
     }
 }
+
+void Channel::removeOperator(User *userToDelete)
+{
+    std::deque<User *>::iterator pos = std::find(this->_operators.begin(),
+        this->_operators.end(), userToDelete);
+    if (pos != this->_operators.end())
+    {
+        this->_operators.erase(pos);
+    }
+}

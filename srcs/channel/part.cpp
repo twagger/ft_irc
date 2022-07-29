@@ -24,6 +24,13 @@ int checkPartParameter(std::map<std::string, Channel *> channelList,
     return (0);
 }
 
+void checkChannelMustBeDeleted(Server *server,
+    std::map<std::string, Channel *>::iterator channelPos)
+{
+    if (channelPos->second->_users.empty() == true)
+        server->_channelList.erase(channelPos);
+}
+
 void part(const int &fdUser, const std::vector<std::string> &parameter,
           const std::string &, Server *server)
 {
@@ -53,8 +60,10 @@ void part(const int &fdUser, const std::vector<std::string> &parameter,
         // Effectively part from channel
         std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(*it);
         channelPos->second->removeUser(server->getUserByFd(fdUser));
+        channelPos->second->removeUser(server->getUserByFd(fdUser));
         server->getUserByFd(fdUser)->removeChannelJoined(*it);
         // Reply once user parted from channel
         server->sendChannel(*it, clientReply(server, fdUser, "PART " + *it + " :" + partMessage));
+        checkChannelMustBeDeleted(server, channelPos);
     }
 }

@@ -75,7 +75,9 @@ void invite(const int &fdUser, const std::vector<std::string> &parameter, const 
     // Add user to the list of invitee and return reply
     std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(channel);
     channelPos->second->addUser(server->getUserByNickname(nickname));
-    server->sendClient(fdUser, clientReply(server, fdUser, nickname + "INVITE " + channel + "by " + server->getUserByFd(fdUser)->getNickname()));
+    server->sendClient(fdUser, clientReply(server, fdUser, "INVITE " +
+            server->getUserByNickname(nickname)->getNickname()) + " " + channel);
     server->sendClient(server->getUserByNickname(nickname)->getFd(),
-                       clientReply(server, fdUser, nickname + "INVITE " + channel + "by " + server->getUserByFd(fdUser)->getNickname()));
+        clientReply(server, fdUser, "INVITE " +
+            server->getUserByNickname(nickname)->getNickname()) + " " + channel);
 }
