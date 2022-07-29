@@ -54,7 +54,7 @@ std::string replyList(Server *irc, const int &fd, std::string code,
         nicknameList = nicknameList + (*it)->getNickname() + "  ";
     }
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
-						+ irc->getUserByFd(fd)->getNickname() + " = "
+						+ irc->getUserByFd(fd)->getNickname() + "= "
                         + channelName + " :@" + nicknameList;		
 	return (reply);
 }
@@ -63,7 +63,7 @@ std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"
 						+ irc->getUserByFd(originFd)->getUsername() + "@"
-						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg;
+						+ "::ffff:" + irc->getUserByFd(originFd)->getHostname() + " " + replyMsg;
 	return (reply);
 }
 

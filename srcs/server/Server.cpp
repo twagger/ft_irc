@@ -186,7 +186,6 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
     // Ask getsockname to fill in this socket's local address
     getsockname(newfd, reinterpret_cast<struct sockaddr*>(&client_addr), &sin_size);
     // create a new empty user
-    std::cout << "ip address = " << inet_ntoa(client_addr.sin_addr) << std::endl;
     this->_userList[newfd] = new User(newfd, inet_ntoa(client_addr.sin_addr));
 
     // add the new fd to the poll
