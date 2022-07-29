@@ -2,12 +2,17 @@
 # define UTILS_HPP
 
 # include "Server.hpp"
+# include "replies.hpp"
 
 # include <string>
 # include <vector>
 # include <stdlib.h>
-# include "replies.hpp"
-# include "Server.hpp"
+# include <sstream>
+# include <fstream>
+# include <string>
+# include <cstring>
+# include <algorithm>
+# include <sys/socket.h>
 
 // Util functions
 int                         printError(std::string message, int code,

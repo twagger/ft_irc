@@ -24,6 +24,9 @@
 #define WAIT_TIMEOUT 3000	// in milliseconds
 #define KILLTIME 3600		// in seconds = 1h
 
+// Config files
+#define OPERCONF "operhost.config"
+
 // Program infos
 #ifndef VERSION
 # define VERSION "1"

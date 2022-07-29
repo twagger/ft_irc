@@ -1,7 +1,21 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
+bool isOperHost(User *user) {
+	char			*configFile = OPERCONF;
+	std::ifstream	input;
+	std::string		str;
 
+	input.open(configFile, std::ios::in);
+	try {input.is_open(); } 
+    catch (std::ifstream::failure e)
+        { printError(e.what(), 1, true); return; }
+	while (getline(input, str)) {
+		if (str == user->getHostname())
+			return true;
+	}
+	return false;
+}
 
 void	oper(const int &fd, const std::vector<std::string> &params, const std::string &prefix, 
 		Server *srv) {
@@ -17,7 +31,9 @@ void	oper(const int &fd, const std::vector<std::string> &params, const std::stri
 	else if (params[1] != srv->getPassword())
 		replyMsg = numericReply(srv, fd, "464", ERR_PASSWDMISMATCH);
 	else {
+		std::vector<std::string> nickname;
+		nickname.push_back(user->getNickname());
 		user->addMode(MOD_OPER);
-		mode(fd, user->getNickname(), "MODE", srv);
+		mode(fd, nickname, "MODE", srv);
 	}
 }

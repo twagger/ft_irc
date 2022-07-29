@@ -16,6 +16,10 @@ void	nick(const int &fd, const std::vector<std::string> &params, const std::stri
 void	user(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void 	mode(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void	oper(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv); 
+void	quit(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv); 
+
+// Commands to ignore
+void cap(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
 // Server queries and commands
 void	motd(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);

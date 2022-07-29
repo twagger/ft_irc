@@ -1,8 +1,5 @@
-#include <sstream>
-#include <iostream>
-#include <algorithm>
 #include "../../includes/Server.hpp"
-#include <sys/socket.h>
+#include "../../includes/utils.hpp"
 
 
 bool emptyParams(const std::vector<std::string> &params) {
