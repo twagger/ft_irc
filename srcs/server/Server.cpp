@@ -269,13 +269,15 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
     CmdFunction                                     exec_command;
     std::string                                     reply_str;
     User                                            *user;
+	std::string										upperCmd;
 
     // for each command in the message
     for (it = cmds.begin(); it < cmds.end(); ++it)
     {
         // search if it is in the known commands list of the server
-        it_cmd = this->_cmdList.find(std::transform(it->command.begin(), it->command.end(),
-            (it->command.begin(), ::toupper)));
+		std::transform(it->command.begin(), it->command.end(),
+				it->command.begin(), ::toupper);
+		it_cmd = this->_cmdList.find(upperCmd);
         if (it_cmd != this->_cmdList.end())
         {
             // execute the command
