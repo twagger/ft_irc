@@ -61,15 +61,14 @@ std::string WelcomeChan(Server *irc, const int &fd, std::string code,
             itOperator++)
         {
             if (*itUser == *itOperator)
-                std::cout << "coucou" << std::endl;
-                // nicknameList += "@"; 
+                nicknameList += "@"; 
         }
         nicknameList += (*itUser)->getNickname() + " ";
         std::cout << "nicklist = " << nicknameList << std::endl;
     }
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
 						+ irc->getUserByFd(fd)->getNickname() + " = "
-                        + channelName;
+                        + channelName + " ";
     reply += nicknameList + "\r\n";		
 	return (reply);
 }
