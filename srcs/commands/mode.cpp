@@ -6,20 +6,20 @@ std::string	userModesToStr(User *user)
 	std::string modes;
 
 	modes.append("+");
-	if (user->hasMode(MOD_RESTRICTED))
-		modes.append("r");
-	if (user->hasMode(MOD_SRVNOTICES))
-		modes.append("s");
-	if (user->hasMode(MOD_LOCALOP))
-		modes.append("O");
-	if (user->hasMode(MOD_OPER))
-		modes.append("o");
-	if (user->hasMode(MOD_INVISIBLE))
-		modes.append("i");
-	if (user->hasMode(MOD_WALLOPS))
-		modes.append("w");
 	if (user->hasMode(MOD_AWAY))
 		modes.append("a");
+	if (user->hasMode(MOD_WALLOPS))
+		modes.append("w");
+	if (user->hasMode(MOD_INVISIBLE))
+		modes.append("i");
+	if (user->hasMode(MOD_OPER))
+		modes.append("o");
+	if (user->hasMode(MOD_LOCALOP))
+		modes.append("O");
+	if (user->hasMode(MOD_SRVNOTICES))
+		modes.append("s");
+	if (user->hasMode(MOD_RESTRICTED))
+		modes.append("r");
 	return (modes);
 }
 
