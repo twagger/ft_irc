@@ -11,7 +11,7 @@ void ircException::reply(Server *srv, const int &fd) const throw()
 
 // Grammar exception
 const char	*grammarException::what() const throw()
-{ return ("Grammar exception"); }
+{ return (msg); }
 
 // 401 - nosuchnickException
 nosuchnickException::nosuchnickException(std::string nickname, std::string code)
@@ -29,3 +29,11 @@ notexttosendException::notexttosendException(std::string code)
 toomanytargetsException::toomanytargetsException(std::string target, \
                     std::string errcode, std::string abortmsg, std::string code)
 { this->code = code; this->rpl = ERR_TOOMANYTARGETS(target, errcode, abortmsg);}
+
+// 413 - notoplevelException
+notoplevelException::notoplevelException(std::string mask, std::string code)
+{ this->code = code; this->rpl = ERR_NOTOPLEVEL(mask); }
+
+// 414 - wildtoplevelException
+wildtoplevelException::wildtoplevelException(std::string mask, std::string code)
+{ this->code = code; this->rpl = ERR_WILDTOPLEVEL(mask); }

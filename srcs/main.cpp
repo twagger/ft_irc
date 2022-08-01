@@ -25,7 +25,7 @@ int main(int ac, char **av)
     password = av[2]; 
 
     // server creation ------------------------------------------------------- /
-    Server irc_server(port, password);
-    irc_server.start();
+    Server ircServer(port, password);
+    ircServer.start();
     return (0);
 }

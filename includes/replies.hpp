@@ -89,7 +89,8 @@
     // SENDING MESSAGES
     #define ERR_NORECIPIENT(command)                        (":No recipient given (" + command + ")\r\n")                                               // 411
     #define ERR_NOTEXTTOSEND                                (":No text to send\r\n")                                                                    // 412
-    #define ERR_TOOMANYTARGETS(target, errcode, abortmsg)   (target + " :" + errcode + "recipients. " + abortmsg + "\r\n")                              // 407
+    #define ERR_NOTOPLEVEL(mask)                            (mask + " :No toplevel domain specified\r\n")                                               // 413
+    #define ERR_WILDTOPLEVEL(mask)                          (mask + " :Wildcard in toplevel domain\r\n")                                                // 414
 
 	// OTHER ERRORS:
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")												// 401
@@ -111,5 +112,6 @@
 	#define CLIENT_QUIT(prefix, msg)								(prefix + " " + msg + "\r\n")
 	#define	CLIENT_ERROR											("ERROR : \r\n")
 	#define	CLIENT_ERRORMSG(msg)									("ERROR :\"" + msg + "\"\r\n")
+	#define	PRIVMSG(target, message)						("PRIVMSG " + target + " " + message)
 
 #endif

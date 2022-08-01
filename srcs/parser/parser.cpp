@@ -16,7 +16,7 @@
 /* ************************************************************************** */
 /* MAP : SYMBOL AND EXPRESSION OF THE GRAMMAR                                 */
 /* ************************************************************************** */
-const std::map<const std::string, std::string>	initGrammar(std::string filename)
+const std::map<const std::string, std::string>	initGrammar(const char *filename)
 {
 
 	const std::string 							ws = "\n\r\t\f\v ";

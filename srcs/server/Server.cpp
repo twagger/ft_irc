@@ -117,7 +117,7 @@ std::deque<User*>  Server::getUsersByHostname(const std::string &hostname) const
 }
 
 User*		Server::getUserByUsername(const std::string &user, \
-                                const std::string &host = std::string()) const
+                                const std::string &host) const
 {
     std::map<int, User *>::const_iterator it;
 
@@ -136,6 +136,16 @@ User*		Server::getUserByUsername(const std::string &user, \
         }
     }
     return (NULL);
+}
+
+std::deque<User*>   Server::getAllUsers(void) const
+{
+    std::map<const int, User *>::const_iterator it;
+    std::deque<User*>                           users;
+
+    for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+        users.push_back(it->second);
+    return (users);
 }
 
 /* ************************************************************************** */

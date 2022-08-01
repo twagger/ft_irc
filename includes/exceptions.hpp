@@ -12,8 +12,18 @@ class ircException : public std::exception
         std::string code;
         std::string rpl;
     public:
-        virtual void        reply(Server *srv, const int &fd) const throw();
-        virtual const char  *what() const throw();
+        virtual         ~ircException() throw() {}
+        virtual void    reply(Server *srv, const int &fd) const throw();
+};
+
+class grammarException : public ircException
+{ 
+    private:
+        const char  *msg;
+    public:
+        virtual         ~grammarException() throw() {}
+        grammarException(const char *msg = NULL) : msg(msg) {}
+        virtual const char *what() const throw();
 };
 
 class nosuchnickException : public ircException
@@ -32,7 +42,10 @@ class toomanytargetsException : public ircException
                                 std::string abortmsg, std::string code = "407");
 };
 
-class grammarException : public ircException
-{ public: virtual const char *what() const throw(); };
+class notoplevelException : public ircException
+{ public: notoplevelException(std::string mask, std::string code = "413");};
+
+class wildtoplevelException : public ircException
+{ public: wildtoplevelException(std::string mask, std::string code = "414");};
 
 #endif

@@ -5,6 +5,7 @@
 #include "../../includes/replies.hpp"
 #include "../../includes/utils.hpp"
 #include "../../includes/exceptions.hpp"
+#include "../../includes/parser.hpp"
 
 #define MAX_TARGETS 100
 
@@ -13,17 +14,17 @@
 /* ************************************************************************** */
 struct Target {
     int         fd;
-    std::string name;
+    std::string channel;
+    std::string target;
 
-    Target(int fd, std::string name = std::string())
-    : fd(fd), name(name) {}
-    Target  &operator=(const Target &rhs) 
-    { this->fd = rhs.fd; this->name = rhs.name; }
+    Target(int fd, std::string target, std::string channel = std::string())
+    : fd(fd), channel(channel), target(target) {}
 };
 
 /* ************************************************************************** */
 /* SPECIFIC FUNCTIONS TO EXTRACT USER FD, CHANNEL NAME OR TO COMPUTE MASK     */
 /* ************************************************************************** */
+// CHANNEL
 const std::string extractChannelName(const std::string str, Server *srv)
 {
     int         pos = 1;
@@ -34,7 +35,7 @@ const std::string extractChannelName(const std::string str, Server *srv)
         for (int i = 0; i < 5; ++i)
         {
             if (!std::isdigit(str[i]))
-                throw grammarException();
+                throw grammarException("Grammar : channel name");
         }
         pos = 6;
     }
@@ -42,17 +43,21 @@ const std::string extractChannelName(const std::string str, Server *srv)
         name = str.substr(pos, str.find(':') - pos);
     else
         name = str.substr(pos, std::string::npos);
+    
+    // Check if channel exists
+    if (srv->_channelList.find(name) == srv->_channelList.end())
+        throw nosuchnickException(name);
     return (name);
 }
 
-//ERR_NOSUCHNICK
-const int   extractUserFd(const std::string str, Server *srv)
+// USER
+int   extractUserFd(const std::string str, Server *srv)
 {
     std::string user;
     std::string host;
     std::string servername;
     std::string nickname;
-    User        *resultUser;
+    User        *resultUser = NULL;
 
     // For basic grammar checking
     std::string nickControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN\
@@ -78,7 +83,7 @@ const int   extractUserFd(const std::string str, Server *srv)
         nickname = str.substr(0, str.find('!') - 1);
         user = str.substr(str.find('!') + 1);
         if (user.find('@') == std::string::npos)
-            throw grammarException();
+            throw grammarException("Grammar : nickname");
         host = user.substr(user.find('@') + 1);
         user.erase(user.find('@'));
     }
@@ -86,20 +91,21 @@ const int   extractUserFd(const std::string str, Server *srv)
         nickname = str;
 
     // Basic grammar check
+    // > ne check que ce qui est rempli
     if (nickname.find_first_not_of(nickControl) != std::string::npos)
-        throw grammarException();
+        throw grammarException("Grammar : nickname");
     if (nickname.length() < 1 || nickname.length() > 9)
-        throw grammarException();
+        throw grammarException("Grammar : nickname");
     if (nickname[0] == '-' || std::isdigit(nickname[0]))
-        throw grammarException();
+        throw grammarException("Grammar : nickname");
     if (user.find_first_of(userControl) != std::string::npos)
-        throw grammarException();
+        throw grammarException("Grammar : user");
     if (user.length() < 1)
-        throw grammarException();
+        throw grammarException("Grammar : user");
     if (servername.find_first_not_of(serverControl) != std::string::npos)
-        throw grammarException();
+        throw grammarException("Grammar : servername");
     if (host.find_first_not_of(hostControl) != std::string::npos)
-        throw grammarException();
+        throw grammarException("Grammar : hostname");
 
     // User search and return
     if (!nickname.empty())
@@ -124,17 +130,41 @@ const int   extractUserFd(const std::string str, Server *srv)
     return (resultUser->getFd());
 }
 
-// ERR_NOTOPLEVEL, ERR_WILDTOPLEVEL,
-// # : HOSTMASK | $ : SERVERMASK for users only : the mask must have one . in it
+// MASK
 void    computeMask(const std::string str, Server *srv, \
                     std::deque<Target> &target)
 {
+    std::deque<User*>                   userList;
+    std::deque<User*>::const_iterator   it;
+    std::string                         mask;
+    size_t                              toplevel;
+    
+    // Check the mask for exceptions
+    mask = str.substr(1);
+    toplevel = mask.find_last_of('.');
+    if (toplevel == std::string::npos)
+        throw notoplevelException(mask);
+    else if (mask.find('*', toplevel))
+        throw wildtoplevelException(mask);
+
     if (str[0] == '$') {
         // Server mask
-
+        if (matchMask(srv->getHostname().c_str(), \
+                      str.substr(1).c_str()) == true) {
+            userList = srv->getAllUsers();
+            for (it = userList.begin(); it != userList.end(); ++it)
+                target.push_back(Target((*it)->getFd(), str));
+        }
     }
     else {
         // Host mask
+        userList = srv->getAllUsers();
+        for (it = userList.begin(); it != userList.end(); ++it)
+        {
+            if (matchMask((*it)->getHostname().c_str(), \
+                          str.substr(1).c_str()) == true)
+                target.push_back(Target((*it)->getFd(), str));
+        }
     }
 }
 
@@ -147,7 +177,7 @@ void getTargetsFromString(const std::string str, \
     if (str[0] == '+' || str[0] == '&' || str[0] == '!'
         || (str[0] == '#' && str.find('.') == std::string::npos)) {
         // CHANNEL
-        target.push_back(Target(-1, extractChannelName(str, srv)));
+        target.push_back(Target(-1, str, extractChannelName(str, srv)));
     }
     else if (str[0] == '$' 
              || (str[0] == '#' && str.find('.') != std::string::npos)) {
@@ -156,7 +186,7 @@ void getTargetsFromString(const std::string str, \
     }
     else {
         // USER
-        target.push_back(Target(extractUserFd(str, srv)));
+        target.push_back(Target(extractUserFd(str, srv), str));
     }
 }
 
@@ -169,7 +199,7 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
     std::vector<std::string>            targets;
     std::vector<std::string>::iterator  it;
     std::string                         msgtarget;
-    std::string                         text;
+    std::string                         message;
     std::deque<Target>                  target;
     std::deque<Target>::iterator        itg;
     std::stringstream                   ss;
@@ -186,7 +216,7 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
         
         // Two params, iterate throught the first to and send
         msgtarget = params[0];
-        text = params[1];
+        message = params[1];
         targets = splitByComma(msgtarget);
         // First loop WITH NO SEND to count the exact number of targets
         for (it = targets.begin(); it != targets.end(); ++it)
@@ -204,9 +234,13 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
             // HANDLE HERE : RPL_AWAY, ERR_CANNOTSENDTOCHAN
             if (itg->fd != -1) {
                 // Send to user
+                srv->sendClient(itg->fd, \
+                        clientReply(srv, fd, PRIVMSG(itg->target, message)));
             }
-            else if (!itg->name.empty()) {
+            else if (!itg->channel.empty()) {
                 // Send to channel
+                srv->sendChannel(itg->channel, \
+                        clientReply(srv, fd, PRIVMSG(itg->target, message)));
             }
         }
     } // EXCEPTIONS
@@ -214,4 +248,6 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
     catch (norecipientException &e) {e.reply(srv, fd); return; }
     catch (notexttosendException &e) {e.reply(srv, fd); return; }
     catch (toomanytargetsException &e) {e.reply(srv, fd); return; }
+    catch (notoplevelException &e) {e.reply(srv, fd); return; }
+    catch (wildtoplevelException &e) {e.reply(srv, fd); return; }
 }
