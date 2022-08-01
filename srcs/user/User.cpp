@@ -3,7 +3,8 @@
 
 // CONSTRUCTORS
 User::User(const int fd, std::string hostname) : _fd(fd), _nickname("*"), 
-			_hostname(hostname), _mode(MOD_NONE), _authenticated(false), _channelsJoined(), 
+			_username(""), _fullname(""), _hostname(hostname), 
+			_mode(MOD_NONE),  _password(false), _authenticated(false), _channelsJoined(), 
 			_status(ST_ALIVE), _lastActivityTime(time(NULL)){ }
 
 User::User(const User &src) : _fd(src._fd), _status(ST_ALIVE), _lastActivityTime(time(NULL)){

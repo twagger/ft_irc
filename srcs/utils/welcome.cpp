@@ -3,7 +3,7 @@
 
 bool 	isAuthenticationCmd(std::string cmd) {
 	if (cmd.compare("USER") == 0 || cmd.compare("NICK") == 0
-		|| cmd.compare("PASS") == 0)
+		|| cmd.compare("PASS") == 0 || cmd.compare("QUIT") == 0)
 		return true;
 	return false;
 }

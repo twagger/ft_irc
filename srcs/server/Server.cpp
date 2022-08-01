@@ -413,9 +413,6 @@ void    Server::start(void)
                 catch (Server::passwordException &e)
                 { printError(e.what(), 1, true); }
             }
-			else if (events[i].events == EPOLLHUP) {
-				std::cout << "test close connexion " << std::endl;
-			}
             else // new message from existing connection --------------------- /
             {
                 try { this->_handleNewMessage(events[i]); }
@@ -444,7 +441,7 @@ void    Server::killConnection(int fd)
     // fd exists, clean all -------------------------------------------------- /
     // delete user and remove pair from list
     delete it->second;
-    this->_userList.erase(fd);
+	this->_userList.erase(fd);
     // remove user's fd from the poll
     if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
         throw Server::pollDelException();
@@ -482,9 +479,9 @@ void    Server::sendChannel(std::string channel, std::string message) const
         throw Server::invalidChannelException();
     userList = itChannel->second->getUsers();
     for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers) {
-		std::cout << *itUsers << std::endl;
-		if ((*itUsers))
+		if (((*itUsers)->getFd() != 0)) {
         	this->sendClient((*itUsers)->getFd(), message);
+		}
 	}
 }
 

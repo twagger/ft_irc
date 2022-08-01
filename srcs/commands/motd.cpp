@@ -15,7 +15,7 @@ std::string createModtStr(Server *srv, const int &fd) {
 	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("       .       .    .//          \\ |  \\ /////////       .     .   ."))))
 	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("                    ||.    .    .| |  ///////// .     ."))))
 	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("     .    .         ||           | |//`,/////                ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("             .      \\\\        ./ //  /  \\/   ."))))
+	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("             .       \\\\        ./ //  /  \\/   ."))))
 	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("  .                   \\\\.___./ //\\` '   ,_\\     .     ."))))
 	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("          .           .     \\ //////\\ , /   \\                 .    ."))))
 	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("                       .    ///////// \\|  '  |    ."))))
