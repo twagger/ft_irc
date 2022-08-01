@@ -3,7 +3,7 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
-int checkParameter(std::string topic, std::map<std::string, Channel *>::iterator itChannel,
+int checkTopicParameter(std::string topic, std::map<std::string, Channel *>::iterator itChannel,
     Server *server, const int &fdUser)
 {
     // Topic format is not valid
@@ -16,12 +16,38 @@ int checkParameter(std::string topic, std::map<std::string, Channel *>::iterator
         server->sendClient(fdUser, numericReply(server, fdUser, "442", ERR_NOTONCHANNEL(itChannel->first)));
         return (-2);
     }
+    return (0);
 }
+
+int checkGeneralParameter(const int &fdUser, const std::vector<std::string> &parameter,
+    Server *server, std::map<std::string, Channel *>::iterator itChannel)
+{
+    if (parameter.empty() == true)
+    {
+        server->sendClient(fdUser, numericReply(server, fdUser,
+            "461", ERR_NEEDMOREPARAMS(std::string("TOPIC"))));
+        return (-1);
+    }
+    if (server->_channelList.empty() == true)
+    {
+        server->sendClient(fdUser, numericReply(server, fdUser,
+            "461", ERR_NEEDMOREPARAMS(std::string("TOPIC"))));
+        return (-2);
+    }
+    if (itChannel == server->_channelList.end())
+    {
+        server->sendClient(fdUser, numericReply(server, fdUser,
+            "403", ERR_NOSUCHCHANNEL(parameter[0])));
+        return (-3);
+    }
+    return (0);
+}
+
 
 void changeTopic(std::string topic, std::map<std::string, Channel *>::iterator itChannel,
     Server *server, const int &fdUser)
 {
-    if (checkParameter(topic, itChannel, server, fdUser) < 0)
+    if (checkTopicParameter(topic, itChannel, server, fdUser) < 0)
         return ;
     itChannel->second->setTopic(topic);
     return (server->sendChannel(itChannel->first, clientReply(server, fdUser, "TOPIC " + itChannel->first + " " + topic)));
@@ -33,12 +59,10 @@ void topic(const int &fdUser, const std::vector<std::string> &parameter,
     std::string channel;
     std::map<std::string, Channel *>::iterator itChannel;
     
-    if (parameter.empty() == true)
-        return (server->sendClient(fdUser, numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("TOPIC")))));
-    if (server->_channelList.empty() == true)
-        return (server->sendClient(fdUser, numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("TOPIC")))));
     channel = parameter[0];
     itChannel = server->_channelList.find(channel);
+    if (checkGeneralParameter(fdUser, parameter, server, itChannel) < 0)
+        return ;
     if (parameter.size() > 1)
         changeTopic(parameter[1], itChannel, server, fdUser);
     else if (itChannel->second->getTopic().empty() == false)
