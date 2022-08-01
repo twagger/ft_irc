@@ -478,7 +478,10 @@ void    Server::sendChannel(std::string channel, std::string message) const
         throw Server::invalidChannelException();
     userList = itChannel->second->getUsers();
     for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers)
+    {
         this->sendClient((*itUsers)->getFd(), message);
+        std::cout << "name = " << (*itUsers)->getNickname() << std::endl;
+    }
 }
 
 // BROADCAST
