@@ -16,6 +16,13 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+       #include <sys/types.h>
+       #include <stdio.h>
+       #include <stdlib.h>
+       #include <unistd.h>
+       #include <string.h>
+       #include <sys/socket.h>
+       #include <netdb.h>
 
 // Custom headers
 #include "../../includes/Server.hpp"
@@ -175,6 +182,7 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
     struct epoll_event  ev;
 	int					newfd;
     struct sockaddr_in  client_addr;
+
 
     // accept the connect request
     memset(&client_addr, 0, sizeof(struct sockaddr_in));

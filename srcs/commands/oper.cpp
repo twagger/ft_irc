@@ -1,7 +1,7 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-bool isOperHost(User *user) {
+bool isOperHost(std::string hostname) {
 	std::string		configFile = OPERCONF;
 	const char*			file;
 	std::ifstream	input;
@@ -14,7 +14,8 @@ bool isOperHost(User *user) {
 		{ printError(e.what(), 1, true); return false; }
 	try {
 		while (getline(input, str)) {
-			if (str == user->getHostname())
+			std::cout << "[DEBUG] " << str << " and hostname " << hostname << std::endl;
+			if (str == hostname)
 				return true;
 		}
 	}
@@ -29,20 +30,18 @@ void	oper(const int &fd, const std::vector<std::string> &params, const std::stri
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
 
-	if (params.empty() || params.size() < 2 || emptyParams(params)) {
+	if (params.empty() || params.size() < 2 || emptyParams(params))
 		replyMsg = numericReply(srv, fd, "461", ERR_NEEDMOREPARAMS(std::string("OPER")));
-		srv->sendClient(fd, replyMsg);
-	}
-	// else if (isOperHost(user->getHostname()))
-	// 	replyMsg = numericReply(srv, fd, "491", ERR_NOOPERHOST);
-	else if (params[1] != srv->getPassword()) {
+	else if (isOperHost(user->getHostname()) == false)
+		replyMsg = numericReply(srv, fd, "491", ERR_NOOPERHOST);
+	else if (params[1] != srv->getPassword())
 		replyMsg = numericReply(srv, fd, "464", ERR_PASSWDMISMATCH);
-		srv->sendClient(fd, replyMsg);
-	}
 	else {
 		std::vector<std::string> nickname;
 		nickname.push_back(user->getNickname());
 		user->addMode(MOD_OPER);
 		mode(fd, nickname, "MODE", srv);
 	}
+	if (!replyMsg.empty())
+		srv->sendClient(fd, replyMsg);
 }
