@@ -250,6 +250,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["INVITE"] = &invite;
     this->_cmdList["KICK"] = &kick;
     this->_cmdList["TOPIC"] = &topic;
+    this->_cmdList["LIST"] = &list;
     this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
 	this->_cmdList["QUIT"] = &quit;

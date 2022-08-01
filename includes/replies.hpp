@@ -26,6 +26,9 @@
 	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set" + "\r\n")																			// 331
 	#define RPL_NAMREPLY(cMode, channelName, nMode, nickName) (cMode + " " + channelName + ":" + nMode + " " + nickName + " *(" + nMode + " " + nickName " )" + "\r\n")	// 353
 	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list" + "\r\n")																		// 366
+	#define RPL_LIST(channelName, topic)					(channelName + " " + topic + "\r\n")																		// 322
+	#define RPL_LISTEND										(":End of LIST\r\n")																					// 323
+
 
 
 	// NICK

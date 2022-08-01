@@ -11,7 +11,8 @@ void channelReply(Server *server, const int &fdUser, std::string channelName)
     std::string userList = WelcomeChan(server, fdUser, "353",
                                      server->_channelList.find(channelName),
                                      channelName);
-    std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
+    std::string endOfNames = numericReply(server, fdUser,
+        "366", RPL_ENDOFNAMES(channelName));
     std::vector<std::string> parameterTopic;
 
     parameterTopic.push_back(channelName);

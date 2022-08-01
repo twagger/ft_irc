@@ -34,6 +34,7 @@ void part(const int &fd, const std::vector<std::string> &params, const std::stri
 void invite(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void kick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void topic(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void list(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
 // Miscellaneous commands
 void kill(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
