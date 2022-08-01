@@ -129,7 +129,13 @@ const int   extractUserFd(const std::string str, Server *srv)
 void    computeMask(const std::string str, Server *srv, \
                     std::deque<Target> &target)
 {
-    
+    if (str[0] == '$') {
+        // Server mask
+
+    }
+    else {
+        // Host mask
+    }
 }
 
 /* ************************************************************************** */

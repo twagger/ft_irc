@@ -102,6 +102,19 @@ User*		Server::getUserByNickname(const std::string &nick) const
     return (NULL);
 }
 
+std::deque<User*>  Server::getUsersByHostname(const std::string &hostname) const
+{
+    std::map<int, User *>::const_iterator   it;
+    std::deque<User*>                       result;
+
+    for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+	{
+        if (it->second->getHostname() == hostname)
+            result.push_back(it->second);
+    }
+    return (result);
+}
+
 User*		Server::getUserByUsername(const std::string &user, \
                                 const std::string &host = std::string()) const
 {
