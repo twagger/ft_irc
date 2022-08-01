@@ -37,4 +37,7 @@ void kill(const int &fd, const std::vector<std::string> &params, const std::stri
 void ping(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void pong(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
+// Sending message commands
+void privmsg(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+
 #endif

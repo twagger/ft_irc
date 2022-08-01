@@ -102,6 +102,28 @@ User*		Server::getUserByNickname(const std::string &nick) const
     return (NULL);
 }
 
+User*		Server::getUserByUsername(const std::string &user, \
+                                const std::string &host = std::string()) const
+{
+    std::map<int, User *>::const_iterator it;
+
+    for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+	{
+        if (it->second->getUsername() == user)
+        {
+            if (!host.empty())
+            {
+                if (it->second->getHostname() == host)
+                    return (it->second);
+                else
+                    return (NULL);
+            }
+            return (it->second);
+        }
+    }
+    return (NULL);
+}
+
 /* ************************************************************************** */
 /* Private member functions                                                   */
 /* ************************************************************************** */
@@ -251,6 +273,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["VERSION"] = &version;
     this->_cmdList["TIME"] = &time;
     this->_cmdList["INFO"] = &info;
+    this->_cmdList["PRIVMSG"] = &privmsg;
     this->_cmdList["CAP"] = &cap;
     this->_cmdList["-USER"] = NULL;
 }

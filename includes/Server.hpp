@@ -75,6 +75,8 @@ class Server
 		std::string getDate(void) const;
 		User*		getUserByFd(const int &fd) const;
 		User*		getUserByNickname(const std::string &nick) const;
+		User*		getUserByUsername(const std::string &user, \
+                                const std::string &host = std::string()) const;
 
         // Member functions
         void    start(void);

@@ -35,6 +35,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/info.cpp \
 			  srcs/commands/quit.cpp \
 			  srcs/commands/user.cpp \
+			  srcs/commands/privmsg.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/utils/welcome.cpp \
