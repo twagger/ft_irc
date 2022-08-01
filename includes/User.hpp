@@ -5,6 +5,7 @@
 # include <iostream>
 # include <stdint.h>
 # include <vector>
+# include <deque>
 # include <ctime>
 
 # define ST_ALIVE 1
@@ -41,7 +42,7 @@ class User {
 		uint8_t					    _mode;
 		bool						_password;
 		bool						_authenticated;
-		std::vector<std::string>	_channelsJoined;
+		std::deque<std::string>	_channelsJoined;
 		int							_status;
         time_t                      _lastActivityTime;
         time_t                      _pingTime;
@@ -62,7 +63,7 @@ class User {
 		uint8_t 					getMode(void) const;
 		bool 						getPassword(void) const;
 		bool 						getAuthenticated(void) const;
-		std::vector<std::string>	getChannelsJoined(void) const;
+		std::deque<std::string>		getChannelsJoined(void) const;
 		int							getStatus(void) const;
         time_t  					getLastActivityTime(void) const;
         time_t  					getPingTime(void) const;

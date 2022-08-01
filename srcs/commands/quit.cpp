@@ -19,9 +19,9 @@ void	quit(const int &fd, const std::vector<std::string> &params, const std::stri
 		serverNotice(fd, srv, user->getNickname(), CLIENT_ERRORMSG(params[0]));	
 
 	// // Send a client reply from origin FD to all channels where the user was present
-	std::vector<std::string> channelsToReplyTo = user->getChannelsJoined();
-	std::vector<std::string>::iterator it;
-	std::vector<std::string>::iterator ite = channelsToReplyTo.end();
+	std::deque<std::string> channelsToReplyTo = user->getChannelsJoined();
+	std::deque<std::string>::iterator it;
+	std::deque<std::string>::iterator ite = channelsToReplyTo.end();
 	replyMsg = clientReply(srv, fd, CLIENT_QUIT(prefix, params[0]));
 	for (it = channelsToReplyTo.begin(); it < ite; ++it) {
 		srv->sendChannel(*it, replyMsg);

@@ -45,25 +45,39 @@ std::string numericReply(Server *irc, const int &fd, std::string code, std::stri
 	return (reply);
 }
 
-std::string replyList(Server *irc, const int &fd, std::string code,
-    std::deque<User *> userList, std::string channelName)
+std::string WelcomeChan(Server *irc, const int &fd, std::string code,
+    std::map<std::string, Channel *>::iterator itMap, std::string channelName)
 {
     std::string nicknameList;
-    for (std::deque<User *>::iterator it = userList.begin(); it != userList.end(); it++)
+    std::deque<User *> listUser = itMap->second->_users;
+    std::deque<User *> listOperator = itMap->second->_operators;
+    std::deque<User *>::iterator itUser;
+    std::deque<User *>::iterator itOperator;
+
+    for (itUser = listUser.begin(); itUser != listUser.end(); itUser++)
     {
-        nicknameList = nicknameList + (*it)->getNickname() + "  ";
+        // Case if user is an operator
+        for (itOperator = listOperator.begin(); itOperator != listOperator.end();
+            itOperator++)
+        {
+            if (*itUser == *itOperator)
+                nicknameList += "@"; 
+        }
+        nicknameList += (*itUser)->getNickname() + " ";
     }
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
-						+ irc->getUserByFd(fd)->getNickname() + "= "
-                        + channelName + " :@" + nicknameList;		
+						+ irc->getUserByFd(fd)->getNickname() + " = "
+                        + channelName + " ";
+    reply += nicknameList + "\r\n";		
 	return (reply);
 }
 
 std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"
-						+ irc->getUserByFd(originFd)->getUsername() + "@"
-						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg;
+						+ irc->getUserByFd(originFd)->getUsername() + "@:"
+						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg
+                        + "\r\n";
 	return (reply);
 }
 

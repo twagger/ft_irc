@@ -2,12 +2,14 @@
 
 Channel::Channel(std::string name, User *currentUser): _channelName(name)
             {
+                addOperator(currentUser);
                 addUser(currentUser);
             }
 
 Channel::Channel(std::string name, std::string key, User *currentUser): _channelName(name), _key(key)
             {
                 addOperator(currentUser);
+                addUser(currentUser);
                 this->_mode.push_back('k');
             }
 
@@ -96,5 +98,15 @@ void Channel::removeUser(User *userToDelete)
     if (pos != this->_users.end())
     {
         this->_users.erase(pos);
+    }
+}
+
+void Channel::removeOperator(User *userToDelete)
+{
+    std::deque<User *>::iterator pos = std::find(this->_operators.begin(),
+        this->_operators.end(), userToDelete);
+    if (pos != this->_operators.end())
+    {
+        this->_operators.erase(pos);
     }
 }

@@ -28,11 +28,16 @@ void version(const int &fd, const std::vector<std::string> &params, const std::s
 void admin(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void info(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
-// Miscellaneous commands
+// Channel command
 void join(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void part(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void invite(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void kick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void topic(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void list(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void names(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+
+// Miscellaneous commands
 void kill(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void ping(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void pong(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
