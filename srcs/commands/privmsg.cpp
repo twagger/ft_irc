@@ -27,13 +27,47 @@ struct Target {
 void    checkChannelRights(Server *srv, const int &fd, \
                                                     const std::string channel)
 {
-    std::map<std::string, Channel *>::const_iterator it;
+    std::map<std::string, Channel *>::const_iterator    itChan;
+    std::deque<User*>                                   userList;
+    std::deque<User*>                                   banList;
+    std::deque<User*>::const_iterator                   it;
+    bool                                                result;
 
     // Get the list of users in the channel
-    it = srv->_channelList.find(channel);
-    if (it == srv->_channelList.end())
+    itChan = srv->_channelList.find(channel);
+    if (itChan == srv->_channelList.end())
         throw nosuchnickException(channel);
 
+    // Get lists
+    userList = itChan->second->_bannedUsers;
+    banList = itChan->second->_bannedUsers;
+
+    // Check the user fd against users of the channel then banlist
+    result = false;
+    // Check user list
+    for (it = userList.begin(); it != userList.end(); ++it)
+    {
+        if ((*it)->getFd() == fd)
+        {
+            result = true;
+            break;
+        }
+    }
+    if (result == false)
+        throw cannotsendtochanException(channel);
+    else {
+        // Check banlist
+        for (it = banList.begin(); it != banList.end(); ++it)
+        {
+            if ((*it)->getFd() == fd)
+            {
+                result = false;
+                break;
+            }
+        }
+    }
+    if (result == false)
+        throw cannotsendtochanException(channel);
 }
 
 /* ************************************************************************** */
