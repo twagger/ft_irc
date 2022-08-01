@@ -14,8 +14,6 @@ std::string	userModesToStr(User *user)
 		modes.append("i");
 	if (user->hasMode(MOD_OPER))
 		modes.append("o");
-	if (user->hasMode(MOD_LOCALOP))
-		modes.append("O");
 	if (user->hasMode(MOD_SRVNOTICES))
 		modes.append("s");
 	if (user->hasMode(MOD_RESTRICTED))
@@ -36,8 +34,6 @@ void addModes(User *user, const std::string mode, int start, int stop) {
 				user->addMode(MOD_INVISIBLE);
 				break;
 			case 'o':
-				break;
-			case 'O':
 				break;
 			case 's':
 				user->addMode(MOD_SRVNOTICES);
@@ -63,9 +59,6 @@ void removeModes(User *user, const std::string mode, int start, int stop) {
 				break;
 			case 'o':
 				user->removeMode(MOD_OPER);
-				break;
-			case 'O':
-				user->removeMode(MOD_LOCALOP);
 				break;
 			case 's':
 				user->removeMode(MOD_SRVNOTICES);

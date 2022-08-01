@@ -37,9 +37,18 @@ void	kick(const int &fd, const std::vector<std::string> &params, const std::stri
 // Commands to ignore
 void	cap(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
+// Channel command
+void join(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void part(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void invite(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void kick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void topic(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void list(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void names(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+
 // Miscellaneous commands
-void	kill(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-void	ping(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
-void	pong(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void kill(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void ping(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void pong(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
 #endif

@@ -22,6 +22,10 @@ SRCS		= srcs/main.cpp \
 			  srcs/channel/join.cpp \
 			  srcs/channel/part.cpp \
 			  srcs/channel/invite.cpp \
+			  srcs/channel/kick.cpp \
+			  srcs/channel/topic.cpp \
+			  srcs/channel/list.cpp \
+			  srcs/channel/names.cpp \
 			  srcs/user/User.cpp \
 			  srcs/commands/cap.cpp \
 			  srcs/commands/info.cpp \

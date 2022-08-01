@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <map>
 #include <vector>
+#include <algorithm>
 
 // Custom headers
 #include "../../includes/Server.hpp"
@@ -183,7 +184,9 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
     if (newfd == -1)
         throw Server::acceptException();
 
-    // create a new empty user 
+    // Ask getsockname to fill in this socket's local address
+    getsockname(newfd, reinterpret_cast<struct sockaddr*>(&client_addr), &sin_size);
+    // create a new empty user
     this->_userList[newfd] = new User(newfd, inet_ntoa(client_addr.sin_addr));
 
     // add the new fd to the poll
@@ -246,6 +249,11 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["KILL"] = &kill;
     this->_cmdList["JOIN"] = &join;
     this->_cmdList["PART"] = &part;
+    this->_cmdList["INVITE"] = &invite;
+    this->_cmdList["KICK"] = &kick;
+    this->_cmdList["TOPIC"] = &topic;
+    this->_cmdList["LIST"] = &list;
+    this->_cmdList["NAMES"] = &names;
     this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
 	this->_cmdList["QUIT"] = &quit;
@@ -254,11 +262,6 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["TIME"] = &time;
     this->_cmdList["INFO"] = &info;
     this->_cmdList["CAP"] = &cap;
-	this->_cmdList["kill"] = &kill;
-	this->_cmdList["motd"] = &motd;
-	this->_cmdList["info"] = &info;
-	this->_cmdList["time"] = &time;
-	this->_cmdList["version"] = &version;
 }
 
 // EXECUTE RECEIVED COMMANDS
@@ -275,7 +278,9 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
     for (it = cmds.begin(); it < cmds.end(); ++it)
     {
         // search if it is in the known commands list of the server
-        it_cmd = this->_cmdList.find(it->command);
+		std::transform(it->command.begin(), it->command.end(),
+				it->command.begin(), ::toupper);
+		it_cmd = this->_cmdList.find(it->command);
         if (it_cmd != this->_cmdList.end())
         {
             // execute the command
@@ -478,7 +483,7 @@ void    Server::sendChannel(std::string channel, std::string message) const
     userList = itChannel->second->getUsers();
     for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers) {
 		std::cout << *itUsers << std::endl;
-		if (((*itUsers)))
+		if ((*itUsers))
         	this->sendClient((*itUsers)->getFd(), message);
 	}
 }

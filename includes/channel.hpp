@@ -54,6 +54,7 @@ class Channel
     void addMode(char mode);
     void addUser(User *newUser);
     void removeUser(User *userToDelete);
+    void removeOperator(User *userToDelete);
     void addOperator(User *newOperator);
     void addBannedUser(User *newBannedUser);
     void addInvitee(User *newInvitee);

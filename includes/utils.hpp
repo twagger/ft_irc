@@ -27,8 +27,9 @@ const std::vector<Command>     splitCmds(std::vector<std::string> cmd_strings);
 std::string numericReply(Server *irc, const int &fd, std::string code,
 			std::string replyMsg);
 std::string	clientReply(Server *irc, const int &fd, std::string replyMsg);
-std::string replyList(Server *irc, const int &fd, std::string code,
-    		std::deque<User *> userList, std::string channelName);
+std::string WelcomeChan(Server *irc, const int &fd, std::string code,
+    std::map<std::string, Channel *>::iterator itMap,
+    std::string channelName);
 std::string eventChannel(Server *irc, const int &fd, std::string eventType,
     std::string channelName);
 //std::string get_next_tokn(std::string *str, std::string delimiter);
