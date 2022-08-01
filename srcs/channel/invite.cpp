@@ -53,8 +53,7 @@ int checkParameterInvite(std::string nickname, std::string channel,
         return (-5);
     }
     // Current user must be an operator if channel is invite only
-    std::vector<char>::iterator itMode = findMode(it->second->_mode, 'i');
-    if (itMode != it->second->_mode.end() && findUserOnChannel(it->second->_operators,
+    if (it->second->hasMode(MOD_INVITE) && findUserOnChannel(it->second->_operators,
                                                                server->getUserByFd(fdUser)) == it->second->_operators.end())
     {
         server->sendClient(fdUser, numericReply(server, fdUser,

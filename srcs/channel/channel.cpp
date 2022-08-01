@@ -10,7 +10,7 @@ Channel::Channel(std::string name, std::string key, User *currentUser): _channel
             {
                 addOperator(currentUser);
                 addUser(currentUser);
-                this->_mode.push_back('k');
+                this->addMode(MOD_KEY);
             }
 
 Channel::~Channel(void) {}
@@ -50,28 +50,6 @@ void Channel::setTopic(std::string topic) { this->_topic = topic; }
 
 void Channel::setKey(std::string key) { this->_key = key; }
 
-void Channel::setMode(char mode) { this->_mode.push_back(mode); }
-
-/**
- * @brief Remove a mode in the channel
- * 
- * @param mode passed as argument with -
- */
-
-void Channel::removeMode(char mode)
-{
-    std::vector<char>::iterator pos = std::find(this->_mode.begin(), this->_mode.end(), mode);
-    if (pos != this->_mode.end())
-    {
-        this->_mode.erase(pos);
-    }
-}
-
-void Channel::addMode(char mode)
-{
-    this->_mode.push_back(mode);
-}
-
 void Channel::addUser(User *newUser)
 {
     this->_users.push_back(newUser);
@@ -110,3 +88,9 @@ void Channel::removeOperator(User *userToDelete)
         this->_operators.erase(pos);
     }
 }
+
+/* Mode */
+
+void Channel::addMode(uint8_t mode) { this->_mode |= mode; }
+void Channel::removeMode(uint8_t mode) { this->_mode &= ~mode; }
+bool Channel::hasMode(uint8_t mode) { return ((this->_mode & mode) > 0); }

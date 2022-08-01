@@ -116,7 +116,6 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
     std::vector<std::string> key;
     std::vector<std::string>::iterator itChan;
     std::map<std::string, Channel *>::iterator itMap;
-    std::vector<char>::iterator itMode;
 
     channel = splitByComma(parameter[0]);
     if (parameter.size() > 1)
@@ -136,9 +135,8 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
             {
                 if (checkKey(itChan - channel.begin(), key, itMap, server, fdUser) < 0)
                     return;
-                itMode = findMode(itMap->second->_mode, 'i');
-                if (itMap->second->_mode.empty() == false
-                    && itMode == itMap->second->_mode.end()
+                std::cout << "mode = " << itMap->second->hasMode(MOD_INVITE) << std::endl;
+                if (itMap->second->hasMode(MOD_INVITE) == true
                     && checkInviteBan(itMap->second->_invitees, server->getUserByFd(fdUser)) < 0)
                     return (server->sendClient(fdUser, numericReply(server, fdUser,
                                                                     "473", ERR_INVITEONLYCHAN(*itChan))));
