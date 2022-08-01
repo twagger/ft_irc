@@ -48,9 +48,15 @@ int checkKey(size_t pos, std::vector<std::string> key,
     std::vector<std::string>::iterator it;
     std::string keyToCheck;
 
+    keySetInChannel = itMap->second->getKey();
+    if (keySetInChannel.empty() == false && key.empty() == true)
+    {
+        server->sendClient(fdUser, numericReply(server, fdUser,
+                                                "475", ERR_BADCHANNELKEY(itMap->second->getChannelName())));
+        return (-1);
+    }
     if (key.empty() == true)
         return (0);
-    keySetInChannel = itMap->second->getKey();
     it = key.begin() + pos;
     keyToCheck = *it;
 
@@ -117,7 +123,6 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
         key = splitByComma(parameter[1]);
 
     itChan = channel.begin();
-    itChan = channel.begin();
     for (; itChan != channel.end(); itChan++)
     {
         // Check channelname
@@ -133,7 +138,7 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
                     return;
                 itMode = findMode(itMap->second->_mode, 'i');
                 if (itMap->second->_mode.empty() == false
-                    && itMode != itMap->second->_mode.end()
+                    && itMode == itMap->second->_mode.end()
                     && checkInviteBan(itMap->second->_invitees, server->getUserByFd(fdUser)) < 0)
                     return (server->sendClient(fdUser, numericReply(server, fdUser,
                                                                     "473", ERR_INVITEONLYCHAN(*itChan))));

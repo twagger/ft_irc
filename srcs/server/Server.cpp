@@ -480,7 +480,6 @@ void    Server::sendChannel(std::string channel, std::string message) const
     for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers)
     {
         this->sendClient((*itUsers)->getFd(), message);
-        std::cout << "name = " << (*itUsers)->getNickname() << std::endl;
     }
 }
 
