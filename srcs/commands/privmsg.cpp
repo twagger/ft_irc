@@ -70,6 +70,47 @@ void    checkChannelRights(Server *srv, const int &fd, \
         throw cannotsendtochanException(channel);
 }
 
+void    paramGrammarCheck(const std::string user, const std::string host, \
+                       const std::string servername, const std::string nickname)
+{
+    // For basic grammar checking
+    std::string nickControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN\
+                             OPQRSTUVWXYZ-[]\\`_^{|}");
+    std::string userControl("\0\r\n @");
+    std::string hostControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN\
+                             OPQRSTUVWXYZ-.:");
+    std::string serverControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKL\
+                               MNOPQRSTUVWXYZ-.");
+    
+    // Basic grammar check
+    if (!nickname.empty())
+    {
+        if (nickname.find_first_not_of(nickControl) != std::string::npos)
+            throw grammarException("Grammar : nickname");
+        if (nickname.length() < 1 || nickname.length() > 9)
+            throw grammarException("Grammar : nickname");
+        if (nickname[0] == '-' || std::isdigit(nickname[0]))
+            throw grammarException("Grammar : nickname");
+    }
+    if (!user.empty())
+    {
+        if (user.find_first_of(userControl) != std::string::npos)
+            throw grammarException("Grammar : user");
+        if (user.length() < 1)
+            throw grammarException("Grammar : user");
+    }
+    if (!servername.empty())
+    {
+        if (servername.find_first_not_of(serverControl) != std::string::npos)
+            throw grammarException("Grammar : servername");
+    }
+    if (!host.empty())
+    {
+        if (host.find_first_not_of(hostControl) != std::string::npos)
+            throw grammarException("Grammar : hostname");
+    }
+}
+
 /* ************************************************************************** */
 /* SPECIFIC FUNCTIONS TO EXTRACT USER FD, CHANNEL NAME OR TO COMPUTE MASK     */
 /* ************************************************************************** */
@@ -108,15 +149,6 @@ int   extractUserFd(const std::string str, Server *srv)
     std::string nickname;
     User        *resultUser = NULL;
 
-    // For basic grammar checking
-    std::string nickControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN\
-                             OPQRSTUVWXYZ-[]\\`_^{|}");
-    std::string userControl("\0\r\n @");
-    std::string hostControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN\
-                             OPQRSTUVWXYZ-.:");
-    std::string serverControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKL\
-                               MNOPQRSTUVWXYZ-.");
-
     // string matching using
     if (str.find('%') != std::string::npos) {
         // USER / HOST / SERVERNAME
@@ -139,33 +171,8 @@ int   extractUserFd(const std::string str, Server *srv)
     else
         nickname = str;
 
-    // Basic grammar check
-    if (!nickname.empty())
-    {
-        if (nickname.find_first_not_of(nickControl) != std::string::npos)
-            throw grammarException("Grammar : nickname");
-        if (nickname.length() < 1 || nickname.length() > 9)
-            throw grammarException("Grammar : nickname");
-        if (nickname[0] == '-' || std::isdigit(nickname[0]))
-            throw grammarException("Grammar : nickname");
-    }
-    if (!user.empty())
-    {
-        if (user.find_first_of(userControl) != std::string::npos)
-            throw grammarException("Grammar : user");
-        if (user.length() < 1)
-            throw grammarException("Grammar : user");
-    }
-    if (!servername.empty())
-    {
-        if (servername.find_first_not_of(serverControl) != std::string::npos)
-            throw grammarException("Grammar : servername");
-    }
-    if (!host.empty())
-    {
-        if (host.find_first_not_of(hostControl) != std::string::npos)
-            throw grammarException("Grammar : hostname");
-    }
+    // Param check
+    paramGrammarCheck(user, host, servername, nickname);
 
     // User search and return
     if (!nickname.empty())
