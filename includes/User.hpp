@@ -12,8 +12,8 @@
 # define ST_DEAD 0
 # define ST_PINGED 2
 
-//   The available modes are as follows:
-//		none ?												=> 0	0000 0000
+//   The available modes are:
+//		none												=> 0	0000 0000
 //		a - user is flagged as away;						=> 1	0000 0001
 //		w - user receives wallops;							=> 2	0000 0010			
 //     	i - marks a users as invisible; 					=> 3	0000 0100

@@ -11,9 +11,8 @@ bool	forbiddenNick(std::string param)
 		return true;
 	else if (!isalpha(param[0]) && std::string(NAMESPECIALS).find(param[0])
 				== std::string::npos)										
-				//&& param[0] != 92 ?
 		return true;
-	else if (param.length() > 9)												// to be check if > 9 >> erroneous nickname msg
+	else if (param.length() > 9)
 		return true;
 	else {
 		for (unsigned int i = 0; i < param.length(); i++) {
@@ -25,7 +24,26 @@ bool	forbiddenNick(std::string param)
 	return false;
 }
 
-void nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
+bool isInKillList(Server *srv, std::string nick) {
+	
+	std::map<std::string, time_t>::iterator it = srv->_unavailableNicknames.find(nick);
+	std::map<std::string, time_t>::iterator ite = srv->_unavailableNicknames.end();
+	double	seconds;
+
+	if (it != ite) {
+		seconds = difftime(time(NULL), (srv->_unavailableNicknames.find(nick))->second);
+		if (seconds < KILLTIME)
+			return (true);
+		else {
+			srv->_unavailableNicknames.erase(it);
+			return (false);			
+		}
+	}
+	return (false);
+}
+
+void nick(const int &fd, const std::vector<std::string> &params, const std::string &,
+			Server *srv) 
 {	
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -41,18 +59,20 @@ void nick(const int &fd, const std::vector<std::string> &params, const std::stri
 		else if (srv->getUserByNickname(params[0]) != 0) {
 			replyMsg = numericReply(srv, fd, "433", ERR_NICKNAMEINUSE(params[0]));
 		}
-		// else if (// nick is in kill list)											// waiting for killlist
-		// 	replyMsg = numericReply(srv, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
+		else if (isInKillList(srv, params[0])) {
+			replyMsg = numericReply(srv, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
+		}
 		else if (user->hasMode(MOD_RESTRICTED)) {
 			replyMsg = numericReply(srv, fd, "484", ERR_RESTRICTED);
 		}
 		else if (user->getNickname() == "*") {
 			user->setNickname(params[0]);
 			if (isAuthenticatable(user)) 
-				replyMsg = authenticateUser(fd, srv);
+				authenticateUser(fd, srv);
+			return ;
 		}
 		else {
-			replyMsg = clientReply(srv, fd, CLIENT_NICK(prefix, params[0]));			
+			replyMsg = clientReply(srv, fd, "NICK " + params[0]);
 			user->setNickname(params[0]);
 		}
 	}
