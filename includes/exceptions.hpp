@@ -36,9 +36,7 @@ class notexttosendException : public ircException
 { public: notexttosendException(std::string code = "412"); };
 
 class toomanytargetsException : public ircException
-{ 
-    public:
-        toomanytargetsException(std::string target, std::string errcode, \
+{ public: toomanytargetsException(std::string target, std::string errcode, \
                                 std::string abortmsg, std::string code = "407");
 };
 
@@ -47,5 +45,10 @@ class notoplevelException : public ircException
 
 class wildtoplevelException : public ircException
 { public: wildtoplevelException(std::string mask, std::string code = "414");};
+
+class cannotsendtochanException : public ircException
+{ public: cannotsendtochanException(std::string channame, \
+                                                      std::string code = "404");
+};
 
 #endif

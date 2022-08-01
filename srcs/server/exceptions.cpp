@@ -37,3 +37,8 @@ notoplevelException::notoplevelException(std::string mask, std::string code)
 // 414 - wildtoplevelException
 wildtoplevelException::wildtoplevelException(std::string mask, std::string code)
 { this->code = code; this->rpl = ERR_WILDTOPLEVEL(mask); }
+
+// 404 - cannotsendtochanException
+cannotsendtochanException::cannotsendtochanException(std::string channame, \
+                                                     std::string code)
+{ this->code = code; this->rpl = ERR_CANNOTSENDTOCHAN(channame); }

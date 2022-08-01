@@ -91,6 +91,7 @@
     #define ERR_NOTEXTTOSEND                                (":No text to send\r\n")                                                                    // 412
     #define ERR_NOTOPLEVEL(mask)                            (mask + " :No toplevel domain specified\r\n")                                               // 413
     #define ERR_WILDTOPLEVEL(mask)                          (mask + " :Wildcard in toplevel domain\r\n")                                                // 414
+    #define ERR_CANNOTSENDTOCHAN(channame)                  (channame + " :Cannot send to channel\r\n")                                                 // 404
 
 	// OTHER ERRORS:
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")												// 401

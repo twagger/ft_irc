@@ -22,6 +22,21 @@ struct Target {
 };
 
 /* ************************************************************************** */
+/* UTILITY FUNCTIONS                                                          */
+/* ************************************************************************** */
+void    checkChannelRights(Server *srv, const int &fd, \
+                                                    const std::string channel)
+{
+    std::map<std::string, Channel *>::const_iterator it;
+
+    // Get the list of users in the channel
+    it = srv->_channelList.find(channel);
+    if (it == srv->_channelList.end())
+        throw nosuchnickException(channel);
+
+}
+
+/* ************************************************************************** */
 /* SPECIFIC FUNCTIONS TO EXTRACT USER FD, CHANNEL NAME OR TO COMPUTE MASK     */
 /* ************************************************************************** */
 // CHANNEL
@@ -91,21 +106,32 @@ int   extractUserFd(const std::string str, Server *srv)
         nickname = str;
 
     // Basic grammar check
-    // > ne check que ce qui est rempli
-    if (nickname.find_first_not_of(nickControl) != std::string::npos)
-        throw grammarException("Grammar : nickname");
-    if (nickname.length() < 1 || nickname.length() > 9)
-        throw grammarException("Grammar : nickname");
-    if (nickname[0] == '-' || std::isdigit(nickname[0]))
-        throw grammarException("Grammar : nickname");
-    if (user.find_first_of(userControl) != std::string::npos)
-        throw grammarException("Grammar : user");
-    if (user.length() < 1)
-        throw grammarException("Grammar : user");
-    if (servername.find_first_not_of(serverControl) != std::string::npos)
-        throw grammarException("Grammar : servername");
-    if (host.find_first_not_of(hostControl) != std::string::npos)
-        throw grammarException("Grammar : hostname");
+    if (!nickname.empty())
+    {
+        if (nickname.find_first_not_of(nickControl) != std::string::npos)
+            throw grammarException("Grammar : nickname");
+        if (nickname.length() < 1 || nickname.length() > 9)
+            throw grammarException("Grammar : nickname");
+        if (nickname[0] == '-' || std::isdigit(nickname[0]))
+            throw grammarException("Grammar : nickname");
+    }
+    if (!user.empty())
+    {
+        if (user.find_first_of(userControl) != std::string::npos)
+            throw grammarException("Grammar : user");
+        if (user.length() < 1)
+            throw grammarException("Grammar : user");
+    }
+    if (!servername.empty())
+    {
+        if (servername.find_first_not_of(serverControl) != std::string::npos)
+            throw grammarException("Grammar : servername");
+    }
+    if (!host.empty())
+    {
+        if (host.find_first_not_of(hostControl) != std::string::npos)
+            throw grammarException("Grammar : hostname");
+    }
 
     // User search and return
     if (!nickname.empty())
@@ -239,6 +265,7 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
             }
             else if (!itg->channel.empty()) {
                 // Send to channel
+                checkChannelRights(srv, fd, itg->channel);
                 srv->sendChannel(itg->channel, \
                         clientReply(srv, fd, PRIVMSG(itg->target, message)));
             }
@@ -246,8 +273,10 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
     } // EXCEPTIONS
     catch (grammarException &e) { printError(e.what(), 1, false); return; }
     catch (norecipientException &e) {e.reply(srv, fd); return; }
+    catch (nosuchnickException &e) {e.reply(srv, fd); return; }
     catch (notexttosendException &e) {e.reply(srv, fd); return; }
     catch (toomanytargetsException &e) {e.reply(srv, fd); return; }
     catch (notoplevelException &e) {e.reply(srv, fd); return; }
     catch (wildtoplevelException &e) {e.reply(srv, fd); return; }
+    catch (cannotsendtochanException &e) {e.reply(srv, fd); return; }
 }
