@@ -16,25 +16,25 @@
 // CONNECTION REGISTRATION
 
 	// CONNECTION REGISTRATION REPLY
-	#define	RPL_WELCOME(nick, username, clientHost)			("Welcome to the Internet Relay Network " + nick + "!" + username + "@" + clientHost + "\r\n")	// 001
+	#define	RPL_WELCOME(nick, username, clientHost)			("Welcome to the Internet Relay Network " + nick + "!" + username + "@" + clientHost + "\r\n")		// 001
 	#define	RPL_YOURHOST(serverName, version)				("Your host is " + serverName + ", running version " + version + "\r\n")							// 002
 	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")														// 003
 	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " " + userModes + " " + channelModes + "\r\n")				// 004
 
 	// CHANNELS
-	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic + "\r\n")																				// 332
-	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set" + "\r\n")																			// 331
-	#define RPL_NAMREPLY(cMode, channelName, nMode, nickName) (cMode + " " + channelName + ":" + nMode + " " + nickName + " *(" + nMode + " " + nickName " )" + "\r\n")	// 353
-	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list" + "\r\n")																		// 366
-	#define RPL_LIST(channelName, topic)					(channelName + " " + topic + "\r\n")																		// 322
-	#define RPL_LISTEND										(":End of LIST\r\n")																					// 323
+	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic + "\r\n")																// 332
+	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set" + "\r\n")														// 331
+	#define RPL_NAMREPLY(channelName, nickName) 			(channelName + " :" + nickName + "\r\n")																// 353
+	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list" + "\r\n")														// 366
+	#define RPL_LIST(channelName, topic)					(channelName + " " + topic + "\r\n")																// 322
+	#define RPL_LISTEND										(":End of LIST\r\n")																				// 323
 
 
 
 	// NICK
 	#define ERR_NONICKNAMEGIVEN								(":No nickname given\r\n")																	// 431
 	#define ERR_ERRONEUSNICKNAME(nick)						(nick + " :Erroneous nickname" + "\r\n")													// 432
-	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :TEST Nickname is already in use" + "\r\n")											// 433
+	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :TEST Nickname is already in use" + "\r\n")										// 433
 	//#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")			// 436
 	#define ERR_UNAVAILRESOURCE(nickOrChannel) 				(nickOrChannel + " :Nick/channel is temporarily unavailable" + "\r\n")						// 437
 	#define ERR_RESTRICTED 									(":Your connection is restricted!\r\n")														// 484

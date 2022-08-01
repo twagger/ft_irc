@@ -64,7 +64,6 @@ std::string WelcomeChan(Server *irc, const int &fd, std::string code,
                 nicknameList += "@"; 
         }
         nicknameList += (*itUser)->getNickname() + " ";
-        std::cout << "nicklist = " << nicknameList << std::endl;
     }
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
 						+ irc->getUserByFd(fd)->getNickname() + " = "
