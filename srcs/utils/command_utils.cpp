@@ -1,41 +1,13 @@
-#include <sstream>
-#include <iostream>
-#include <algorithm>
 #include "../../includes/Server.hpp"
-#include <sys/socket.h>
+#include "../../includes/utils.hpp"
 
-bool isChannel(std::string channelName)
-{
-    if (channelName.find("#") != std::string::npos
-        || channelName.find("&") != std::string::npos)
-        {
-            return (true);
-        }
-    return (false);
-}
 
-std::vector<std::string> splitByComma(std::string parameter)
-{
-    std::vector<std::string> tab;
-
-    // Case where no comma were found
-
-    if (parameter.find(',') == std::string::npos)
-    {
-        tab.push_back(parameter);
-        return (tab);
-    }
-
-    // Case where one comma was found
-
-    std::string temp;
-    std::istringstream stream(parameter);
-    while (std::getline(stream, temp, ','))
-    {
-        transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
-        tab.push_back(temp);
-    }
-    return (tab);
+bool emptyParams(const std::vector<std::string> &params) {
+	for (unsigned int i = 0; i < params.size(); i++) {
+		if (params[i].empty()) 	
+			return true;
+	}
+	return false;
 }
 
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
@@ -79,6 +51,40 @@ std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 						+ irc->getUserByFd(originFd)->getHostname() + " " + replyMsg
                         + "\r\n";
 	return (reply);
+}
+
+std::vector<std::string> splitByComma(std::string parameter)
+{
+    std::vector<std::string> tab;
+
+    // Case where no comma were found
+
+    if (parameter.find(',') == std::string::npos)
+    {
+        tab.push_back(parameter);
+        return (tab);
+    }
+
+    // Case where one comma was found
+
+    std::string temp;
+    std::istringstream stream(parameter);
+    while (std::getline(stream, temp, ','))
+    {
+        transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+        tab.push_back(temp);
+    }
+    return (tab);
+}
+
+bool isChannel(std::string channelName)
+{
+    if (channelName.find("#") != std::string::npos
+        || channelName.find("&") != std::string::npos)
+        {
+            return (true);
+        }
+    return (false);
 }
 
 std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList, User *currentUser)

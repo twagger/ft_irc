@@ -244,6 +244,8 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["PASS"] = &pass;
     this->_cmdList["NICK"] = &nick;
 	this->_cmdList["USER"] = &user;
+	this->_cmdList["MODE"] = &mode;
+	this->_cmdList["OPER"] = &oper;
     this->_cmdList["KILL"] = &kill;
     this->_cmdList["JOIN"] = &join;
     this->_cmdList["PART"] = &part;
@@ -260,7 +262,6 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["TIME"] = &time;
     this->_cmdList["INFO"] = &info;
     this->_cmdList["CAP"] = &cap;
-    this->_cmdList["-USER"] = NULL;
 }
 
 // EXECUTE RECEIVED COMMANDS
@@ -284,17 +285,17 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
         {
             // execute the command
             exec_command = it_cmd->second;
-            // control if the fd can execute the command (is auth ?)
-            // < code here ... >
-            // update client timers
-            user = this->getUserByFd(fd);
-            user->setLastActivityTime();
-            try { exec_command(fd, it->params, it->prefix, this); }
-            // send exception
-            catch (Server::invalidFdException &e)
-            { printError(e.what(), 1, false); return; }
-            catch (Server::sendException &e)
-            { printError(e.what(), 1, true); return; }
+			user = this->getUserByFd(fd);
+			// update client timers
+			user->setLastActivityTime();
+            if (user->getAuthenticated() || isAuthenticationCmd(it_cmd->first)) {
+				try { exec_command(fd, it->params, it->prefix, this); }
+				// send exception
+				catch (Server::invalidFdException &e)
+				{ printError(e.what(), 1, false); return; }
+				catch (Server::sendException &e)
+				{ printError(e.what(), 1, true); return; }
+			}
         }
         else // the command is unknown, send something to the client
         {
@@ -440,7 +441,7 @@ void    Server::killConnection(int fd)
     // fd exists, clean all -------------------------------------------------- /
     // delete user and remove pair from list
     delete it->second;
-    this->_userList.erase(fd);
+	this->_userList.erase(fd);
     // remove user's fd from the poll
     if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
         throw Server::pollDelException();
@@ -477,11 +478,11 @@ void    Server::sendChannel(std::string channel, std::string message) const
     if (itChannel == this->_channelList.end())
         throw Server::invalidChannelException();
     userList = itChannel->second->getUsers();
-    for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers)
-    {
-        this->sendClient((*itUsers)->getFd(), message);
-        std::cout << "name = " << (*itUsers)->getNickname() << std::endl;
-    }
+    for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers) {
+		if (((*itUsers)->getFd() != 0)) {
+        	this->sendClient((*itUsers)->getFd(), message);
+		}
+	}
 }
 
 // BROADCAST
