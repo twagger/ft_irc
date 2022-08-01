@@ -244,7 +244,6 @@ void    Server::_initCommandList(void) // functions to complete
 	this->_cmdList["MODE"] = &mode;
 	this->_cmdList["OPER"] = &oper;
     this->_cmdList["KILL"] = &kill;
-	this->_cmdList["kill"] = &kill;
     this->_cmdList["JOIN"] = &join;
     this->_cmdList["PART"] = &part;
     this->_cmdList["PING"] = &ping;
@@ -255,6 +254,11 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["TIME"] = &time;
     this->_cmdList["INFO"] = &info;
     this->_cmdList["CAP"] = &cap;
+	this->_cmdList["kill"] = &kill;
+	this->_cmdList["motd"] = &motd;
+	this->_cmdList["info"] = &info;
+	this->_cmdList["time"] = &time;
+	this->_cmdList["version"] = &version;
 }
 
 // EXECUTE RECEIVED COMMANDS
@@ -404,6 +408,9 @@ void    Server::start(void)
                 catch (Server::passwordException &e)
                 { printError(e.what(), 1, true); }
             }
+			else if (events[i].events == EPOLLHUP) {
+				std::cout << "test close connexion " << std::endl;
+			}
             else // new message from existing connection --------------------- /
             {
                 try { this->_handleNewMessage(events[i]); }
@@ -469,8 +476,11 @@ void    Server::sendChannel(std::string channel, std::string message) const
     if (itChannel == this->_channelList.end())
         throw Server::invalidChannelException();
     userList = itChannel->second->getUsers();
-    for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers)
-        this->sendClient((*itUsers)->getFd(), message);
+    for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers) {
+		std::cout << *itUsers << std::endl;
+		if (((*itUsers)))
+        	this->sendClient((*itUsers)->getFd(), message);
+	}
 }
 
 // BROADCAST

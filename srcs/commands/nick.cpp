@@ -42,7 +42,7 @@ bool isInKillList(Server *srv, std::string nick) {
 	return (false);
 }
 
-void nick(const int &fd, const std::vector<std::string> &params, const std::string &prefix,
+void nick(const int &fd, const std::vector<std::string> &params, const std::string &,
 			Server *srv) 
 {	
 	std::string replyMsg;
@@ -72,7 +72,7 @@ void nick(const int &fd, const std::vector<std::string> &params, const std::stri
 			return ;
 		}
 		else {
-			replyMsg = clientReply(srv, fd, CLIENT_NICK(prefix, params[0]));			
+			replyMsg = clientReply(srv, fd, CLIENT_NICK(std::string("NICK"), params[0]));			
 			user->setNickname(params[0]);
 		}
 	}

@@ -47,7 +47,7 @@ bool areValidParams(const std::vector<std::string> &params)
 	return true;
 }
 
-void user(const int &fd, const std::vector<std::string> &params, const std::string &prefix, 
+void user(const int &fd, const std::vector<std::string> &params, const std::string &, 
 		Server *srv) 
 {
 	std::string replyMsg;
@@ -56,7 +56,7 @@ void user(const int &fd, const std::vector<std::string> &params, const std::stri
 	if (user != 0 && user->getPassword() == true) {
 		if (params.empty() || params.size() < 4 || emptyParams(params)) {
 			replyMsg = numericReply(srv, fd, "461",
-				ERR_NEEDMOREPARAMS(prefix));
+				ERR_NEEDMOREPARAMS(std::string("USER")));
 		}
 		else if (!user->getUsername().empty()) {
 			replyMsg = numericReply(srv, fd, "462", ERR_ALREADYREGISTRED); 

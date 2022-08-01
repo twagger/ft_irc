@@ -106,34 +106,28 @@ void	handleAddRemoveModes(User *user, const std::string modes)
 	}
 }
 
-void	mode(const int &fd, const std::vector<std::string> &params, const std::string &prefix, 
+void	mode(const int &fd, const std::vector<std::string> &params, const std::string &, 
 		Server *srv) {
 	
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
 
-	std::cout << "[DEBUG] Mode step 1 " << std::endl;
 	if (params.empty() || params[0].empty()) {
-			std::cout << "[DEBUG] Mode step 2 " << std::endl;
 			replyMsg = numericReply(srv, fd, "461",
-				ERR_NEEDMOREPARAMS(prefix));
+				ERR_NEEDMOREPARAMS(std::string("MODE")));
 	}
 	else if (params.size() == 1 && params[0] == user->getNickname()) {		// no nickname given
-			std::cout << "[DEBUG] Mode step 3 " << std::endl;	
 		replyMsg = numericReply(srv, fd, "221", RPL_UMODEIS(userModesToStr(user)));
 	}
 	else if (srv->getUserByNickname(params[0]) == 0) {
-			std::cout << "[DEBUG] Mode step 4 " << std::endl;
 	   	replyMsg = numericReply(srv, fd, "401", ERR_NOSUCHNICK(params[0]));
 	}
 	else if (params[0] != user->getNickname()) {
-			std::cout << "[DEBUG] Mode step 5 " << std::endl;
 		replyMsg = numericReply(srv, fd, "502", ERR_USERSDONTMATCH);
 	}
-	// else if (params.find(USERMODES))									// replace with pattern match
+	// else if (isNotUserMode(params[1], USERMODES) || isNotChannelMode(params[1], CHANNELMODES))									// replace with pattern matching
 	// 	replyMsg = numericReply(srv, fd, "501", ERR_UMODEUNKNOWNFLAG);		
 	else if (!params[1].empty()) {
-			std::cout << "[DEBUG] Mode step 6 " << std::endl;
 		handleAddRemoveModes(user, params[1]);
 	} 	// we already checked above that param == user's own nickname
 	srv->sendClient(fd, replyMsg);

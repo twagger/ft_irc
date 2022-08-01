@@ -23,6 +23,8 @@ SRCS		= srcs/main.cpp \
 			  srcs/channel/part.cpp \
 			  srcs/channel/invite.cpp \
 			  srcs/user/User.cpp \
+			  srcs/commands/cap.cpp \
+			  srcs/commands/info.cpp \
 			  srcs/commands/kill.cpp \
 			  srcs/commands/mode.cpp \
 			  srcs/commands/motd.cpp \
@@ -31,12 +33,10 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/pass.cpp \
 			  srcs/commands/ping.cpp \
 			  srcs/commands/pong.cpp \
-			  srcs/commands/cap.cpp \
-			  srcs/commands/version.cpp \
-			  srcs/commands/time.cpp \
-			  srcs/commands/info.cpp \
 			  srcs/commands/quit.cpp \
+			  srcs/commands/time.cpp \
 			  srcs/commands/user.cpp \
+			  srcs/commands/version.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/utils/welcome.cpp \

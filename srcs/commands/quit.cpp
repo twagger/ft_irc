@@ -7,7 +7,7 @@ void	serverNotice(const int &fd,  Server *srv, const std::string &destNick, std:
 	srv->sendClient(fd, reply);
 }
 
-void	quit(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv) 
+void	quit(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
 {
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
@@ -22,17 +22,27 @@ void	quit(const int &fd, const std::vector<std::string> &params, const std::stri
 	std::vector<std::string> channelsToReplyTo = user->getChannelsJoined();
 	std::vector<std::string>::iterator it;
 	std::vector<std::string>::iterator ite = channelsToReplyTo.end();
-	replyMsg = clientReply(srv, fd, CLIENT_QUIT(prefix, params[0]));
-	for (it = channelsToReplyTo.begin(); it < ite; ++it) {
-		srv->sendChannel(*it, replyMsg);
+	if (params.empty() || params[0].empty())
+		replyMsg = clientReply(srv, fd, CLIENT_QUIT(std::string("QUIT"), std::string()));
+	else		
+		replyMsg = clientReply(srv, fd, CLIENT_QUIT(std::string("QUIT"), params[0]));
+	try {
+		for (it = channelsToReplyTo.begin(); it < ite; ++it) {
+			srv->sendChannel(*it, replyMsg);
+		}
 	}
+	catch (Server::invalidChannelException &e) 
+	{ printError(e.what(), 1, true); }
 
 	//Try to kill the fd (should be done after sending reply to all channels?)
 	try { srv->killConnection(fd); }
-    catch (Server::pollDelException &e) { printError(e.what(), 1, true); }
-    catch (Server::invalidFdException &e) { printError(e.what(), 1, false); }
+    catch (Server::pollDelException &e) 
+	{ printError(e.what(), 1, true); }
+    catch (Server::invalidFdException &e) 
+	{ printError(e.what(), 1, false); }
 	return ;
 }
 
 // test segfault on second user quitting a channel
 // protect if channel is deleted when all users left 
+// broken pipe if /QUIT inside a channel on IRSSI
