@@ -19,9 +19,13 @@
 #define MAX_EVENTS 10
 
 // Client check params
-#define PING_TIMEOUT 120 // in seconds
-#define PONG_TIMEOUT 20 // in seconds
-#define WAIT_TIMEOUT 3000 // in milliseconds
+#define PING_TIMEOUT 120	// in seconds
+#define PONG_TIMEOUT 20		// in seconds
+#define WAIT_TIMEOUT 3000	// in milliseconds
+#define KILLTIME 3600		// in seconds = 1h
+
+// Config files
+#define OPERCONF "operhost.config"
 
 // Program infos
 #ifndef VERSION
@@ -34,9 +38,6 @@
 # define COMPILDATE "Sun 25 Sep 1983 10:00:00 AM CEST"
 #endif
 
-// Non numeric replies
-#define	PING(hostname) (":" + hostname + " PING " + hostname + "\r\n")
-#define	PONG(hostname) (":" + hostname + " PONG " + hostname + "\r\n")
 
 // Utility structure
 struct Command

@@ -4,7 +4,7 @@
 #include <iostream>
 # include <string>
 
-#define USERMODES "iorx"
+#define USERMODES "aiwroOs"
 #define CHANNELMODES ""
 #define NAMESPECIALS ";[]`_^{|}\\"
 
@@ -72,6 +72,7 @@
 	#define RPL_UMODEIS(userModeStr) 						(userModeStr + "\r\n")																		// 221
 	#define ERR_UMODEUNKNOWNFLAG 							(":Unknown MODE flag\r\n")																	// 501
 	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users\r\n")													// 502
+	//	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")	
 	// #define ERR_NEEDMOREPARAMS 461
 
     // MOTD
@@ -93,7 +94,7 @@
 	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command" + "\r\n") 													// 421
 	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
 	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator" + "\r\n")					// 481
-
+	#define ERR_CANTKILLSERVER								(":You can't kill a server!\r\n")															// 483
 
 	// LIST OF CLIENT ORIGINATED REPLIES
 
@@ -102,9 +103,9 @@
 	//ADDITIONAL CLIENT REPLIES
     #define	PING(hostname)                                  (":" + hostname + " PING " + hostname + "\r\n")
     #define	PONG(hostname)                                  (":" + hostname + " PONG " + hostname + "\r\n")
-	#define CLIENT_NICK(prefix, nickname)							(prefix + " " + nickname + "\r\n")
-	#define CLIENT_QUIT(prefix, msg)								(prefix + " " + msg + "\r\n")
-	#define	CLIENT_ERROR											("ERROR : \r\n")
-	#define	CLIENT_ERRORMSG(msg)									("ERROR :\"" + msg + "\"\r\n")
+	#define CLIENT_NICK(prefix, nickname)					(prefix + " " + nickname + "\r\n")
+	#define CLIENT_QUIT(prefix, msg)						(prefix + " " + msg + "\r\n")
+	#define	CLIENT_ERROR									("ERROR : \r\n")
+	#define	CLIENT_ERRORMSG(msg)							("ERROR :\"" + msg + "\"\r\n")
 
 #endif

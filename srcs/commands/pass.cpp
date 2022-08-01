@@ -1,8 +1,9 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-void	pass(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) {
-	
+void	pass(const int &fd, const std::vector<std::string> &params, const std::string &,
+			Server *srv) 
+{	
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
 

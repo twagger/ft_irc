@@ -7,16 +7,19 @@
 #include "../includes/utils.hpp"
 #include "../includes/Server.hpp"
 
-#define DEF_PORT 6667
-#define DEF_PASS "changeme"
+//#define DEF_PORT 6667
+//#define DEF_PASS "changeme"
 
 int main(int ac, char **av)
 {
     // parameters
     std::stringstream   ss; 
-    int                 port = DEF_PORT;
-    std::string         password = DEF_PASS;
+//    int                 port = DEF_PORT;
+//    std::string         password = DEF_PASS;
 
+	int port;
+	std::string	password;
+	
     // basic using parameters ------------------------------------------------ /
     if (ac != 3)
         return (printError("Parameters error", 1, false));
