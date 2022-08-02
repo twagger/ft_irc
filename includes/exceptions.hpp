@@ -68,4 +68,7 @@ class needmoreparamsException : public ircException
 class cantkillserverException : public ircException
 { public: cantkillserverException(std::string code = "483");};
 
+class nomotdException : public ircException
+{ public: nomotdException(std::string code = "422");};
+
 #endif

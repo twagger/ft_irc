@@ -1,32 +1,32 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 #include "../../includes/replies.hpp"
+#include "../../includes/exceptions.hpp"
 
-std::string createModtStr(Server *srv, const int &fd) {
-	std::string	replyMsg;
-	replyMsg
-    .append(numericReply(srv, fd, "372", RPL_MOTD(std::string("Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - benvinguts - velkommen"))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("		           .       .                   .       .      .     .      ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("          .    .         .    .            .     ______                    "))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("      .           .             .               ////////"))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("                .    .   ________   .  .      /////////     .    ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("           .            |.____.  /\\        ./////////    ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("    .                 .//      \\/  |\\     /////////"))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("       .       .    .//          \\ |  \\ /////////       .     .   ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("                    ||.    .    .| |  ///////// .     ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("     .    .         ||           | |//`,/////                ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("             .       \\\\        ./ //  /  \\/   ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("  .                   \\\\.___./ //\\` '   ,_\\     .     ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("          .           .     \\ //////\\ , /   \\                 .    ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("                       .    ///////// \\|  '  |    ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("      .        .          ///////// .   \\ _ /          ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("                        /////////                              ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("                 .   ./////////     .     ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("         .           --------   .                  ..             ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("  .               .        .         .                       ."))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("                        ________________________"))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("____________------------                        -------------_________"))))
-	.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("Des bisous de la Space team <3"))));
+#ifndef MOTD_FILE 
+# define MOTD_FILE "conf/motd.txt"
+#endif
+
+std::string createModtStr(Server *srv, const int &fd, std::string &filename)
+{
+	std::ifstream   infile;
+	std::string	    line;
+	std::string	    replyMsg;
+
+    // Try to open file
+	infile.exceptions(std::ifstream::failbit);
+	try { infile.open(filename.c_str(), std::fstream::in); }
+	catch (std::ios_base::failure &e)
+	{ throw nomotdException(); }
+
+    // Read the file one line at a time and append the line to the reply
+    replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - benvinguts - velkommen"))));
+	try {
+		while (std::getline(infile, line))
+            replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(line)));
+	} catch (std::ios_base::failure &e) {}
+    replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("Des bisous de la Space team <3"))));
+
 	return (replyMsg);
 }
 
@@ -34,15 +34,17 @@ void    motd(const int &fd, const std::vector<std::string> &, \
                        const std::string &,Server *srv)
 {
     std::string reply;
-    
-    if (!createModtStr(srv, fd).empty())
-    {
+    std::string motdFile(MOTD_FILE);
+
+     // COMMAND EXECUTION
+    try { 
         reply
         .append(numericReply(srv, fd, "375", RPL_MOTDSTART(srv->getHostname())))
-        .append(createModtStr(srv, fd))
+        .append(createModtStr(srv, fd, motdFile))
         .append(numericReply(srv, fd, "376", RPL_ENDOFMOTD));
         srv->sendClient(fd, reply);
     }
-    else
-        srv->sendClient(fd, numericReply(srv, fd, "422", ERR_NOMOTD));
+
+    // EXCEPTIONS
+    catch (nomotdException &e) {e.reply(srv, fd); return; }
 }
