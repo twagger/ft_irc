@@ -86,6 +86,7 @@ class User {
 
 		bool addChannelJoined(std::string channelName);			// if channel is already in the list, return false, else add + return true 
 		bool removeChannelJoined(std::string channelName);		// if channel is found in the list, erase it + return true, else do nothing and return false
+		bool empty(void) const;
 };
 
 std::ostream & operator<<(std::ostream &o, User const &rhs);	// for printing 'nickname!username@host.name.com ...'

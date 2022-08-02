@@ -14,7 +14,6 @@ bool isOperHost(std::string hostname) {
 		{ printError(e.what(), 1, true); return false; }
 	try {
 		while (getline(input, str)) {
-			std::cout << "[DEBUG] " << str << " and hostname " << hostname << std::endl;
 			if (str == hostname)
 				return true;
 		}

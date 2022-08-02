@@ -34,7 +34,7 @@
 	// NICK
 	#define ERR_NONICKNAMEGIVEN								(":No nickname given\r\n")																	// 431
 	#define ERR_ERRONEUSNICKNAME(nick)						(nick + " :Erroneous nickname" + "\r\n")													// 432
-	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :TEST Nickname is already in use" + "\r\n")										// 433
+	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :Nickname is already in use" + "\r\n")										// 433
 	//#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")			// 436
 	#define ERR_UNAVAILRESOURCE(nickOrChannel) 				(nickOrChannel + " :Nick/channel is temporarily unavailable" + "\r\n")						// 437
 	#define ERR_RESTRICTED 									(":Your connection is restricted!\r\n")														// 484

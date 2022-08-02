@@ -197,6 +197,10 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
     // create a new empty user
     this->_userList[newfd] = new User(newfd, inet_ntoa(client_addr.sin_addr));
 
+	// TO DELETE
+	// hostent *host = gethostbyname(inet_ntoa(client_addr.sin_addr));
+	// std::cout << "[DEBUG] sin addr " << host->h_name << std::endl;
+
     // add the new fd to the poll
     memset(&ev, 0, sizeof(struct epoll_event));
     ev.events = EPOLLIN | EPOLLET;
@@ -220,7 +224,7 @@ void    Server::_handleNewMessage(struct epoll_event event)
     if (ret == -1)
         throw Server::readException();
     buf[ret] = '\0';
-
+	
     // split the commands in a vector. Non blocking in case of not ok message.
     try { cmd_strings = splitBy(buf, "\r\n"); } 
     catch (std::runtime_error &e) { printError(e.what(), 1, false); }
@@ -487,7 +491,7 @@ void    Server::sendChannel(std::string channel, std::string message) const
         throw Server::invalidChannelException();
     userList = itChannel->second->getUsers();
     for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers) {
-		if (((*itUsers)->getFd() != 0)) {
+		if ((*itUsers)->empty() && ((*itUsers)->getFd() != 0)) {
         	this->sendClient((*itUsers)->getFd(), message);
 		}
 	}
