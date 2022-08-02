@@ -307,6 +307,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["TIME"] = &time;
     this->_cmdList["INFO"] = &info;
     this->_cmdList["PRIVMSG"] = &privmsg;
+    this->_cmdList["NOTICE"] = &notice;
     this->_cmdList["CAP"] = &cap;
 }
 

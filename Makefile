@@ -42,6 +42,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/time.cpp \
 			  srcs/commands/user.cpp \
 			  srcs/commands/privmsg.cpp \
+			  srcs/commands/notice.cpp \
 			  srcs/commands/version.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \

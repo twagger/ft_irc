@@ -350,7 +350,9 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
                         clientReply(srv, fd, PRIVMSG(itg->target, message)), fd);
             }
         }
-    } // EXCEPTIONS
+    }
+    
+    // EXCEPTIONS
     catch (grammarException &e) { printError(e.what(), 1, false); return; }
     catch (norecipientException &e) {e.reply(srv, fd); return; }
     catch (nosuchnickException &e) {e.reply(srv, fd); return; }
