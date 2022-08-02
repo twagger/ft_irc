@@ -160,13 +160,32 @@ void listBannedUser(const int &fdUser, Server *server,
 		"368", RPL_ENDOFBANLIST(channel->getChannelName())));
 }
 
+int checkUserExists(User *user, const std::vector<std::string> params, const int &fd,
+	Server *srv, int bannedList)
+{
+	if (user == NULL && params.size() > 2)
+	{
+		srv->sendClient(fd, numericReply(srv, fd, "441",
+			ERR_USERNOTINCHANNEL(params[2], params[0])));
+		return (-1);
+	}
+	else if (params.size() < 3 && bannedList == 0)
+		return (-2);
+	else if (params.size() < 3 && bannedList == 1)
+	{
+		listBannedUser(fd, srv, srv->_channelList.find(params[0])->second);
+		return (-3);
+	}
+	return (0);
+}
+
 void addModesChannel(const std::vector<std::string> params, int start, int stop,
 					 const int &fd, Server *srv)
 {
 	Channel *channel = srv->_channelList.find(params[0])->second;
 	User *user = NULL;
 	
-	if (params[2].empty() == false)
+	if (params.size() > 2)
 		user = srv->getUserByNickname(params[2]);
 
 	for (int i = start; i < stop; i++)
@@ -175,34 +194,39 @@ void addModesChannel(const std::vector<std::string> params, int start, int stop,
 		{
 		case 'i':
 			channel->addMode(MOD_INVITE);
+			break ;
 		case 'k':
+		// Check that a key was not already set
 			if (channel->hasMode(MOD_KEY) == true)
 				return (srv->sendClient(fd, numericReply(srv, fd, "467",
 					ERR_KEYSET(params[0]))));
 			channel->addMode(MOD_KEY);
 			channel->setKey(params[2]);
+			break ;
 		case 'o':
-			if (user == NULL && params[2].empty() == false)
-				return (srv->sendClient(fd, numericReply(srv, fd, "441",
-					ERR_USERNOTINCHANNEL(params[2], params[0]))));
-			else if (params[2].empty() == true)
+			// Check that the user exists and a user was given in parameter
+			if (checkUserExists(user, params, fd, srv, 0) < 0)
 				return ;
 			channel->addMode(MOD_OPERATOR);
 			channel->addOperator(user);
+			break ;
 		case 'b':
-			if (user == NULL && params[2].empty() == false)
-				return (srv->sendClient(fd, numericReply(srv, fd, "441",
-					ERR_USERNOTINCHANNEL(params[2], params[0]))));
-			else if (params[2].empty() == true)
-				listBannedUser(fd, srv, channel);
+			// Check that the user exists and a user was given in parameter
+			if (checkUserExists(user, params, fd, srv, 1) < 0)
+				return ;
 			channel->addMode(MOD_BAN);
 			channel->addBannedUser(user);
+			break ;
 		default:
 			return (srv->sendClient(fd, numericReply(srv, fd, "472",
 				ERR_UNKNOWNMODE(params[1], params[0]))));
-
 		}
 	}
+	if (params.size() < 3)
+		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
+			params[0] + " " + params[1])));
+	return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
+		params[0] + " " + params[1] + " " + params[2])));
 }
 
 void removeModesChannel(const std::vector<std::string> params, int start, int stop,
@@ -211,7 +235,7 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 	Channel *channel = srv->_channelList.find(params[0])->second;
 	User *user = NULL;
 	 
-	 if (params[2].empty() == false)
+	 if (params.size() > 2)
 	 	user = srv->getUserByNickname(params[2]);
 
 	for (int i = start; i < stop; i++)
@@ -220,28 +244,28 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 		{
 		case 'i':
 			channel->removeMode(MOD_INVITE);
+			break ;
 		case 'k':
 			channel->removeMode(MOD_KEY);
+			break ;
 		case 'o':
-			if (user == NULL && params[2].empty() == false)
-				return (srv->sendClient(fd, numericReply(srv, fd, "441",
-					ERR_USERNOTINCHANNEL(params[3], params[0]))));
-			else if (params[2].empty() == true)
+			if (checkUserExists(user, params, fd, srv, 0) < 0)
 				return ;
+			channel->removeOperator(user);
 			channel->removeMode(MOD_OPERATOR);
+			break ;
 		case 'b':
-			if (user == NULL && params[2].empty() == false)
-				return (srv->sendClient(fd, numericReply(srv, fd, "441",
-					ERR_USERNOTINCHANNEL(params[3], params[0]))));
-			else if (params[2].empty() == true)
+			if (checkUserExists(user, params, fd, srv, 0) < 0)
 				return ;
 			channel->removeMode(MOD_BAN);
+			channel->removeBannedUser(user);
+			break ;
 		default:
 			return (srv->sendClient(fd, numericReply(srv, fd, "472",
 				ERR_UNKNOWNMODE(params[1], params[0]))));
 		}
 	}
-	if (params[2].empty() == true)
+	if (params.size() < 3)
 		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
 			params[0] + " " + params[1])));
 	return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
@@ -252,7 +276,6 @@ void handleAddRemoveModesChannel(const int &fd, const std::vector<std::string> p
 								 Server *srv)
 {
 	std::pair<char, int> pair;
-
 	for (unsigned int i = 0; i < params[1].size(); i++)
 	{
 		if (params[1][i] == '+' || params[1][i] == '-')
@@ -261,11 +284,11 @@ void handleAddRemoveModesChannel(const int &fd, const std::vector<std::string> p
 		}
 		if (params[1][i] == '+' && pair.second > 0)
 		{
-			addModesChannel(params, i, pair.second + 1, fd, srv);
+			addModesChannel(params, i + 1, pair.second + 1, fd, srv);
 		}
 		else if (params[1][i] == '-' && pair.second > 0)
 		{
-			removeModesChannel(params, i, pair.second + 1, fd, srv);
+			removeModesChannel(params, i + 1, pair.second + 1, fd, srv);
 		}
 	}
 }
@@ -312,13 +335,27 @@ int checkChannelMode(const int &fd, const std::vector<std::string> &params, Serv
 
 void ChannelMode(const int &fd, const std::vector<std::string> &params, Server *srv)
 {
+	std::string mode = "+";
+	std::string modeParams;
+	Channel *channel;
+
 	if (checkChannelMode(fd, params, srv) < 0)
 		return;
-	if (params[1].empty() == false)
+	if (params.size() > 1)
 		handleAddRemoveModesChannel(fd, params, srv);
 	else
-		return (srv->sendClient(fd, numericReply(srv, fd, "461",
-			ERR_NEEDMOREPARAMS(std::string("MODE")))));
+	{
+		channel = srv->_channelList.find(params[0])->second;
+		if (channel->getKey().empty() == false)
+		{
+			mode += "k";
+			modeParams += channel->getKey();
+		}
+		if (channel->hasMode(MOD_INVITE) == true)
+			mode += "i";
+		return (srv->sendClient(fd, numericReply(srv, fd,
+			"324", RPL_CHANNELMODEIS(params[0], mode, modeParams))));
+	}
 }
 
 /* ************************************************************************** */

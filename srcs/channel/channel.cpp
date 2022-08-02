@@ -89,6 +89,16 @@ void Channel::removeOperator(User *userToDelete)
     }
 }
 
+void Channel::removeBannedUser(User *userToDelete)
+{
+    std::deque<User *>::iterator pos = std::find(this->_bannedUsers.begin(),
+        this->_bannedUsers.end(), userToDelete);
+    if (pos != this->_bannedUsers.end())
+    {
+        this->_bannedUsers.erase(pos);
+    }
+}
+
 /* Mode */
 
 void Channel::addMode(uint8_t mode) { this->_mode |= mode; }

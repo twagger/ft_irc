@@ -30,7 +30,7 @@
 	#define RPL_LISTEND										(":End of LIST\r\n")																				// 323
 	#define RPL_BANLIST(channel, nickname)					(channel + " " + nickname + "\r\n")																	// 323
 	#define RPL_ENDOFBANLIST(channel)						(":End of channel ban list\r\n")																	// 368
-	#define RPL_CHANNELMODEIS(channel, mode, params)		(channel + " " mode + " " + params + "\r\n")														// 324
+	#define RPL_CHANNELMODEIS(channel, mode, params)		(channel + " " +  mode + " " + params + "\r\n")														// 324
 
 	// NICK
 	#define ERR_NONICKNAMEGIVEN								(":No nickname given\r\n")																	// 431
