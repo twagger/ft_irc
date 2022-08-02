@@ -18,6 +18,7 @@ GCLONE		= git clone
 ################################################################################
 SRCS		= srcs/main.cpp \
 			  srcs/server/Server.cpp \
+		      srcs/server/exceptions.cpp \
 			  srcs/channel/channel.cpp \
 			  srcs/channel/join.cpp \
 			  srcs/channel/part.cpp \
@@ -40,12 +41,14 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/quit.cpp \
 			  srcs/commands/time.cpp \
 			  srcs/commands/user.cpp \
+			  srcs/commands/privmsg.cpp \
+			  srcs/commands/notice.cpp \
 			  srcs/commands/version.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/utils/welcome.cpp \
 			  srcs/utils/command_utils.cpp \
-			  		  
+			  srcs/parser/mask.cpp
 OBJS		= $(SRCS:.cpp=.o)
 
 # EXECUTABLES & LIBRARIES

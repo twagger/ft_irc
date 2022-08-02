@@ -68,7 +68,6 @@ class User {
         time_t  					getLastActivityTime(void) const;
         time_t  					getPingTime(void) const;
 
-
 		void setNickname(std::string nickname);
 		void setUsername(std::string username);
 		void setFullname(std::string fullname);

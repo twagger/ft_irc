@@ -90,6 +90,13 @@
     #define RPL_INFO(string)                                (": " + string + "\r\n")                                                                    // 371
     #define RPL_ENDOFINFO                                   (":End of INFO list\r\n")                                                                   // 374
 
+    // SENDING MESSAGES
+    #define ERR_NORECIPIENT(command)                        (":No recipient given (" + command + ")\r\n")                                               // 411
+    #define ERR_NOTEXTTOSEND                                (":No text to send\r\n")                                                                    // 412
+    #define ERR_NOTOPLEVEL(mask)                            (mask + " :No toplevel domain specified\r\n")                                               // 413
+    #define ERR_WILDTOPLEVEL(mask)                          (mask + " :Wildcard in toplevel domain\r\n")                                                // 414
+    #define ERR_CANNOTSENDTOCHAN(channame)                  (channame + " :Cannot send to channel\r\n")                                                 // 404
+
 	// OTHER ERRORS:
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")												// 401
     #define	ERR_NOSUCHSERVER(servername)					(servername + " :No such server" + "\r\n")												    // 402
@@ -106,6 +113,7 @@
 	//ADDITIONAL CLIENT REPLIES
     #define	PING(hostname)                                  (":" + hostname + " PING " + hostname + "\r\n")
     #define	PONG(hostname)                                  (":" + hostname + " PONG " + hostname + "\r\n")
+	#define	PRIVMSG(target, message)						("PRIVMSG " + target + " " + message)
 	#define CLIENT_NICK(prefix, nickname)					(prefix + " " + nickname + "\r\n")
 	#define CLIENT_QUIT(prefix, msg)						(prefix + " " + msg + "\r\n")
 	#define	CLIENT_ERROR									("ERROR : \r\n")
