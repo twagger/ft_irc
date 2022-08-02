@@ -362,21 +362,19 @@ void    Server::_pingClients(void)
     int                             userFd;
     User                            *user;
     double                          seconds;
-    std::string                     pingCmd;
     std::map<int, User *>::iterator it;
 
-    // loop on every active connection --------------------------------------- /
+    // loop on every active connection
     for (it = this->_userList.begin(); it != this->_userList.end();)
     {
         userFd = it->first;
         user = it->second;
         // Check user's last activity time 
         seconds = difftime(time(NULL), user->getLastActivityTime());
-        // case 1 : send a PING command if > 120sec -------------------------- /
+        // case 1 : send a PING command if > 120sec
         if (user->getStatus() == ST_ALIVE && seconds > PING_TIMEOUT)
         {
-            pingCmd = PING(this->_hostname);
-            try { this->sendClient(userFd, pingCmd); }
+            try { this->sendClient(userFd, PING(this->_hostname)); }
             catch (Server::sendException &e)
             { printError(e.what(), 1, true); return; }
             catch (Server::invalidFdException &e)
@@ -390,17 +388,10 @@ void    Server::_pingClients(void)
             // case 2 : PONG timeout > Kill the client
             if (seconds > PONG_TIMEOUT)
             {
-                // remove user's fd from the poll
-                if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, userFd, NULL) == -1)
-                    throw Server::pollDelException();
-                // close the socket
-                close(userFd);
-
-                // add the nickname to the list of unavailable nicknames and 
-                // remove user
-                this->_unavailableNicknames[user->getNickname()] = time(NULL);
-                delete user;
-                this->_userList.erase(it++);
+                // Move the iterator to the next user before removing user 
+                ++it;
+                // Kill connection
+                this->killConnection(userFd);
             }
         }
         else
