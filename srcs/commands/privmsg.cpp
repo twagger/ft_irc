@@ -1,4 +1,5 @@
 #include <deque>
+#include <set>
 #include <sstream>
 
 #include "../../includes/commands.hpp"
@@ -10,7 +11,7 @@
 #define MAX_TARGETS 100
 
 /* ************************************************************************** */
-/* STRUCTURE TO HOST CLIENT FD OR CHANNEL NAME                                */
+/* STRUCTURE TO HOST CLIENT FD OR CHANNEL NAME AND TARGET OF THE MESSAGE      */
 /* ************************************************************************** */
 struct Target {
     int         fd;
@@ -108,6 +109,40 @@ void    paramGrammarCheck(const std::string user, const std::string host, \
     {
         if (host.find_first_not_of(hostControl) != std::string::npos)
             throw grammarException("Grammar : hostname");
+    }
+}
+
+void cleanTargetsList(std::deque<Target> &target)
+{
+    std::deque<Target>::iterator    it;
+    std::set<int>                   alreadyFds;
+    std::set<std::string>           alreadyChannels;
+
+    // Clean target fds or channel that appears multiple time
+    for (it = target.begin(); it != target.end();)
+    {
+        if (it->fd != -1)
+        {
+            if (alreadyFds.find(it->fd) == alreadyFds.end())
+            {
+                alreadyFds.insert(it->fd);
+                ++it;
+            }
+            else
+                target.erase(it++);
+        }
+        else if (!(it->channel.empty()))
+        {
+            if (alreadyChannels.find(it->channel) == alreadyChannels.end())
+            {
+                alreadyChannels.insert(it->channel);
+                ++it;
+            }
+            else
+                target.erase(it++);
+        }
+        else
+            ++it;
     }
 }
 
@@ -285,6 +320,7 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
         msgtarget = params[0];
         message = params[1];
         targets = splitByComma(msgtarget);
+        
         // First loop WITH NO SEND to count the exact number of targets
         for (it = targets.begin(); it != targets.end(); ++it)
         {
@@ -294,6 +330,9 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
         ss << nbTargets; 
         if (nbTargets > MAX_TARGETS)
             throw toomanytargetsException(msgtarget, ss.str(), "Aborted.");
+
+        // Clean the targets list from doubles
+        cleanTargetsList(target);
 
         // Second loop TO SEND all messages
         for (itg = target.begin(); itg != target.end(); ++itg)
