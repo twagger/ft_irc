@@ -83,11 +83,17 @@ class Server
 
         // Member functions
         void    start(void);
-        void    sendClient(int fd, std::string message) const;
-        void    sendClient(std::set<int> &fds, std::string message) const;
-        void    broadcast(std::string message) const;
-        void    sendChannel(std::string channel, std::string message) const;
-        void    killConnection(int fd);
+        void    sendClient(const int &fd, const std::string &message, \
+                           const int &originFd = -1) const;
+        void    sendClient(const std::set<int> &fds, \
+                            const std::string &message, \
+                            const int &originFd= -1) const;
+        void    broadcast(const std::string &message, \
+                          const int &originFd = -1) const;
+        void    sendChannel(const std::string &channel, \
+                            const std::string &message, \
+                            const int &originFd = -1) const;
+        void    killConnection(const int &fd);
 
         // exceptions
         class socketException : public std::exception

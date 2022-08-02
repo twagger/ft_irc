@@ -39,7 +39,7 @@ void    checkChannelRights(Server *srv, const int &fd, \
         throw nosuchnickException(channel);
 
     // Get lists
-    userList = itChan->second->_bannedUsers;
+    userList = itChan->second->_users;
     banList = itChan->second->_bannedUsers;
 
     // Check the user fd against users of the channel then banlist
@@ -117,7 +117,7 @@ void    paramGrammarCheck(const std::string user, const std::string host, \
 // CHANNEL
 const std::string extractChannelName(const std::string str, Server *srv)
 {
-    int         pos = 1;
+    int         pos = 0;
     std::string name;
 
     if (str[0] == '!') {
@@ -198,7 +198,7 @@ int   extractUserFd(const std::string str, Server *srv)
 }
 
 // MASK
-void    computeMask(const std::string str, Server *srv, \
+void    computeMask(const std::string &str, Server *srv, \
                     std::deque<Target> &target)
 {
     std::deque<User*>                   userList;
@@ -211,7 +211,7 @@ void    computeMask(const std::string str, Server *srv, \
     toplevel = mask.find_last_of('.');
     if (toplevel == std::string::npos)
         throw notoplevelException(mask);
-    else if (mask.find('*', toplevel))
+    else if (mask.find('*', toplevel) != std::string::npos)
         throw wildtoplevelException(mask);
 
     if (str[0] == '$') {
@@ -238,7 +238,7 @@ void    computeMask(const std::string str, Server *srv, \
 /* ************************************************************************** */
 /* SPECIFIC FUNCTIONS TO CREATE A COLLECTION OF TARGETS FOR THE MAIN FUNCTION */
 /* ************************************************************************** */
-void getTargetsFromString(const std::string str, \
+void getTargetsFromString(const std::string &str, \
                           std::deque<Target> &target, Server *srv)
 {
     if (str[0] == '+' || str[0] == '&' || str[0] == '!'
@@ -263,14 +263,14 @@ void getTargetsFromString(const std::string str, \
 void privmsg(const int &fd, const std::vector<std::string> &params, \
                         const std::string &, Server *srv)
 {
-    std::vector<std::string>            targets;
-    std::vector<std::string>::iterator  it;
-    std::string                         msgtarget;
-    std::string                         message;
-    std::deque<Target>                  target;
-    std::deque<Target>::iterator        itg;
-    std::stringstream                   ss;
-    int                                 nbTargets = 0;
+    std::vector<std::string>                    targets;
+    std::vector<std::string>::const_iterator    it;
+    std::string                                 msgtarget;
+    std::string                                 message;
+    std::deque<Target>                          target;
+    std::deque<Target>::iterator                itg;
+    std::stringstream                           ss;
+    int                                         nbTargets = 0;
 
     // COMMAND EXECUTION
     try
@@ -296,7 +296,7 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
             throw toomanytargetsException(msgtarget, ss.str(), "Aborted.");
 
         // Second loop TO SEND all messages
-        for (itg = target.begin(); itg != target.end(); ++it)
+        for (itg = target.begin(); itg != target.end(); ++itg)
         {
             // HANDLE HERE : RPL_AWAY, ERR_CANNOTSENDTOCHAN
             if (itg->fd != -1) {
@@ -308,7 +308,7 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
                 // Send to channel
                 checkChannelRights(srv, fd, itg->channel);
                 srv->sendChannel(itg->channel, \
-                        clientReply(srv, fd, PRIVMSG(itg->target, message)));
+                        clientReply(srv, fd, PRIVMSG(itg->target, message)), fd);
             }
         }
     } // EXCEPTIONS
