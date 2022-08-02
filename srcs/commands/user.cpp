@@ -33,15 +33,9 @@ bool areValidParams(const std::vector<std::string> &params)
 	if (forbiddenUsername(params[0]) || params[0].find(' ') != std::string::npos)
 		return false;
 	else if (isNumber(params[1]) && std::atol(params[1].c_str()) > 256)
- 	{
-		std::cout << "here 2" << std::endl;
 		return false;
-	}
 	else if (isNumber(params[1]) == false && (params[1] != params[0]))
- 	{
-		std::cout << "here 3" << std::endl;
 		return false;
-	}
 	else if (params[3].size() < 1 || forbiddenUsername(params[3]))
 		return false;
 	return true;
