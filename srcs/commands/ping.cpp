@@ -1,23 +1,34 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
+#include "../../includes/exceptions.hpp"
 
 void    ping(const int &fd, const std::vector<std::string> &params, \
                        const std::string &, Server *srv)
 {
-    std::string hostname;
+    std::string origin;
+    std::string servername;
 
-    // check nb of param
-    if (params.size() == 1) // only hostname is expected
-    {
-        hostname = params[0];
-        // check if hostname is the one of the server
-        if (srv->getHostname() != hostname)
+    // COMMAND EXECUTION
+    try {
+        if (params.size() == 0)
+            throw nooriginException();
+        if (params.size() >= 1)
         {
-            srv->sendClient(fd, \
-                numericReply(srv, fd, "402", ERR_NOSUCHSERVER(hostname)));
-            return;
+            origin = params[0];
+            if (params.size() == 2)
+            {
+                // In mono-server, the target server must be the current one
+                servername = params[1];
+                if (srv->getHostname().compare(servername) != 0)
+                    throw nosuchserverException(servername);
+            }
+            // answer with a pong, use fd instead of origin as we are not in
+            // multiserv and PING queries cannot be forwarded
+            srv->sendClient(fd, PONG(srv->getHostname()));
         }
-        // answer with a pong
-        srv->sendClient(fd, PONG(hostname));
     }
+
+    // EXCEPTIONS
+    catch (nooriginException &e) {e.reply(srv, fd); return; }
+    catch (nosuchserverException &e) {e.reply(srv, fd); return; }
 }

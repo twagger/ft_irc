@@ -35,8 +35,7 @@
 	// NICK
 	#define ERR_NONICKNAMEGIVEN								(":No nickname given\r\n")																	// 431
 	#define ERR_ERRONEUSNICKNAME(nick)						(nick + " :Erroneous nickname" + "\r\n")													// 432
-	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :TEST Nickname is already in use" + "\r\n")										// 433
-	//#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")			// 436
+	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :Nickname is already in use" + "\r\n")										// 433
 	#define ERR_UNAVAILRESOURCE(nickOrChannel) 				(nickOrChannel + " :Nick/channel is temporarily unavailable" + "\r\n")						// 437
 	#define ERR_RESTRICTED 									(":Your connection is restricted!\r\n")														// 484
 
@@ -103,7 +102,7 @@
     #define ERR_NOORIGIN									(":No origin specified\r\n")																// 409
 	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command" + "\r\n") 													// 421
 	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
-	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator" + "\r\n")					// 481
+	#define	ERR_NOPRIVILEGES        						(":Permission denied - You are not an IRC operator\r\n")			        	            // 481
 	#define ERR_CANTKILLSERVER								(":You can't kill a server!\r\n")															// 483
 
 	// LIST OF CLIENT ORIGINATED REPLIES
@@ -111,8 +110,8 @@
 	// Use as: clientReply()
 
 	//ADDITIONAL CLIENT REPLIES
-    #define	PING(hostname)                                  (":" + hostname + " PING " + hostname + "\r\n")
-    #define	PONG(hostname)                                  (":" + hostname + " PONG " + hostname + "\r\n")
+    #define	PING(origin)                                    ("PING " + origin + "\r\n")
+    #define	PONG(origin)                                    ("PONG " + origin + "\r\n")
 	#define	PRIVMSG(target, message)						("PRIVMSG " + target + " " + message)
 	#define CLIENT_NICK(prefix, nickname)					(prefix + " " + nickname + "\r\n")
 	#define CLIENT_QUIT(prefix, msg)						(prefix + " " + msg + "\r\n")

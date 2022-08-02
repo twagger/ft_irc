@@ -42,3 +42,29 @@ wildtoplevelException::wildtoplevelException(std::string mask, std::string code)
 cannotsendtochanException::cannotsendtochanException(std::string channame, \
                                                      std::string code)
 { this->code = code; this->rpl = ERR_CANNOTSENDTOCHAN(channame); }
+
+// 409 - nooriginException
+nooriginException::nooriginException(std::string code)
+{ this->code = code; this->rpl = ERR_NOORIGIN; }
+
+// 402 - nosuchserverException
+nosuchserverException::nosuchserverException(std::string servername, \
+                                             std::string code)
+{ this->code = code; this->rpl = ERR_NOSUCHSERVER(servername); }
+
+// 481 - noprivilegesException
+noprivilegesException::noprivilegesException(std::string code)
+{ this->code = code; this->rpl = ERR_NOPRIVILEGES; }
+
+// 461 - needmoreparamsException
+needmoreparamsException::needmoreparamsException(std::string command, \
+                                                 std::string code)
+{ this->code = code; this->rpl = ERR_NEEDMOREPARAMS(command); }
+
+// 483 - cantkillserverException
+cantkillserverException::cantkillserverException(std::string code)
+{ this->code = code; this->rpl = ERR_CANTKILLSERVER; }
+
+// 422 - nomotdException
+nomotdException::nomotdException(std::string code)
+{ this->code = code; this->rpl = ERR_NOMOTD; }
