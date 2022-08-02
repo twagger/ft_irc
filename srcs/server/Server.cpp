@@ -501,7 +501,7 @@ void	cleanFd(Server *srv, User *user) {
 	}
 }
 
-void    Server::killConnection(const int fd)
+void    Server::killConnection(const int &fd)
 {
     std::map<int, User *>::iterator it;
 

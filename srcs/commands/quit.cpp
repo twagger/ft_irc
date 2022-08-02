@@ -30,6 +30,7 @@ void	quit(const int &fd, const std::vector<std::string> &params, const std::stri
 		{ printError(e.what(), 1, false); }
 	
 	// Send a client reply from origin FD to all channels where the user was ----- /
+	try {
 		for (it = channelsToReplyTo.begin(); it < channelsToReplyTo.end(); ++it) {
 			srv->sendChannel(*it, replyMsg);
 		}
