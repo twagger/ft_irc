@@ -39,8 +39,15 @@
 /* Constructors & destructor                                                  */
 /* ************************************************************************** */
 Server::Server(int port, std::string password, std::string name)
-: _port(port), _password(password), _name(name), _hostname(HOSTNAME)
-{ this->_initCommandList(); }
+: _port(port), _password(password), _name(name), _hostname(HOSTNAME), _version(VERSION)
+{ 
+	time_t      rawtime = time(NULL);
+    struct tm   *timeinfo;
+
+    timeinfo = localtime(&rawtime);
+	_date = std::string(asctime(timeinfo));
+	this->_initCommandList(); 
+}
 
 Server::Server(Server const &src)
 { *this = src; }
@@ -266,7 +273,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["TOPIC"] = &topic;
     this->_cmdList["LIST"] = &list;
     this->_cmdList["NAMES"] = &names;
-    this->_cmdList["PING"] = &ping;
+    //this->_cmdList["PING"] = &ping;
     this->_cmdList["PONG"] = &pong;
 	this->_cmdList["QUIT"] = &quit;
     this->_cmdList["MOTD"] = &motd;
@@ -441,19 +448,62 @@ void    Server::start(void)
 }
 
 // KILL CONNECTION
-void    Server::killConnection(int fd)
+
+// void printChannelUsers(Server *srv) {
+// 	std::map<std::string, Channel *>::iterator chanIt = srv->_channelList.begin();
+// 	std::map<std::string, Channel *>::iterator chanIte = srv->_channelList.end();
+// 	for (; chanIt != chanIte; chanIt++) {
+// 		std::cout << "[DEBUG] channel is : " << (chanIt->second) << std::endl;
+// 		std::deque<User*> userDeque = (chanIt->second)->getUsers();
+// 		std::deque<User*>::iterator userIt = userDeque.begin();
+// 		std::deque<User*>::iterator userIte = userDeque.end();
+// 		for (; userIt != userIte; userIt++) {
+// 			std::cout << "[DEBUG] user is : " << *userIt << std::endl;
+// 		}
+// 	}
+// }
+
+
+void	cleanFd(Server *srv, User *user) {
+
+	std::map<std::string, Channel *>::iterator chanIt = srv->_channelList.begin();
+	std::map<std::string, Channel *>::iterator chanIte = srv->_channelList.end();
+	for (; chanIt != chanIte; chanIt++) {
+	//	std::cout << "[DEBUG] channel is : " << (chanIt->second) << std::endl;
+		std::deque<User*>::iterator userIt = ((chanIt->second)->_users).begin();
+		std::deque<User*>::iterator userIte = ((chanIt->second)->_users).end();
+	//	std::cout << "[DEBUG] user is : " << (*userIt)->getNickname() << std::endl;
+		for (; userIt != userIte; userIt++) {
+			if (user == *userIt)
+				((chanIt->second)->_users).erase(userIt);
+		}
+	}
+}
+
+void    Server::killConnection(const int fd)
 {
     std::map<int, User *>::iterator it;
 
     // check if fd/user exists using the userlist ---------------------------- /
     it = this->_userList.find(fd);
-    if (it == this->_userList.end())
+    if (it == this->_userList.end()) {
         throw Server::invalidFdException();
+	}
 
     // fd exists, clean all -------------------------------------------------- /
     // delete user and remove pair from list
-    delete it->second;
-	this->_userList.erase(fd);
+	cleanFd(this, it->second);
+	
+	delete it->second;
+
+	// try {
+		this->_userList.erase(fd);
+	// }
+ 	// catch (Server::invalidFdException &e)
+    //     { printError(e.what(), 1, true); std::cout << "here 1" << std::endl; return; }
+
+	//printChannelUsers(this);
+
     // remove user's fd from the poll
     if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
         throw Server::pollDelException();
@@ -491,7 +541,8 @@ void    Server::sendChannel(std::string channel, std::string message) const
         throw Server::invalidChannelException();
     userList = itChannel->second->getUsers();
     for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers) {
-		if ((*itUsers)->empty() && ((*itUsers)->getFd() != 0)) {
+		if (((*itUsers)->getFd() != 0)) {
+			std::cout << "[DEBUG] user: " << (*itUsers)->getNickname() << std::endl;
         	this->sendClient((*itUsers)->getFd(), message);
 		}
 	}

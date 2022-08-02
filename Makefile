@@ -1,6 +1,6 @@
 # PROGRAM INFOS
 ################################################################################
-VERSION		= "0.1"
+VERSION		= "1.0"
 VCOMMENT	= "This version is almost perfect."
 HOSTNAME	= $(shell hostname)
 COMPILDATE	= "$(shell date)"

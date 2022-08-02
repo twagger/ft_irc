@@ -89,13 +89,6 @@ bool User::removeChannelJoined(std::string channelName) {
 	return false;
 }
 
-bool User::empty(void) const {
-	if (this->_status != ST_ALIVE)
-		return true;
-	return false;
-}
-
-
 // OSTREAM 
 std::ostream & operator<<(std::ostream &o, User const &rhs) {
 	if (rhs.getAuthenticated() == true)

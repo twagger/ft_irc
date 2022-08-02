@@ -3,14 +3,14 @@
 
 bool isOperHost(std::string hostname) {
 	std::string		configFile = OPERCONF;
-	const char*			file;
+	const char*		file;
 	std::ifstream	input;
 	std::string		str;
 
 	file = configFile.c_str();
 	input.open(file, std::ios::in);
 	try {input.is_open(); } 
-	catch (std::ifstream::failure e)
+	catch (std::ifstream::failure &e)
 		{ printError(e.what(), 1, true); return false; }
 	try {
 		while (getline(input, str)) {

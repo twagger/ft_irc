@@ -16,21 +16,11 @@ void	quit(const int &fd, const std::vector<std::string> &params, const std::stri
 	serverNotice(fd, srv, user->getNickname(), 
 		params.empty() == true ? CLIENT_ERROR : CLIENT_ERRORMSG(params[0]));
 
-	// Make the replyMsg before killing the fd
+	// Make the replyMsg and get channels from the user before killing the fd
 	replyMsg = clientReply(srv, fd, CLIENT_QUIT(std::string("QUIT"),
 		(params.empty() == true ? std::string() : params[0])));
-
-	// // Send a client reply from origin FD to all channels where the user was present
 	std::deque<std::string> channelsToReplyTo = user->getChannelsJoined();
 	std::deque<std::string>::iterator it;
-	try {
-		for (it = channelsToReplyTo.begin(); it < channelsToReplyTo.end(); ++it) {
-			srv->sendChannel(*it, replyMsg);
-		}
-	}
-	catch (Server::invalidChannelException &e) 
-	{ printError(e.what(), 1, true); }
-
 
 	// Kill the client fd
 	try { srv->killConnection(fd); }
@@ -38,6 +28,15 @@ void	quit(const int &fd, const std::vector<std::string> &params, const std::stri
 		{ printError(e.what(), 1, true); }
 	catch (Server::invalidFdException &e) 
 		{ printError(e.what(), 1, false); }
+	
+	// // Send a client reply from origin FD to all channels where the user was present
+	try {
+		for (it = channelsToReplyTo.begin(); it < channelsToReplyTo.end(); ++it) {
+			srv->sendChannel(*it, replyMsg);
+		}
+	}
+	catch (Server::invalidChannelException &e) 
+	{ printError(e.what(), 1, true); }
 
 	return ;
 }
