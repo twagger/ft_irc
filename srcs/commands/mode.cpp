@@ -244,9 +244,11 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 		{
 		case 'i':
 			channel->removeMode(MOD_INVITE);
+			channel->_invitees.clear();
 			break ;
 		case 'k':
 			channel->removeMode(MOD_KEY);
+			channel->setKey("");
 			break ;
 		case 'o':
 			if (checkUserExists(user, params, fd, srv, 0) < 0)

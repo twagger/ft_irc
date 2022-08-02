@@ -11,8 +11,8 @@
 //   The available modes are as follows:
 //		none ?												=> 0	0000 0000
 //		o - channel operator;						        => 1	0000 0001
-//		i - invite only;        							=> 2	0000 0010
-//     	k - key locked;                  					=> 3	0000 0100
+//     	k - key locked;                  					=> 3	0000 0010
+//		i - invite only;        							=> 3	0000 0100
 //      b - ban user;         								=> 4	0000 1000
 
 #define MOD_NONE (0 << 0)
