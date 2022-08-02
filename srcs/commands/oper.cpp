@@ -10,7 +10,7 @@ bool isOperHost(User *user) {
 	file = configFile.c_str();
 	input.open(file, std::ios::in);
 	try {input.is_open(); } 
-	catch (std::ifstream::failure e)
+	catch (std::ifstream::failure &e)
 		{ printError(e.what(), 1, true); return false; }
 	try {
 		while (getline(input, str)) {
