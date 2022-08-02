@@ -78,7 +78,7 @@ class Server
 		User*		getUserByNickname(const std::string &nick) const;
 		User*		getUserByUsername(const std::string &user, \
                                 const std::string &host = std::string()) const;
-		std::deque<User*> getUsersByHostname(const std::string &nostname) const;
+		std::deque<User*> getUsersByHostname(const std::string &hostname) const;
 		std::deque<User*> getAllUsers(void) const;
 
         // Member functions

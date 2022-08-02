@@ -51,4 +51,21 @@ class cannotsendtochanException : public ircException
                                                       std::string code = "404");
 };
 
+class nooriginException : public ircException
+{ public: nooriginException(std::string code = "409"); };
+
+class nosuchserverException : public ircException
+{ public: nosuchserverException(std::string servername, \
+                                                    std::string code = "402");};
+
+class noprivilegesException : public ircException
+{ public: noprivilegesException(std::string code = "481");};
+
+class needmoreparamsException : public ircException
+{ public: needmoreparamsException(std::string command, \
+                                  std::string code = "461");};
+
+class cantkillserverException : public ircException
+{ public: cantkillserverException(std::string code = "483");};
+
 #endif
