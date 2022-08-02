@@ -117,6 +117,51 @@ User*		Server::getUserByNickname(const std::string &nick) const
     return (NULL);
 }
 
+std::deque<User*>  Server::getUsersByHostname(const std::string &hostname) const
+{
+    std::map<int, User *>::const_iterator   it;
+    std::deque<User*>                       result;
+
+    for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+	{
+        if (it->second->getHostname() == hostname)
+            result.push_back(it->second);
+    }
+    return (result);
+}
+
+User*		Server::getUserByUsername(const std::string &user, \
+                                const std::string &host) const
+{
+    std::map<int, User *>::const_iterator it;
+
+    for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+	{
+        if (it->second->getUsername() == user)
+        {
+            if (!host.empty())
+            {
+                if (it->second->getHostname() == host)
+                    return (it->second);
+                else
+                    return (NULL);
+            }
+            return (it->second);
+        }
+    }
+    return (NULL);
+}
+
+std::deque<User*>   Server::getAllUsers(void) const
+{
+    std::map<const int, User *>::const_iterator it;
+    std::deque<User*>                           users;
+
+    for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
+        users.push_back(it->second);
+    return (users);
+}
+
 /* ************************************************************************** */
 /* Private member functions                                                   */
 /* ************************************************************************** */
@@ -280,6 +325,8 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["VERSION"] = &version;
     this->_cmdList["TIME"] = &time;
     this->_cmdList["INFO"] = &info;
+    this->_cmdList["PRIVMSG"] = &privmsg;
+    this->_cmdList["NOTICE"] = &notice;
     this->_cmdList["CAP"] = &cap;
 }
 
@@ -334,21 +381,19 @@ void    Server::_pingClients(void)
     int                             userFd;
     User                            *user;
     double                          seconds;
-    std::string                     pingCmd;
     std::map<int, User *>::iterator it;
 
-    // loop on every active connection --------------------------------------- /
+    // loop on every active connection
     for (it = this->_userList.begin(); it != this->_userList.end();)
     {
         userFd = it->first;
         user = it->second;
         // Check user's last activity time 
         seconds = difftime(time(NULL), user->getLastActivityTime());
-        // case 1 : send a PING command if > 120sec -------------------------- /
+        // case 1 : send a PING command if > 120sec
         if (user->getStatus() == ST_ALIVE && seconds > PING_TIMEOUT)
         {
-            pingCmd = PING(this->_hostname);
-            try { this->sendClient(userFd, pingCmd); }
+            try { this->sendClient(userFd, PING(this->_hostname)); }
             catch (Server::sendException &e)
             { printError(e.what(), 1, true); return; }
             catch (Server::invalidFdException &e)
@@ -362,17 +407,10 @@ void    Server::_pingClients(void)
             // case 2 : PONG timeout > Kill the client
             if (seconds > PONG_TIMEOUT)
             {
-                // remove user's fd from the poll
-                if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, userFd, NULL) == -1)
-                    throw Server::pollDelException();
-                // close the socket
-                close(userFd);
-
-                // add the nickname to the list of unavailable nicknames and 
-                // remove user
-                this->_unavailableNicknames[user->getNickname()] = time(NULL);
-                delete user;
-                this->_userList.erase(it++);
+                // Move the iterator to the next user before removing user 
+                ++it;
+                // Kill connection
+                this->killConnection(userFd);
             }
         }
         else
@@ -449,30 +487,13 @@ void    Server::start(void)
 
 // KILL CONNECTION
 
-// void printChannelUsers(Server *srv) {
-// 	std::map<std::string, Channel *>::iterator chanIt = srv->_channelList.begin();
-// 	std::map<std::string, Channel *>::iterator chanIte = srv->_channelList.end();
-// 	for (; chanIt != chanIte; chanIt++) {
-// 		std::cout << "[DEBUG] channel is : " << (chanIt->second) << std::endl;
-// 		std::deque<User*> userDeque = (chanIt->second)->getUsers();
-// 		std::deque<User*>::iterator userIt = userDeque.begin();
-// 		std::deque<User*>::iterator userIte = userDeque.end();
-// 		for (; userIt != userIte; userIt++) {
-// 			std::cout << "[DEBUG] user is : " << *userIt << std::endl;
-// 		}
-// 	}
-// }
-
-
 void	cleanFd(Server *srv, User *user) {
 
 	std::map<std::string, Channel *>::iterator chanIt = srv->_channelList.begin();
 	std::map<std::string, Channel *>::iterator chanIte = srv->_channelList.end();
 	for (; chanIt != chanIte; chanIt++) {
-	//	std::cout << "[DEBUG] channel is : " << (chanIt->second) << std::endl;
 		std::deque<User*>::iterator userIt = ((chanIt->second)->_users).begin();
 		std::deque<User*>::iterator userIte = ((chanIt->second)->_users).end();
-	//	std::cout << "[DEBUG] user is : " << (*userIt)->getNickname() << std::endl;
 		for (; userIt != userIte; userIt++) {
 			if (user == *userIt)
 				((chanIt->second)->_users).erase(userIt);
@@ -491,29 +512,24 @@ void    Server::killConnection(const int fd)
 	}
 
     // fd exists, clean all -------------------------------------------------- /
-    // delete user and remove pair from list
+    // delete user and remove pair from list  -------------------------------- /
 	cleanFd(this, it->second);
-	
 	delete it->second;
+	this->_userList.erase(fd);
 
-	// try {
-		this->_userList.erase(fd);
-	// }
- 	// catch (Server::invalidFdException &e)
-    //     { printError(e.what(), 1, true); std::cout << "here 1" << std::endl; return; }
-
-	//printChannelUsers(this);
-
-    // remove user's fd from the poll
+    // remove user's fd from the poll  --------------------------------------- /
     if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
         throw Server::pollDelException();
-    // close the socket
+    // close the socket  ----------------------------------------------------- /
     close(fd);
 }
 
 // SEND CLIENT (ONE FD)
-void    Server::sendClient(int fd, std::string message) const
+void    Server::sendClient(const int &fd, const std::string &message, \
+                           const int &originFd) const
 {
+    if (originFd != -1 && originFd == fd)
+        return;
     if (this->_userList.find(fd) == this->_userList.end())
         throw Server::invalidFdException();
     if (send(fd, message.c_str(), message.length(), MSG_NOSIGNAL) == -1)
@@ -521,16 +537,20 @@ void    Server::sendClient(int fd, std::string message) const
 }
 
 // SEND CLIENT (MULTIPLE FDS)
-void    Server::sendClient(std::set<int> &fds, std::string message) const
+void    Server::sendClient(const std::set<int> &fds, \
+                           const std::string &message, \
+                           const int &originFd) const
 {
-    std::set<int>::iterator it;
+    std::set<int>::const_iterator it;
 
     for (it = fds.begin(); it != fds.end(); ++it)
-        this->sendClient(*it, message);
+        this->sendClient(*it, message, originFd);
 }
 
 // SEND CHANNEL
-void    Server::sendChannel(std::string channel, std::string message) const
+void    Server::sendChannel(const std::string &channel, \
+                            const std::string &message, \
+                            const int &originFd) const
 {
     std::map<std::string, Channel *>::const_iterator    itChannel;
     std::deque<User *>::const_iterator                  itUsers;
@@ -542,14 +562,13 @@ void    Server::sendChannel(std::string channel, std::string message) const
     userList = itChannel->second->getUsers();
     for (itUsers = userList.begin(); itUsers != userList.end(); ++itUsers) {
 		if (((*itUsers)->getFd() != 0)) {
-			std::cout << "[DEBUG] user: " << (*itUsers)->getNickname() << std::endl;
-        	this->sendClient((*itUsers)->getFd(), message);
+        	this->sendClient((*itUsers)->getFd(), message, originFd);
 		}
 	}
 }
 
 // BROADCAST
-void    Server::broadcast(std::string message) const
+void    Server::broadcast(const std::string &message,const int &originFd) const
 {
     std::map<const int, User *>::const_iterator it;
     std::set<int>                               fds;
@@ -557,7 +576,7 @@ void    Server::broadcast(std::string message) const
     for (it = this->_userList.begin(); it != this->_userList.end(); ++it)
     {
         fds.insert(it->first);
-        this->sendClient(fds, message);
+        this->sendClient(fds, message, originFd);
     }
 }
 

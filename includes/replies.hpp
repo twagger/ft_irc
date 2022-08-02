@@ -35,7 +35,6 @@
 	#define ERR_NONICKNAMEGIVEN								(":No nickname given\r\n")																	// 431
 	#define ERR_ERRONEUSNICKNAME(nick)						(nick + " :Erroneous nickname" + "\r\n")													// 432
 	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :Nickname is already in use" + "\r\n")										// 433
-	//#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")			// 436
 	#define ERR_UNAVAILRESOURCE(nickOrChannel) 				(nickOrChannel + " :Nick/channel is temporarily unavailable" + "\r\n")						// 437
 	#define ERR_RESTRICTED 									(":Your connection is restricted!\r\n")														// 484
 
@@ -87,13 +86,20 @@
     #define RPL_INFO(string)                                (": " + string + "\r\n")                                                                    // 371
     #define RPL_ENDOFINFO                                   (":End of INFO list\r\n")                                                                   // 374
 
+    // SENDING MESSAGES
+    #define ERR_NORECIPIENT(command)                        (":No recipient given (" + command + ")\r\n")                                               // 411
+    #define ERR_NOTEXTTOSEND                                (":No text to send\r\n")                                                                    // 412
+    #define ERR_NOTOPLEVEL(mask)                            (mask + " :No toplevel domain specified\r\n")                                               // 413
+    #define ERR_WILDTOPLEVEL(mask)                          (mask + " :Wildcard in toplevel domain\r\n")                                                // 414
+    #define ERR_CANNOTSENDTOCHAN(channame)                  (channame + " :Cannot send to channel\r\n")                                                 // 404
+
 	// OTHER ERRORS:
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")												// 401
     #define	ERR_NOSUCHSERVER(servername)					(servername + " :No such server" + "\r\n")												    // 402
     #define ERR_NOORIGIN									(":No origin specified\r\n")																// 409
 	#define	ERR_UNKNOWNCOMMAND(command)						(command + " :Unknown command" + "\r\n") 													// 421
 	#define ERR_NOTREGISTERED								(":You have not registered\r\n")															// 451
-	#define	ERR_NOPRIVILEGES(nickname)						(nickname + " :Permission denied - You are not an IRC operator" + "\r\n")					// 481
+	#define	ERR_NOPRIVILEGES        						(":Permission denied - You are not an IRC operator\r\n")			        	            // 481
 	#define ERR_CANTKILLSERVER								(":You can't kill a server!\r\n")															// 483
 
 	// LIST OF CLIENT ORIGINATED REPLIES
@@ -101,8 +107,9 @@
 	// Use as: clientReply()
 
 	//ADDITIONAL CLIENT REPLIES
-    #define	PING(hostname)                                  (":" + hostname + " PING " + hostname + "\r\n")
-    #define	PONG(hostname)                                  (":" + hostname + " PONG " + hostname + "\r\n")
+    #define	PING(origin)                                    ("PING " + origin + "\r\n")
+    #define	PONG(origin)                                    ("PONG " + origin + "\r\n")
+	#define	PRIVMSG(target, message)						("PRIVMSG " + target + " " + message)
 	#define CLIENT_NICK(prefix, nickname)					(prefix + " " + nickname + "\r\n")
 	#define CLIENT_QUIT(prefix, msg)						(prefix + " " + msg + "\r\n")
 	#define	CLIENT_ERROR									("ERROR : \r\n")
