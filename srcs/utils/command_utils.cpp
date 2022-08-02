@@ -1,7 +1,6 @@
 #include "../../includes/Server.hpp"
 #include "../../includes/utils.hpp"
 
-
 bool emptyParams(const std::vector<std::string> &params) {
 	for (unsigned int i = 0; i < params.size(); i++) {
 		if (params[i].empty()) 	

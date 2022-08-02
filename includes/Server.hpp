@@ -162,6 +162,7 @@ class Server
 
         int                     _pollfd;
         int                     _sockfd;
+		int						_signalfd;
 
         std::map<const int, User *>   _userList;
 

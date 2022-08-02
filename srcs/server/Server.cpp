@@ -16,6 +16,8 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <sys/signalfd.h>
+#include <signal.h>
 
 // Custom headers
 #include "../../includes/Server.hpp"
