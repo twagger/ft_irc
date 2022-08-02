@@ -18,8 +18,8 @@ void    kill(const int &fd, const std::vector<std::string> &params, \
         nickname = params[0];
         comment = params[1];
         // check if nickname is actually the server hostname
-        // This involves that you cannot have a nickname = to server hostname
-        if (nickname.compare(srv->getHostname()) == 0)
+        if (nickname.compare(srv->getHostname()) == 0
+            && srv->getUserByNickname(nickname) == NULL)
             throw cantkillserverException();
 
         // check if nickname exists
