@@ -135,7 +135,7 @@ int   extractUserFd(const std::string str, Server *srv)
         // USER / HOST / SERVERNAME
         user = str.substr(0, str.find('%') - 1);
         host = str.substr(str.find('%') + 1);
-        if (host.find('@')) {
+        if (host.find('@') != std::string::npos) {
             servername = host.substr(host.find('@') + 1);
             host.erase(host.find('@'));
         }
