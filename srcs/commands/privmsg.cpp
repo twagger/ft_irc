@@ -1,5 +1,6 @@
 #include <deque>
 #include <set>
+#include <map>
 #include <sstream>
 
 #include "../../includes/commands.hpp"
@@ -25,6 +26,7 @@ struct Target {
 /* ************************************************************************** */
 /* UTILITY FUNCTIONS                                                          */
 /* ************************************************************************** */
+// Check grammar
 void    paramGrammarCheck(const std::string user, const std::string host, \
                        const std::string servername, const std::string nickname)
 {
@@ -66,38 +68,27 @@ void    paramGrammarCheck(const std::string user, const std::string host, \
     }
 }
 
-void cleanTargetsList(std::deque<Target> &target)
+// Split the message by comma into multiple targets
+std::map<std::string, std::deque<Target> > splitTargets(std::string targets)
 {
-    std::deque<Target>::iterator    it;
-    std::set<int>                   alreadyFds;
-    std::set<std::string>           alreadyChannels;
+    std::map<std::string, std::deque<Target> > map;
 
-    // Clean target fds or channel that appears multiple time
-    for (it = target.begin(); it != target.end();)
+    // only one target
+    if (targets.find(',') == std::string::npos)
     {
-        if (it->fd != -1)
-        {
-            if (alreadyFds.find(it->fd) == alreadyFds.end())
-            {
-                alreadyFds.insert(it->fd);
-                ++it;
-            }
-            else
-                target.erase(it++);
-        }
-        else if (!(it->channel.empty()))
-        {
-            if (alreadyChannels.find(it->channel) == alreadyChannels.end())
-            {
-                alreadyChannels.insert(it->channel);
-                ++it;
-            }
-            else
-                target.erase(it++);
-        }
-        else
-            ++it;
+        map[targets] = std::deque<Target>();
+        return (map);
     }
+
+    // multiple targets    
+    std::string temp;
+    std::istringstream stream(targets);
+    while (std::getline(stream, temp, ','))
+    {
+        transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+        map[temp] = std::deque<Target>();
+    }
+    return (map);
 }
 
 /* ************************************************************************** */
@@ -122,10 +113,11 @@ const std::string extractChannelName(const std::string str, Server *srv)
         name = str.substr(pos, str.find(':') - pos);
     else
         name = str.substr(pos, std::string::npos);
-    
+
     // Check if channel exists
     if (srv->_channelList.find(name) == srv->_channelList.end())
         throw nosuchnickException(name);
+    
     return (name);
 }
 
@@ -257,14 +249,13 @@ void getTargetsFromString(const int &fd, const std::string &str, \
 void privmsg(const int &fd, const std::vector<std::string> &params, \
                         const std::string &, Server *srv)
 {
-    std::vector<std::string>                    targets;
-    std::vector<std::string>::const_iterator    it;
-    std::string                                 msgtarget;
-    std::string                                 message;
-    std::deque<Target>                          target;
-    std::deque<Target>::iterator                itTarg;
-    std::stringstream                           ss;
-    int                                         nbTargets = 0;
+    std::map<std::string, std::deque<Target> >              targets;
+    std::map<std::string, std::deque<Target> >::iterator    it;
+    std::string                                             msgtarget;
+    std::string                                             message;
+    std::deque<Target>                                      target;
+    std::deque<Target>::iterator                            itTarg;
+    std::stringstream                                       ss;
 
     // COMMAND EXECUTION
     try {
@@ -274,48 +265,46 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
         if (params.size() == 1)
             throw notexttosendException();
 
-        // Two params, iterate throught the first to and send
         msgtarget = params[0];
         message = params[1];
-        targets = splitByComma(msgtarget);
-
-        // Loop WITH NO SEND to count the exact number of targets (before 
-        // cleaning doubles).
-        for (it = targets.begin(); it != targets.end(); ++it)
-        {
-            getTargetsFromString(fd, *it, target, srv);
-            nbTargets += target.size();
-        }
-        ss << nbTargets; 
-        if (nbTargets > MAX_TARGETS)
+        
+        // Split targets into a map
+        targets = splitTargets(msgtarget);
+        
+        // Too many targets ?
+        if (targets.size() > MAX_TARGETS)
             throw toomanytargetsException(msgtarget, ss.str(), "Aborted.");
-
-        // Clean the targets list from doubles to avoid multiple sends
-        cleanTargetsList(target);
-
-        // Loop to SEND all messages
-        for (itTarg = target.begin(); itTarg != target.end(); ++itTarg)
-        {
-            try {
-                if (itTarg->fd != -1) {
-                    // Send to user (no away management, we don't handle this)
-                    srv->sendClient(itTarg->fd, \
+        
+        try {
+            // Loop to SEND all messages
+            for (it = targets.begin(); it != targets.end(); ++it)
+            {
+                std::cout << "TARGET : " << it->first << std::endl;
+                getTargetsFromString(fd, it->first, it->second, srv);
+                target = it->second;
+                for (itTarg = target.begin(); itTarg != target.end(); ++itTarg)
+                {
+                    // Check target validity here instead of upper
+                    if (itTarg->fd != -1) {
+                        // Send to user (we don't handle AWAY flag on user)
+                        srv->sendClient(itTarg->fd, \
                         clientReply(srv, fd, PRIVMSG(itTarg->target, message)));
-                }
-                else if (!itTarg->channel.empty()) {
-                    // Send to channel : no exception cannot send because we do
-                    // not handle the needed chan mode for this
-                    srv->sendChannel(itTarg->channel, \
-                                     clientReply(srv, fd, \
-                                     PRIVMSG(itTarg->target, message)), fd);
+                    }
+                    else if (!itTarg->channel.empty()) {
+                        // Send to channel : no exception cannot send because 
+                        //  we do not handle the needed chan mode for this
+                        srv->sendChannel(itTarg->channel, \
+                                        clientReply(srv, fd, \
+                                        PRIVMSG(itTarg->target, message)), fd);
+                    }
                 }
             }
-            // EXCEPTIONS THAT DON'T END THE COMMAND
-            catch (grammarException &e) { printError(e.what(), 1, false);}
-            catch (nosuchnickException &e) {e.reply(srv, fd);}
-            catch (notoplevelException &e) {e.reply(srv, fd);}
-            catch (wildtoplevelException &e) {e.reply(srv, fd);}
         }
+        // EXCEPTIONS THAT DON'T END THE COMMAND
+        catch (grammarException &e) { printError(e.what(), 1, false);}
+        catch (nosuchnickException &e) {e.reply(srv, fd);}
+        catch (notoplevelException &e) {e.reply(srv, fd);}
+        catch (wildtoplevelException &e) {e.reply(srv, fd);}
     }
 
     // EXCEPTIONS THAT END THE COMMAND
