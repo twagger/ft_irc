@@ -105,7 +105,7 @@ const std::string extractChannelName(const std::string str, Server *srv)
         for (int i = 0; i < 5; ++i)
         {
             if (!std::isdigit(str[i]))
-                throw grammarException("Grammar : channel name");
+                throw nosuchnickException(str);
         }
         pos = 6;
     }
@@ -146,7 +146,7 @@ int   extractUserFd(const std::string str, Server *srv)
         nickname = str.substr(0, str.find('!'));
         user = str.substr(str.find('!') + 1);
         if (user.find('@') == std::string::npos)
-            throw grammarException("Grammar : nickname");
+            throw nosuchnickException(str);
         host = user.substr(user.find('@') + 1);
         user.erase(user.find('@'));
     }
@@ -166,19 +166,19 @@ int   extractUserFd(const std::string str, Server *srv)
     {
         resultUser = srv->getUserByNickname(nickname);
         if (resultUser == NULL)
-            throw nosuchnickException(nickname);
+            throw nosuchnickException(str);
     }
     else if (!user.empty() && !host.empty())
     {
         resultUser = srv->getUserByUsername(user, host);
         if (resultUser == NULL)
-            throw nosuchnickException(user.append("%").append(host));
+            throw nosuchnickException(str);
     }
     else if (!user.empty())
     {
         resultUser = srv->getUserByUsername(user);
         if (resultUser == NULL)
-            throw nosuchnickException(user);
+            throw nosuchnickException(str);
     }
 
     return (resultUser->getFd());
