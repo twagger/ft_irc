@@ -3,6 +3,24 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief Create or join an existing channel with or without key
+ * 
+ * Mode supported:
+ * - i
+ * - b
+ * - o
+ * - k
+ *   
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_INVITEONLYCHAN
+ * - ERR_NOSUCHCHANNEL
+ * - ERR_BANNEDFROMCHAN
+ * - ERR_BADCHANNELKEY
+ *   
+ */
+
 void channelReply(Server *server, const int &fdUser, std::string channelName)
 {
     // Reply if the user successfully joined the channel

@@ -3,6 +3,16 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief View or change the topic of a channel
+ * 
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_NOTONCHANNEL
+ * - ERR_NOSUCHCHANNEL
+ *   
+ */
+
 int checkTopicParameter(std::string topic, std::map<std::string, Channel *>::iterator itChannel,
     Server *server, const int &fdUser)
 {

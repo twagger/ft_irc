@@ -3,6 +3,21 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief Invite a user to a channel
+ * The user will be added to the invitee list
+ * The user will be able to join an existing channel with mode i.
+ * 
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_NOTONCHANNEL
+ * - ERR_NOSUCHNICK
+ * - ERR_USERONCHANNEL
+ * - ERR_NOSUCHCHANNEL
+ * - ERR_CHANOPRIVSNEEDED
+ *   
+ */
+
 int checkParameterInvite(std::string nickname, std::string channel,
                          const int &fdUser, Server *server, User *userToInvite)
 {

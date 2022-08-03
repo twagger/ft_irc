@@ -3,6 +3,18 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief Kick a user from a channel with or without a specific message.
+ * 
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_NOTONCHANNEL
+ * - ERR_USERNOTINCHANNEL
+ * - ERR_NOSUCHCHANNEL
+ * - ERR_CHANOPRIVSNEEDED
+ *   
+ */
+
 int checkChannelExist(std::string channel, const int &fdUser, Server *server)
 {
     // channel must exist

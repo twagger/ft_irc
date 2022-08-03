@@ -144,6 +144,28 @@ void UserMode(const int &fd, const std::vector<std::string> &params, Server *srv
 /* CHANNEL	                                                                  */
 /* ************************************************************************** */
 
+/**
+ * @brief Add or remove a channel mode
+ * 
+ * Mode supported:
+ * - i = set the channel to invite only. Users won't be able to join an existing channel
+ * 		if they are not invited by an operator on the channel
+ * - b = ban an existing user on the channel. The user will be added to the ban list.
+ * 		He won't be able to join unless the ban is removed
+ * - o = give to a user the operator rights. This flag can only be set by an operator.
+ * - k = add or remove a key from the channel.
+ * 		Users won't be able to join the channel without this key
+ *   
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_USERNOTINCHANNEL
+ * - ERR_KEYSET
+ * - ERR_NOSUCHCHANNEL
+ * - ERR_CHANOPRIVSNEEDED
+ * - ERR_UNKNOWNMODE
+ *   
+ */
+
 void listBannedUser(const int &fdUser, Server *server,
               Channel *channel)
 {

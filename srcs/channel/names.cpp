@@ -3,6 +3,13 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief List all nicknames on a channel
+ * 
+ * No error handled
+ *   
+ */
+
 void listUser(const int &fdUser, Server *server,
               std::map<std::string, Channel *>::iterator itChannel)
 {

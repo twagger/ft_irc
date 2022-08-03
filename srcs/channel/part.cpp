@@ -3,6 +3,17 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief Leave an existing channel
+ * If all users part from the channel the channel will be destroyed
+ * 
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_NOTONCHANNEL
+ * - ERR_NOSUCHCHANNEL
+ *   
+ */
+
 int checkPartParameter(std::map<std::string, Channel *> channelList,
                        std::string channelName, User *currentUser, Server *server, const int &fdUser)
 {
