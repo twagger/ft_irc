@@ -233,7 +233,7 @@ int   extractUserFd(const std::string str, Server *srv)
 }
 
 // MASK
-void    computeMask(const std::string &str, Server *srv, \
+void    computeMask(const int &fd, const std::string &str, Server *srv, \
                     std::deque<Target> &target)
 {
     std::deque<User*>                   userList;
@@ -241,6 +241,10 @@ void    computeMask(const std::string &str, Server *srv, \
     std::string                         mask;
     size_t                              toplevel;
     
+    // Check user privileges : must be oper to use mask
+    if (!srv->getUserByFd(fd)->hasMode(MOD_OPER))
+        throw noprivilegesException();
+
     // Check the mask for exceptions
     mask = str.substr(1);
     toplevel = mask.find_last_of('.');
@@ -273,7 +277,7 @@ void    computeMask(const std::string &str, Server *srv, \
 /* ************************************************************************** */
 /* SPECIFIC FUNCTIONS TO CREATE A COLLECTION OF TARGETS FOR THE MAIN FUNCTION */
 /* ************************************************************************** */
-void getTargetsFromString(const std::string &str, \
+void getTargetsFromString(const int &fd, const std::string &str, \
                           std::deque<Target> &target, Server *srv)
 {
     if (str[0] == '+' || str[0] == '&' || str[0] == '!'
@@ -284,7 +288,8 @@ void getTargetsFromString(const std::string &str, \
     else if (str[0] == '$' 
              || (str[0] == '#' && str.find('.') != std::string::npos)) {
         // MASK
-        computeMask(str, srv, target);
+        try { computeMask(fd, str, srv, target); }
+        catch (noprivilegesException &e) { e.reply(srv, fd); }  
     }
     else {
         // USER
@@ -308,57 +313,59 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
     int                                         nbTargets = 0;
 
     // COMMAND EXECUTION
-    try
-    {
+    try {
         // check nb of param
         if (params.size() == 0)
             throw norecipientException("PRIVMSG");
         if (params.size() == 1)
             throw notexttosendException();
-        
+
         // Two params, iterate throught the first to and send
         msgtarget = params[0];
         message = params[1];
         targets = splitByComma(msgtarget);
-        
-        // First loop WITH NO SEND to count the exact number of targets
+
+        // Loop WITH NO SEND to count the exact number of targets (before 
+        // cleaning doubles).
         for (it = targets.begin(); it != targets.end(); ++it)
         {
-            getTargetsFromString(*it, target, srv);
+            getTargetsFromString(fd, *it, target, srv);
             nbTargets += target.size();
         }
         ss << nbTargets; 
         if (nbTargets > MAX_TARGETS)
             throw toomanytargetsException(msgtarget, ss.str(), "Aborted.");
 
-        // Clean the targets list from doubles
+        // Clean the targets list from doubles to avoid multiple sends
         cleanTargetsList(target);
 
-        // Second loop TO SEND all messages
+        // Loop to SEND all messages
         for (itg = target.begin(); itg != target.end(); ++itg)
         {
-            // HANDLE HERE : RPL_AWAY, ERR_CANNOTSENDTOCHAN
-            if (itg->fd != -1) {
-                // Send to user
-                srv->sendClient(itg->fd, \
+            try {
+                if (itg->fd != -1) {
+                    // Send to user
+                    srv->sendClient(itg->fd, \
                         clientReply(srv, fd, PRIVMSG(itg->target, message)));
+                }
+                else if (!itg->channel.empty()) {
+                    // Send to channel
+                    checkChannelRights(srv, fd, itg->channel);
+                    srv->sendChannel(itg->channel, \
+                       clientReply(srv, fd, PRIVMSG(itg->target, message)), fd);
+                }
             }
-            else if (!itg->channel.empty()) {
-                // Send to channel
-                checkChannelRights(srv, fd, itg->channel);
-                srv->sendChannel(itg->channel, \
-                        clientReply(srv, fd, PRIVMSG(itg->target, message)), fd);
-            }
+            // EXCEPTIONS THAT DON'T END THE COMMAND
+            catch (grammarException &e) { printError(e.what(), 1, false);}
+            catch (nosuchnickException &e) {e.reply(srv, fd);}
+            catch (notoplevelException &e) {e.reply(srv, fd);}
+            catch (wildtoplevelException &e) {e.reply(srv, fd);}
+            catch (cannotsendtochanException &e) {e.reply(srv, fd);}
         }
     }
-    
-    // EXCEPTIONS
-    catch (grammarException &e) { printError(e.what(), 1, false); return; }
+
+    // EXCEPTIONS THAT END THE COMMAND
     catch (norecipientException &e) {e.reply(srv, fd); return; }
-    catch (nosuchnickException &e) {e.reply(srv, fd); return; }
     catch (notexttosendException &e) {e.reply(srv, fd); return; }
     catch (toomanytargetsException &e) {e.reply(srv, fd); return; }
-    catch (notoplevelException &e) {e.reply(srv, fd); return; }
-    catch (wildtoplevelException &e) {e.reply(srv, fd); return; }
-    catch (cannotsendtochanException &e) {e.reply(srv, fd); return; }
 }
