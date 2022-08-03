@@ -160,7 +160,7 @@ int   extractUserFd(const std::string str, Server *srv)
     {
         resultUser = srv->getUserByNickname(nickname);
         if (resultUser == NULL)
-            throw nosuchnickException(user);
+            throw nosuchnickException(nickname);
     }
     else if (!user.empty() && !host.empty())
     {
