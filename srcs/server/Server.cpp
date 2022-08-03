@@ -437,8 +437,13 @@ void    Server::start(void)
         events_tmp = &(events[0]);
         try { nfds = this->_pollWait(pollfd, &events_tmp, MAX_EVENTS); }
         catch (Server::pollWaitException &e)
-        { printError(e.what(), 1, true); return; }
-
+        {	
+			printError("Server is shutting down and clearing.", 1, true); 
+			clearAllUsersChannels(this);
+			clearAllFds(events, nfds);
+			return;
+		}
+		
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
         {

@@ -1,13 +1,22 @@
 #include "../../includes/Server.hpp"
 #include "../../includes/utils.hpp"
 
-bool emptyParams(const std::vector<std::string> &params) {
+bool	emptyParams(const std::vector<std::string> &params) {
+	if (params.empty())
+		return true;
 	for (unsigned int i = 0; i < params.size(); i++) {
 		if (params[i].empty()) 	
 			return true;
 	}
 	return false;
 }
+
+void	clearAllUsersChannels(Server *srv) {
+	
+
+}
+
+
 
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
