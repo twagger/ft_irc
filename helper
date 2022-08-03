@@ -1,0 +1,12 @@
+PASS pwd
+USER ere 16 * :estelle
+NICK ere 
+
+
+/connect localhost 6667 pwd
+
+/connect localhost 6668 pwd
+
+
+
+/RMRECONNS

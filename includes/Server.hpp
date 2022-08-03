@@ -16,7 +16,7 @@
 #define MAX_CMD_LEN 512
 #define BACKLOG 10
 #define BUF_SIZE 4096
-#define MAX_EVENTS 10
+#define MAX_EVENTS 100
 
 // Client check params
 #define PING_TIMEOUT 120	// in seconds
@@ -68,18 +68,18 @@ class Server
         Server  &operator=(Server const &rhs);
         
         // Getters
-		int         getPort(void) const;
-		std::string getPassword(void) const;
-		std::string getName(void) const;
-		std::string getHostname(void) const;
-		std::string getVersion(void) const;
-		std::string getDate(void) const;
-		User*		getUserByFd(const int &fd) const;
-		User*		getUserByNickname(const std::string &nick) const;
-		User*		getUserByUsername(const std::string &user, \
+		int         		getPort(void) const;
+		std::string 		getPassword(void) const;
+		std::string 		getName(void) const;
+		std::string 		getHostname(void) const;
+		std::string 		getVersion(void) const;
+		std::string 		getDate(void) const;
+		User*				getUserByFd(const int &fd) const;
+		User*				getUserByNickname(const std::string &nick) const;
+		User*				getUserByUsername(const std::string &user, \
                                 const std::string &host = std::string()) const;
-		std::deque<User*> getUsersByHostname(const std::string &hostname) const;
-		std::deque<User*> getAllUsers(void) const;
+		std::deque<User*> 	getUsersByHostname(const std::string &hostname) const;
+		std::deque<User*> 	getAllUsers(void) const;
 
         // Member functions
         void    start(void);
@@ -151,6 +151,7 @@ class Server
         void    _handleNewMessage(struct epoll_event event);
         void    _executeCommands(int fd, std::vector<Command> cmds);
         void    _pingClients(void);
+		void	_clearAll(void);
 
         // Member attributes
         int                     _port;
@@ -158,17 +159,13 @@ class Server
         std::string             _name;
         std::string             _hostname;
 		std::string             _version;
-		std::string             _date;			// expected format: 19:52:09 Aug 12 2013
+		std::string             _date;
 
         int                     _pollfd;
         int                     _sockfd;
 
         std::map<const int, User *>   _userList;
 
-		// <hostname> has a maximum length of 63 characters. If name is longer than 63
-        // characters are registered using the host (numeric) address instead of the host name.
-		// hostname   =  shortname *( "." shortname )
-		// hostaddr   =  ip4addr / ip6addr
 };
 
 #endif

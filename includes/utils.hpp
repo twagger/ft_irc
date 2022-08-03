@@ -14,14 +14,16 @@
 # include <algorithm>
 # include <sys/socket.h>
 
+
 // Util functions
 int                         printError(std::string message, int code,
 	bool with_errno);
-bool emptyParams(const std::vector<std::string> &params);
+bool 						emptyParams(const std::vector<std::string> &params);
 
 // Parsing
-std::vector<std::string> splitBy(std::string str, const std::string &delimiter);
-const std::vector<Command>     splitCmds(std::vector<std::string> cmd_strings);
+std::vector<std::string> 	splitBy(std::string str, const std::string &delimiter);
+void  						splitCmds(std::vector<std::string> cmd_strings,
+	std::vector<Command> *cmds);
 
 // Replies util functions
 std::string numericReply(Server *irc, const int &fd, std::string code,
@@ -32,18 +34,19 @@ std::string WelcomeChan(Server *irc, const int &fd, std::string code,
     std::string channelName);
 std::string eventChannel(Server *irc, const int &fd, std::string eventType,
     std::string channelName);
-//std::string get_next_tokn(std::string *str, std::string delimiter);
-//int         print_error(std::string message, int code, bool with_errno);
+void		serverQuitNotice(const int &fd,  Server *srv, const std::string
+	&destNick, std::string msg);
+void	 	informUsers(Server *srv, std::string msg); 
 
 // Channel util functions
-std::vector<std::string> splitByComma(std::string parameter);
-bool                     isChannel(std::string channel_name);
-std::string              getChannelTopic(std::string channelName, std::map<std::string,
-    Channel *> channelList);
-std::vector<std::string> getChannelKey(std::vector<std::string> parameter);
-std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList,
+std::vector<std::string> 		splitByComma(std::string parameter);
+bool                     		isChannel(std::string channel_name);
+std::string              		getChannelTopic(std::string channelName,
+	std::map<std::string, Channel *> channelList);
+std::vector<std::string> 		getChannelKey(std::vector<std::string> parameter);
+std::deque<User *>::iterator 	findUserOnChannel(std::deque<User *> userList,
 	User *currentUser);
-std::vector<char>::iterator findMode(std::vector<char> listMode, char mode);
+std::vector<char>::iterator 	findMode(std::vector<char> listMode, char mode);
 
 // Authenticate users
 bool 		isAuthenticationCmd(std::string cmd);

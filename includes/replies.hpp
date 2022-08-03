@@ -113,7 +113,7 @@
     #define	PING(origin)                                    ("PING " + origin + "\r\n")
     #define	PONG(origin)                                    ("PONG " + origin + "\r\n")
 	#define	PRIVMSG(target, message)						("PRIVMSG " + target + " " + message)
-	#define CLIENT_NICK(prefix, nickname)					(prefix + " " + nickname + "\r\n")
+	//#define CLIENT_NICK(prefix, nickname)					(prefix + " " + nickname + "\r\n")
 	#define CLIENT_QUIT(prefix, msg)						(prefix + " " + msg + "\r\n")
 	#define	CLIENT_ERROR									("ERROR : \r\n")
 	#define	CLIENT_ERRORMSG(msg)							("ERROR :\"" + msg + "\"\r\n")
