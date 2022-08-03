@@ -72,7 +72,7 @@ void nick(const int &fd, const std::vector<std::string> &params, const std::stri
 			return ;
 		}
 		else {
-			replyMsg = clientReply(srv, fd, "NICK " + params[0]);
+			replyMsg = clientReply(srv, fd, "NICK " + params[0]);			
 			user->setNickname(params[0]);
 		}
 	}

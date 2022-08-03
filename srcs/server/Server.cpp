@@ -16,8 +16,18 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+<<<<<<< HEAD
 #include <sys/signalfd.h>
 #include <signal.h>
+=======
+       #include <sys/types.h>
+       #include <stdio.h>
+       #include <stdlib.h>
+       #include <unistd.h>
+       #include <string.h>
+       #include <sys/socket.h>
+       #include <netdb.h>
+>>>>>>> 3289311b5b9350d8c0b7ede69a3adb7f2e39d3d9
 
 // Custom headers
 #include "../../includes/Server.hpp"
@@ -34,8 +44,15 @@
 /* Constructors & destructor                                                  */
 /* ************************************************************************** */
 Server::Server(int port, std::string password, std::string name)
-: _port(port), _password(password), _name(name), _hostname(HOSTNAME)
-{ this->_initCommandList(); }
+: _port(port), _password(password), _name(name), _hostname(HOSTNAME), _version(VERSION)
+{ 
+	time_t      rawtime = time(NULL);
+    struct tm   *timeinfo;
+
+    timeinfo = localtime(&rawtime);
+	_date = std::string(asctime(timeinfo));
+	this->_initCommandList(); 
+}
 
 Server::Server(Server const &src)
 { *this = src; }
@@ -223,6 +240,7 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
 	int					newfd;
     struct sockaddr_in  client_addr;
 
+
     // accept the connect request
     memset(&client_addr, 0, sizeof(struct sockaddr_in));
     memset(&sin_size, 0, sizeof(socklen_t));
@@ -235,6 +253,10 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
     getsockname(newfd, reinterpret_cast<struct sockaddr*>(&client_addr), &sin_size);
     // create a new empty user
     this->_userList[newfd] = new User(newfd, inet_ntoa(client_addr.sin_addr));
+
+	// TO DELETE
+	// hostent *host = gethostbyname(inet_ntoa(client_addr.sin_addr));
+	// std::cout << "[DEBUG] sin addr " << host->h_name << std::endl;
 
     // add the new fd to the poll
     memset(&ev, 0, sizeof(struct epoll_event));
@@ -259,7 +281,7 @@ void    Server::_handleNewMessage(struct epoll_event event)
     if (ret == -1)
         throw Server::readException();
     buf[ret] = '\0';
-
+	
     // split the commands in a vector. Non blocking in case of not ok message.
     try { cmd_strings = splitBy(buf, "\r\n"); } 
     catch (std::runtime_error &e) { printError(e.what(), 1, false); }
@@ -474,23 +496,41 @@ void    Server::start(void)
 }
 
 // KILL CONNECTION
+
+void	cleanFd(Server *srv, User *user) {
+
+	std::map<std::string, Channel *>::iterator chanIt = srv->_channelList.begin();
+	std::map<std::string, Channel *>::iterator chanIte = srv->_channelList.end();
+	for (; chanIt != chanIte; chanIt++) {
+		std::deque<User*>::iterator userIt = ((chanIt->second)->_users).begin();
+		std::deque<User*>::iterator userIte = ((chanIt->second)->_users).end();
+		for (; userIt != userIte; userIt++) {
+			if (user == *userIt)
+				((chanIt->second)->_users).erase(userIt);
+		}
+	}
+}
+
 void    Server::killConnection(const int &fd)
 {
     std::map<int, User *>::iterator it;
 
     // check if fd/user exists using the userlist ---------------------------- /
     it = this->_userList.find(fd);
-    if (it == this->_userList.end())
+    if (it == this->_userList.end()) {
         throw Server::invalidFdException();
+	}
 
     // fd exists, clean all -------------------------------------------------- /
-    // delete user and remove pair from list
-    delete it->second;
+    // delete user and remove pair from list  -------------------------------- /
+	cleanFd(this, it->second);
+	delete it->second;
 	this->_userList.erase(fd);
-    // remove user's fd from the poll
+
+    // remove user's fd from the poll  --------------------------------------- /
     if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
         throw Server::pollDelException();
-    // close the socket
+    // close the socket  ----------------------------------------------------- /
     close(fd);
 }
 

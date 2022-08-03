@@ -24,18 +24,18 @@
 	// CHANNELS
 	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic + "\r\n")																// 332
 	#define RPL_NOTOPIC(channelName)						(channelName + " :No topic is set" + "\r\n")														// 331
-	#define RPL_NAMREPLY(channelName, nickName) 			(channelName + " :" + nickName + "\r\n")																// 353
+	#define RPL_NAMREPLY(channelName, nickName) 			(channelName + " :" + nickName + "\r\n")															// 353
 	#define RPL_ENDOFNAMES(channelName)						(channelName + " :End of NAMES list" + "\r\n")														// 366
 	#define RPL_LIST(channelName, topic)					(channelName + " " + topic + "\r\n")																// 322
 	#define RPL_LISTEND										(":End of LIST\r\n")																				// 323
-
-
+	#define RPL_BANLIST(channel, nickname)					(channel + " " + nickname + "\r\n")																	// 323
+	#define RPL_ENDOFBANLIST(channel)						(":End of channel ban list\r\n")																	// 368
+	#define RPL_CHANNELMODEIS(channel, mode, params)		(channel + " " +  mode + " " + params + "\r\n")														// 324
 
 	// NICK
 	#define ERR_NONICKNAMEGIVEN								(":No nickname given\r\n")																	// 431
 	#define ERR_ERRONEUSNICKNAME(nick)						(nick + " :Erroneous nickname" + "\r\n")													// 432
-	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :TEST Nickname is already in use" + "\r\n")										// 433
-	//#define ERR_NICKCOLLISION(nick, user, clientHost) 		(nick + " :Nickname collision KILL from " + user + "@" + clientHost + "\r\n")			// 436
+	#define	ERR_NICKNAMEINUSE(nick)							(nick + " :Nickname is already in use" + "\r\n")										// 433
 	#define ERR_UNAVAILRESOURCE(nickOrChannel) 				(nickOrChannel + " :Nick/channel is temporarily unavailable" + "\r\n")						// 437
 	#define ERR_RESTRICTED 									(":Your connection is restricted!\r\n")														// 484
 
@@ -57,6 +57,8 @@
 	#define ERR_USERONCHANNEL(user, channel)				(user + " " + channel + " :is already on channel" + "\r\n")									// 443
 	#define ERR_CHANOPRIVSNEEDED(channel)					(channel + " :You're not channel operator" + "\r\n")										// 482
 	#define ERR_USERNOTINCHANNEL(nickname, channel)			(nickname + " " + channel + " :They aren't on that channel" + "\r\n")						// 441
+	#define ERR_KEYSET(channel)								(channel + " Channel key already set" + "\r\n")												// 467
+	#define ERR_UNKNOWNMODE(mode, channel)					(mode +  ":is unknown mode char to me for " + channel + "\r\n")								// 472
 
 	// USER
 	// #define ERR_NEEDMOREPARAMS 461
