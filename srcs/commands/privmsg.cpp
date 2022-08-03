@@ -26,48 +26,6 @@ struct Target {
 /* ************************************************************************** */
 /* UTILITY FUNCTIONS                                                          */
 /* ************************************************************************** */
-// Check grammar
-void    paramGrammarCheck(const std::string user, const std::string host, \
-                       const std::string servername, const std::string nickname)
-{
-    // For basic grammar checking
-    std::string nickControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN\
-                             OPQRSTUVWXYZ-[]\\`_^{|}");
-    std::string userControl("\0\r\n @");
-    std::string hostControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN\
-                             OPQRSTUVWXYZ-.:");
-    std::string serverControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKL\
-                               MNOPQRSTUVWXYZ-.");
-    
-    // Basic grammar check
-    if (!nickname.empty())
-    {
-        if (nickname.find_first_not_of(nickControl) != std::string::npos)
-            throw grammarException("Grammar : nickname");
-        if (nickname.length() < 1 || nickname.length() > 9)
-            throw grammarException("Grammar : nickname");
-        if (nickname[0] == '-' || std::isdigit(nickname[0]))
-            throw grammarException("Grammar : nickname");
-    }
-    if (!user.empty())
-    {
-        if (user.find_first_of(userControl) != std::string::npos)
-            throw grammarException("Grammar : user");
-        if (user.length() < 1)
-            throw grammarException("Grammar : user");
-    }
-    if (!servername.empty())
-    {
-        if (servername.find_first_not_of(serverControl) != std::string::npos)
-            throw grammarException("Grammar : servername");
-    }
-    if (!host.empty())
-    {
-        if (host.find_first_not_of(hostControl) != std::string::npos)
-            throw grammarException("Grammar : hostname");
-    }
-}
-
 // Split the message by comma into multiple targets
 std::map<std::string, std::deque<Target> > splitTargets(std::string targets)
 {
@@ -157,9 +115,6 @@ int   extractUserFd(const std::string str, Server *srv)
     }
     else
         nickname = str;
-
-    // Param check
-    paramGrammarCheck(user, host, servername, nickname);
 
     // User search and return
     if (!nickname.empty())
@@ -310,7 +265,6 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
             }
         }
         // EXCEPTIONS THAT DON'T END THE COMMAND
-        catch (grammarException &e) { printError(e.what(), 1, false);}
         catch (nosuchnickException &e) {e.reply(srv, fd);}
         catch (notoplevelException &e) {e.reply(srv, fd);}
         catch (wildtoplevelException &e) {e.reply(srv, fd);}
