@@ -25,52 +25,6 @@ struct Target {
 /* ************************************************************************** */
 /* UTILITY FUNCTIONS                                                          */
 /* ************************************************************************** */
-void    checkChannelRights(Server *srv, const int &fd, \
-                                                    const std::string channel)
-{
-    std::map<std::string, Channel *>::const_iterator    itChan;
-    std::deque<User*>                                   userList;
-    std::deque<User*>                                   banList;
-    std::deque<User*>::const_iterator                   it;
-    bool                                                result;
-
-    // Get the list of users in the channel
-    itChan = srv->_channelList.find(channel);
-    if (itChan == srv->_channelList.end())
-        throw nosuchnickException(channel);
-
-    // Get lists
-    userList = itChan->second->_users;
-    banList = itChan->second->_bannedUsers;
-
-    // Check the user fd against users of the channel then banlist
-    result = false;
-    // Check user list
-    for (it = userList.begin(); it != userList.end(); ++it)
-    {
-        if ((*it)->getFd() == fd)
-        {
-            result = true;
-            break;
-        }
-    }
-    if (result == false)
-        throw cannotsendtochanException(channel);
-    else {
-        // Check banlist
-        for (it = banList.begin(); it != banList.end(); ++it)
-        {
-            if ((*it)->getFd() == fd)
-            {
-                result = false;
-                break;
-            }
-        }
-    }
-    if (result == false)
-        throw cannotsendtochanException(channel);
-}
-
 void    paramGrammarCheck(const std::string user, const std::string host, \
                        const std::string servername, const std::string nickname)
 {
@@ -349,8 +303,8 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
                         clientReply(srv, fd, PRIVMSG(itg->target, message)));
                 }
                 else if (!itg->channel.empty()) {
-                    // Send to channel
-                    checkChannelRights(srv, fd, itg->channel);
+                    // Send to channel : no exception cannot send because we do
+                    // not handle the needed chan mode for this
                     srv->sendChannel(itg->channel, \
                        clientReply(srv, fd, PRIVMSG(itg->target, message)), fd);
                 }
@@ -360,7 +314,6 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
             catch (nosuchnickException &e) {e.reply(srv, fd);}
             catch (notoplevelException &e) {e.reply(srv, fd);}
             catch (wildtoplevelException &e) {e.reply(srv, fd);}
-            catch (cannotsendtochanException &e) {e.reply(srv, fd);}
         }
     }
 
