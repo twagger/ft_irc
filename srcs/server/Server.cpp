@@ -279,7 +279,11 @@ void    Server::_handleNewMessage(struct epoll_event event)
 	
     // split the commands in a vector. Non blocking in case of not ok message.
     try { cmd_strings = splitBy(buf, "\r\n"); } 
-    catch (std::runtime_error &e) { printError(e.what(), 1, false); }
+    catch (std::runtime_error &e) { 
+        // Send an error to the client and kill the connection
+        this->sendClient(event.data.fd, ERRORMSG(std::string(e.what())));
+        this->killConnection(event.data.fd);
+    }
 
     // split all commands in a vector of t_command (CMD / PARAM)
     try { cmds = splitCmds(cmd_strings); }

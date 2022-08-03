@@ -15,7 +15,7 @@ std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
 
     // save first command in vector
     if (end + delimiter.length() > MAX_CMD_LEN)
-        throw std::runtime_error("IRC message shall not exceed 512 characters");
+        throw std::runtime_error("Request too long");
     result.push_back(str.substr(0, end));
     
     // update str
@@ -26,8 +26,7 @@ std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
     while (end != std::string::npos)
     {
         if (end + delimiter.length() > MAX_CMD_LEN)
-            throw std::runtime_error(\
-                                 "IRC message shall not exceed 512 characters");
+            throw std::runtime_error("Request too long");
         result.push_back(str.substr(0, end));
         str.erase(0, end + delimiter.length());
         end = str.find(delimiter);

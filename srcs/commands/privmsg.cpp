@@ -262,7 +262,7 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
     std::string                                 msgtarget;
     std::string                                 message;
     std::deque<Target>                          target;
-    std::deque<Target>::iterator                itg;
+    std::deque<Target>::iterator                itTarg;
     std::stringstream                           ss;
     int                                         nbTargets = 0;
 
@@ -294,19 +294,20 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
         cleanTargetsList(target);
 
         // Loop to SEND all messages
-        for (itg = target.begin(); itg != target.end(); ++itg)
+        for (itTarg = target.begin(); itTarg != target.end(); ++itTarg)
         {
             try {
-                if (itg->fd != -1) {
-                    // Send to user
-                    srv->sendClient(itg->fd, \
-                        clientReply(srv, fd, PRIVMSG(itg->target, message)));
+                if (itTarg->fd != -1) {
+                    // Send to user (no away management, we don't handle this)
+                    srv->sendClient(itTarg->fd, \
+                        clientReply(srv, fd, PRIVMSG(itTarg->target, message)));
                 }
-                else if (!itg->channel.empty()) {
+                else if (!itTarg->channel.empty()) {
                     // Send to channel : no exception cannot send because we do
                     // not handle the needed chan mode for this
-                    srv->sendChannel(itg->channel, \
-                       clientReply(srv, fd, PRIVMSG(itg->target, message)), fd);
+                    srv->sendChannel(itTarg->channel, \
+                                     clientReply(srv, fd, \
+                                     PRIVMSG(itTarg->target, message)), fd);
                 }
             }
             // EXCEPTIONS THAT DON'T END THE COMMAND
