@@ -283,6 +283,7 @@ void    Server::_handleNewMessage(struct epoll_event event)
         // Send an error to the client and kill the connection
         this->sendClient(event.data.fd, ERRORMSG(std::string(e.what())));
         this->killConnection(event.data.fd);
+        return;
     }
 
     // split all commands in a vector of t_command (CMD / PARAM)
