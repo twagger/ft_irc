@@ -406,6 +406,7 @@ void    Server::_pingClients(void)
             catch (Server::invalidFdException &e)
             { printError(e.what(), 1, false); return; }
             user->setStatus(ST_PINGED);
+            user->setPingTime();
             ++it;
         }
         else if (user->getStatus() == ST_PINGED) 
