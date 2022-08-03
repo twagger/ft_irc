@@ -275,28 +275,31 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
         if (targets.size() > MAX_TARGETS)
             throw toomanytargetsException(msgtarget, ss.str(), "Aborted.");
         
+    }
+    // EXCEPTIONS THAT END THE COMMAND
+    catch (norecipientException &e) {e.reply(srv, fd); return; }
+    catch (notexttosendException &e) {e.reply(srv, fd); return; }
+    catch (toomanytargetsException &e) {e.reply(srv, fd); return; }
+    
+    // Loop to SEND all messages
+    for (it = targets.begin(); it != targets.end(); ++it)
+    {
         try {
-            // Loop to SEND all messages
-            for (it = targets.begin(); it != targets.end(); ++it)
+            getTargetsFromString(fd, it->first, it->second, srv);
+            target = it->second;
+            for (itTarg = target.begin(); itTarg != target.end(); ++itTarg)
             {
-                std::cout << "TARGET : " << it->first << std::endl;
-                getTargetsFromString(fd, it->first, it->second, srv);
-                target = it->second;
-                for (itTarg = target.begin(); itTarg != target.end(); ++itTarg)
-                {
-                    // Check target validity here instead of upper
-                    if (itTarg->fd != -1) {
-                        // Send to user (we don't handle AWAY flag on user)
-                        srv->sendClient(itTarg->fd, \
+                // Check target validity here instead of upper
+                if (itTarg->fd != -1) {
+                    // Send to user (we don't handle AWAY flag on user)
+                    srv->sendClient(itTarg->fd, \
                         clientReply(srv, fd, PRIVMSG(itTarg->target, message)));
-                    }
-                    else if (!itTarg->channel.empty()) {
-                        // Send to channel : no exception cannot send because 
-                        //  we do not handle the needed chan mode for this
-                        srv->sendChannel(itTarg->channel, \
-                                        clientReply(srv, fd, \
-                                        PRIVMSG(itTarg->target, message)), fd);
-                    }
+                }
+                else if (!itTarg->channel.empty()) {
+                    // Send to channel : no exception cannot send because 
+                    //  we do not handle the needed chan mode for this
+                    srv->sendChannel(itTarg->channel, clientReply(srv, fd, \
+                                     PRIVMSG(itTarg->target, message)), fd);
                 }
             }
         }
@@ -306,9 +309,4 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
         catch (notoplevelException &e) {e.reply(srv, fd);}
         catch (wildtoplevelException &e) {e.reply(srv, fd);}
     }
-
-    // EXCEPTIONS THAT END THE COMMAND
-    catch (norecipientException &e) {e.reply(srv, fd); return; }
-    catch (notexttosendException &e) {e.reply(srv, fd); return; }
-    catch (toomanytargetsException &e) {e.reply(srv, fd); return; }
 }
