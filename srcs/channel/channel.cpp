@@ -1,12 +1,14 @@
 #include "../../includes/channel.hpp"
 
-Channel::Channel(std::string name, User *currentUser): _channelName(name)
+Channel::Channel(std::string name, User *currentUser): _channelName(name),
+    _mode(MOD_NONE)
             {
                 addOperator(currentUser);
                 addUser(currentUser);
             }
 
-Channel::Channel(std::string name, std::string key, User *currentUser): _channelName(name), _key(key)
+Channel::Channel(std::string name, std::string key, User *currentUser): _channelName(name),
+    _key(key), _mode(MOD_NONE)
             {
                 addOperator(currentUser);
                 addUser(currentUser);
