@@ -61,7 +61,7 @@ HEADERS		= -Iincludes -Isrcs/server
 
 # FLAGS
 ################################################################################
-CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic -g3 -fsanitize=address
+CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic -g3
 
 PROGRAMVAR		:= -DHOSTNAME=\"$(HOSTNAME)\" -DVERSION=\"$(VERSION)\" \
 				   -DVCOMMENT=\"$(VCOMMENT)\" -DCOMPILDATE=\"$(COMPILDATE)\"

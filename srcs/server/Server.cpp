@@ -427,16 +427,12 @@ void	Server::_clearAllUsersChannels(void) {
 	
 	std::map<std::string, Channel *>::iterator chanIt = this->_channelList.begin();
 	std::map<std::string, Channel *>::iterator chanIte = this->_channelList.end();
-	for (; chanIt != chanIte; chanIt++) {
+	for (; chanIt != chanIte; chanIt++) 
 		delete chanIt->second;
-		this->_channelList.erase(chanIt);
-	}
 	std::map<const int, User *>::iterator userIt = this->_userList.begin();
 	std::map<const int, User *>::iterator userIte = this->_userList.end();
-	for (; userIt != userIte; userIt++) {
+	for (; userIt != userIte; userIt++)
 		delete userIt->second;
-		this->_userList.erase(userIt);
-	}
 }
 
 void	Server::_clearAllFds(struct epoll_event *events, int nfds) {
