@@ -1,30 +1,21 @@
 // Standard headers
-#include <netinet/in.h>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
 #include <iostream>
+#include <map>
+#include <vector>
+#include <algorithm>
+#include <sstream>
+// C Libraries
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include <sys/epoll.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <map>
-#include <vector>
-#include <algorithm>
-#include <sys/types.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <sstream>
-
 // Custom headers
 #include "../../includes/Server.hpp"
 #include "../../includes/channel.hpp"
