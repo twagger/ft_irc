@@ -164,7 +164,8 @@ class Server
         int                     _pollfd;
         int                     _sockfd;
 
-        std::map<const int, User *>   _userList;
+        std::map<const int, User *>	_userList;
+		std::map<int, std::string>	_buffersByFd;
 
 };
 

@@ -9,9 +9,11 @@ std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
 
     // first check 
     end = str.find(delimiter);
-    if (end == std::string::npos)
+    if (end == std::string::npos) {
+		this->_buffersByFd[event.data.fd].append(str);
         return (std::vector<std::string>()); // empty vector
         //throw std::runtime_error("IRC message must end with CRLF");
+	}
 
     // save first command in vector
     if (end + delimiter.length() > MAX_CMD_LEN)
@@ -32,6 +34,7 @@ std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
         str.erase(0, end + delimiter.length());
         end = str.find(delimiter);
     }
+	this->_buffersByFd[event.data.fd].append(str.substr(end, str.size()));
     return (result);
 }
 

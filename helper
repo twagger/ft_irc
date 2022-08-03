@@ -1,6 +1,7 @@
 PASS pwd
 USER ere 16 * :estelle
-NICK ere 
+NICK
+
 
 
 /connect localhost 6667 pwd
