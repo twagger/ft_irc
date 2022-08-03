@@ -21,7 +21,7 @@ int checkTopicParameter(std::string topic, std::map<std::string, Channel *>::ite
         return (-1);
     // Current user is not in user list
     User *currentUser = server->getUserByFd(fdUser);
-    if (findUserOnChannel(itChannel->second->_users, currentUser) == itChannel->second->_users.end())
+    if (findUserOnChannel(itChannel->second->_users, currentUser) == false)
     {
         server->sendClient(fdUser, numericReply(server, fdUser, "442", ERR_NOTONCHANNEL(itChannel->first)));
         return (-2);

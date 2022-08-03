@@ -87,25 +87,14 @@ bool isChannel(std::string channelName)
     return (false);
 }
 
-std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList, User *currentUser)
+bool findUserOnChannel(std::deque<User *> userList, User *currentUser)
 {
     std::deque<User *>::iterator it = userList.begin();
 
     for (; it != userList.end(); it++)
     {
         if (*it == currentUser)
-            return (it);
+            return (true);
     }
-    return (it);
-}
-
-std::vector<char>::iterator findMode(std::vector<char> listMode, char mode)
-{
-    std::vector<char>::iterator it = listMode.begin();
-    for (; it != listMode.end(); it++)
-    {
-        if (*it == mode)
-            return (it);
-    }
-    return (it);
+    return (false);
 }

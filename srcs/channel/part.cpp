@@ -26,7 +26,7 @@ int checkPartParameter(std::map<std::string, Channel *> channelList,
         return (-1);
     }
     // Current user must be part of the channel
-    if (findUserOnChannel(it->second->_users, currentUser) == it->second->_users.end())
+    if (findUserOnChannel(it->second->_users, currentUser) == false)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "442", ERR_NOTONCHANNEL(channelName)));

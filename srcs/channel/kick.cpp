@@ -28,7 +28,7 @@ int checkChannelExist(std::string channel, const int &fdUser, Server *server)
     }
     // current user must be in channel
     if (findUserOnChannel(itMap->second->getUsers(),
-                          server->getUserByFd(fdUser)) == itMap->second->getUsers().end())
+                          server->getUserByFd(fdUser)) == false)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "442", ERR_NOTONCHANNEL(channel)));
@@ -69,7 +69,7 @@ void oneChannelCase(std::string channel, std::vector<std::string> user,
     {
         // users on user list must be in channel
         if (findUserOnChannel(itMap->second->getUsers(),
-                              server->getUserByNickname(*itVector)) == itMap->second->getUsers().end())
+                              server->getUserByNickname(*itVector)) == false)
         {
             server->sendClient(fdUser, numericReply(server, fdUser,
                                                     "441", ERR_USERNOTINCHANNEL(*itVector, channel)));
@@ -78,9 +78,9 @@ void oneChannelCase(std::string channel, std::vector<std::string> user,
         // check if users on user list are operators.
         // In that case current user must be an operator
         if (findUserOnChannel(itMap->second->_operators,
-                              server->getUserByNickname(*itVector)) != itMap->second->_operators.end() &&
+                              server->getUserByNickname(*itVector)) == true &&
             findUserOnChannel(itMap->second->_operators,
-                              server->getUserByFd(fdUser)) == itMap->second->_operators.end())
+                              server->getUserByFd(fdUser)) == false)
 
         {
             server->sendClient(fdUser, numericReply(server, fdUser,
@@ -122,12 +122,12 @@ void kick(const int &fdUser, const std::vector<std::string> &parameter, const st
     std::vector<std::string> channel;
     std::vector<std::string> user;
     std::string kickMessage;
-
+    
     channel = splitByComma(parameter[0]);
     if (parameter.size() > 1)
         user = splitByComma(parameter[1]);
     if (parameter.size() > 2)
-        kickMessage = parameter[3];
+        kickMessage = parameter[2];
     if (checkGeneralParameter(channel, user, server, fdUser) < 0)
         return;
     if (channel.size() == 1)

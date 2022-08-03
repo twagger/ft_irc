@@ -41,9 +41,7 @@ bool                     isChannel(std::string channel_name);
 std::string              getChannelTopic(std::string channelName, std::map<std::string,
     Channel *> channelList);
 std::vector<std::string> getChannelKey(std::vector<std::string> parameter);
-std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList,
-	User *currentUser);
-std::vector<char>::iterator findMode(std::vector<char> listMode, char mode);
+bool findUserOnChannel(std::deque<User *> userList, User *currentUser);
 
 // Authenticate users
 bool 		isAuthenticationCmd(std::string cmd);

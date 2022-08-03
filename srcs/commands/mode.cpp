@@ -320,8 +320,6 @@ void handleAddRemoveModesChannel(const int &fd, const std::vector<std::string> p
 int checkChannelMode(const int &fd, const std::vector<std::string> &params, Server *srv)
 {
 	std::map<std::string, Channel *>::iterator itChannel;
-	std::deque<User *>::iterator itUser;
-	std::deque<User *>::iterator itOperator;
 
 	// Check that channel list is not empty
 	if (srv->_channelList.empty() == true)
@@ -339,16 +337,15 @@ int checkChannelMode(const int &fd, const std::vector<std::string> &params, Serv
 		return (-2);
 	}
 	// Check that user is on channel
-	itUser = findUserOnChannel(itChannel->second->_users, srv->getUserByFd(fd));
-	if (itUser == itChannel->second->_users.end())
+	if (findUserOnChannel(itChannel->second->_users, srv->getUserByFd(fd)) == false)
 	{
 		srv->sendClient(fd, numericReply(srv, fd, "441",
 										 ERR_USERNOTINCHANNEL(srv->getUserByFd(fd)->getNickname(), params[0])));
 		return (-3);
 	}
 	// Check that user is an operator
-	itOperator = findUserOnChannel(itChannel->second->_operators, srv->getUserByFd(fd));
-	if (itOperator == itChannel->second->_operators.end())
+	if (findUserOnChannel(itChannel->second->_operators, srv->getUserByFd(fd)) == false
+		&& params.size() > 1)
 	{
 		srv->sendClient(fd, numericReply(srv, fd, "482",
 										 ERR_CHANOPRIVSNEEDED(params[0])));
