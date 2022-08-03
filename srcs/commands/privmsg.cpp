@@ -133,7 +133,7 @@ int   extractUserFd(const std::string str, Server *srv)
     // string matching using
     if (str.find('%') != std::string::npos) {
         // USER % HOST
-        user = str.substr(0, str.find('%') - 1);
+        user = str.substr(0, str.find('%'));
         host = str.substr(str.find('%') + 1);
         if (host.find('@') != std::string::npos) {
             // USER % HOST @ SERVERNAME
@@ -143,7 +143,7 @@ int   extractUserFd(const std::string str, Server *srv)
     }
     else if (str.find('!') != std::string::npos) {
         // NICKNAME ! USER @ HOST
-        nickname = str.substr(0, str.find('!') - 1);
+        nickname = str.substr(0, str.find('!'));
         user = str.substr(str.find('!') + 1);
         if (user.find('@') == std::string::npos)
             throw grammarException("Grammar : nickname");
@@ -152,7 +152,7 @@ int   extractUserFd(const std::string str, Server *srv)
     }
     else if (str.find('@') != std::string::npos) {
         // USER @ SERVERNAME
-        user = str.substr(0, str.find('@') - 1);
+        user = str.substr(0, str.find('@'));
         servername = str.substr(str.find('@') + 1);
     }
     else
