@@ -22,7 +22,8 @@ bool emptyParams(const std::vector<std::string> &params);
 
 // Parsing
 std::vector<std::string> splitBy(std::string str, const std::string &delimiter);
-const std::vector<Command>     splitCmds(std::vector<std::string> cmd_strings);
+//const std::vector<Command>     splitCmds(std::vector<std::string> cmd_strings);
+void  splitCmds(std::vector<std::string> cmd_strings, std::vector<Command> *cmds);
 
 // Replies util functions
 std::string numericReply(Server *irc, const int &fd, std::string code,

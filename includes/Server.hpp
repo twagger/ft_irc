@@ -151,6 +151,8 @@ class Server
         void    _handleNewMessage(struct epoll_event event);
         void    _executeCommands(int fd, std::vector<Command> cmds);
         void    _pingClients(void);
+		void	_clearAllUsersChannels(void);
+		void	_clearAllFds(struct epoll_event *events, int nfds);
 
         // Member attributes
         int                     _port;
@@ -158,18 +160,13 @@ class Server
         std::string             _name;
         std::string             _hostname;
 		std::string             _version;
-		std::string             _date;			// expected format: 19:52:09 Aug 12 2013
+		std::string             _date;
 
         int                     _pollfd;
         int                     _sockfd;
-		int						_signalfd;
 
         std::map<const int, User *>   _userList;
 
-		// <hostname> has a maximum length of 63 characters. If name is longer than 63
-        // characters are registered using the host (numeric) address instead of the host name.
-		// hostname   =  shortname *( "." shortname )
-		// hostaddr   =  ip4addr / ip6addr
 };
 
 #endif

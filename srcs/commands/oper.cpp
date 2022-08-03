@@ -13,17 +13,11 @@ bool isOperHost(std::string hostname) {
 	catch (std::ifstream::failure &e)
 		{ printError(e.what(), 1, true); return false; }
 	try {
-<<<<<<< HEAD
 		if (input.is_open()) {
 			while (getline(input, str)) {
-				if (str == user->getHostname())
+				if (str == hostname)
 					return true;
 			}
-=======
-		while (getline(input, str)) {
-			if (str == hostname)
-				return true;
->>>>>>> 3289311b5b9350d8c0b7ede69a3adb7f2e39d3d9
 		}
 	}
 	catch (std::ifstream::failure &e) 

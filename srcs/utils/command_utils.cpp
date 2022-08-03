@@ -11,13 +11,6 @@ bool	emptyParams(const std::vector<std::string> &params) {
 	return false;
 }
 
-void	clearAllUsersChannels(Server *srv) {
-	
-
-}
-
-
-
 std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
