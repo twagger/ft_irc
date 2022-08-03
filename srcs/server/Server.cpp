@@ -39,7 +39,7 @@ Server::Server(int port, std::string password, std::string name)
 
     timeinfo = localtime(&rawtime);
 	_date = std::string(asctime(timeinfo));
-	this->_initCommandList(); 
+	this->_initCommandList();
 }
 
 Server::Server(Server const &src)
