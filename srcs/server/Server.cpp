@@ -16,13 +16,14 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-       #include <sys/types.h>
-       #include <stdio.h>
-       #include <stdlib.h>
-       #include <unistd.h>
-       #include <string.h>
-       #include <sys/socket.h>
-       #include <netdb.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <sstream>
 
 // Custom headers
 #include "../../includes/Server.hpp"
@@ -387,6 +388,7 @@ void    Server::_pingClients(void)
     User                            *user;
     double                          seconds;
     std::map<int, User *>::iterator it;
+    std::stringstream               ss;
 
     // loop on every active connection
     for (it = this->_userList.begin(); it != this->_userList.end();)
@@ -414,6 +416,10 @@ void    Server::_pingClients(void)
             {
                 // Move the iterator to the next user before removing user 
                 ++it;
+                // Send en error to the client
+                ss << PONG_TIMEOUT;
+                this->sendClient(userFd, ERRORMSG(std::string("Ping timeout: ")
+                                        .append(ss.str()).append(" seconds")));
                 // Kill connection
                 this->killConnection(userFd);
             }
