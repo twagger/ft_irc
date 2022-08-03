@@ -16,13 +16,6 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-       #include <sys/types.h>
-       #include <stdio.h>
-       #include <stdlib.h>
-       #include <unistd.h>
-       #include <string.h>
-       #include <sys/socket.h>
-       #include <netdb.h>
 
 // Custom headers
 #include "../../includes/Server.hpp"
@@ -262,6 +255,15 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
 }
 
 // HANDLE NEW MESSAGE
+void	clearCmds(std::vector<Command> cmds) {
+	std::vector<Command>::iterator cmdsIt = cmds.begin();
+	std::vector<Command>::iterator cmdsIte = cmds.end();
+	for (; cmdsIt != cmdsIte; cmdsIt++) {
+		delete &(*cmdsIt);
+		//cmds.erase(cmdsIt);
+	}
+}
+
 void    Server::_handleNewMessage(struct epoll_event event)
 {
     char                        buf[BUF_SIZE];
@@ -282,7 +284,7 @@ void    Server::_handleNewMessage(struct epoll_event event)
     catch (std::runtime_error &e) { printError(e.what(), 1, false); }
 
     // split all commands in a vector of t_command (CMD / PARAM)
-    try { cmds = splitCmds(cmd_strings); }
+    try { splitCmds(cmd_strings, &cmds); }
     catch (std::runtime_error &e) {printError(e.what(), 1, false); }
 
     // temporary check
@@ -300,6 +302,7 @@ void    Server::_handleNewMessage(struct epoll_event event)
 
     // execute all commands in the vector
     this->_executeCommands(event.data.fd, cmds);
+	//clearCmds(cmds);
 }
 
 // INIT COMMAND LIST OF THE SERVER
@@ -328,6 +331,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["PRIVMSG"] = &privmsg;
     this->_cmdList["NOTICE"] = &notice;
     this->_cmdList["CAP"] = &cap;
+	this->_cmdList["DIE"] = &die;
 }
 
 // EXECUTE RECEIVED COMMANDS
@@ -418,6 +422,30 @@ void    Server::_pingClients(void)
     }
 }
 
+// CLEAR USERS/CHANNELS AND FDS
+
+void	Server::_clearAll(void) {
+	
+	// delete channels
+	std::map<std::string, Channel *>::iterator chanIt = this->_channelList.begin();
+	std::map<std::string, Channel *>::iterator chanIte = this->_channelList.end();
+	for (; chanIt != chanIte; chanIt++) 
+		delete chanIt->second;
+	// epoll delete on fds, close fd for each user, delete user
+	std::map<const int, User *>::iterator userIt = this->_userList.begin();
+	std::map<const int, User *>::iterator userIte = this->_userList.end();
+	for (; userIt != userIte; userIt++) {
+		if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, (userIt->second)->getFd(), NULL) == -1)
+        	throw Server::pollDelException();
+    	close((userIt->second)->getFd());
+		delete userIt->second;
+	}
+	// close epoll functional fds
+	close(this->_pollfd);
+	close(this->_sockfd);
+	std::cout << std::endl << "Server is shutting down" << std::endl << std::endl;
+}
+
 /* ************************************************************************** */
 /* Member functions                                                           */
 /* ************************************************************************** */
@@ -453,9 +481,8 @@ void    Server::start(void)
         // poll wait --------------------------------------------------------- /
         events_tmp = &(events[0]);
         try { nfds = this->_pollWait(pollfd, &events_tmp, MAX_EVENTS); }
-        catch (Server::pollWaitException &e)
-        { printError(e.what(), 1, true); return; }
-
+        catch (Server::pollWaitException &e) { _clearAll(); return; }
+		
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
         {
@@ -475,7 +502,9 @@ void    Server::start(void)
                 try { this->_handleNewMessage(events[i]); }
                 catch (Server::readException &e)
                 { printError(e.what(), 1, true); }
-            }
+            	catch (Server::pollWaitException &e)
+				{ _clearAll(); return; }
+			}
         }
 
         // send a PING to fds that seems inactive ---------------------------- /
@@ -487,7 +516,7 @@ void    Server::start(void)
 
 // KILL CONNECTION
 
-void	cleanFd(Server *srv, User *user) {
+void	clearUser(Server *srv, User *user) {
 
 	std::map<std::string, Channel *>::iterator chanIt = srv->_channelList.begin();
 	std::map<std::string, Channel *>::iterator chanIte = srv->_channelList.end();
@@ -513,7 +542,7 @@ void    Server::killConnection(const int &fd)
 
     // fd exists, clean all -------------------------------------------------- /
     // delete user and remove pair from list  -------------------------------- /
-	cleanFd(this, it->second);
+	clearUser(this, it->second);
 	delete it->second;
 	this->_userList.erase(fd);
 

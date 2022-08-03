@@ -118,26 +118,19 @@ void UserMode(const int &fd, const std::vector<std::string> &params, Server *srv
 	User *user = srv->getUserByFd(fd);
 
 	if (params.size() == 1 && params[0] == user->getNickname())
-	{ // no nickname given
 		return (srv->sendClient(fd, numericReply(srv, fd, "221",
 												 RPL_UMODEIS(userModesToStr(user)))));
-	}
 	else if (srv->getUserByNickname(params[0]) == 0)
-	{
 		return (srv->sendClient(fd, numericReply(srv, fd, "401",
 												 ERR_NOSUCHNICK(params[0]))));
-	}
 	else if (params[0] != user->getNickname())
-	{
 		return (srv->sendClient(fd, numericReply(srv, fd, "502",
 												 ERR_USERSDONTMATCH)));
-	}
-	// else if (isNotUserMode(params[1], USERMODES) || isNotChannelMode(params[1], CHANNELMODES))									// replace with pattern matching
-	// 	replyMsg = numericReply(srv, fd, "501", ERR_UMODEUNKNOWNFLAG);
+	else if (params[1].find_first_not_of(USERMODES))
+		return (srv->sendClient(fd, numericReply(srv, fd, "501",
+												 ERR_UMODEUNKNOWNFLAG)));
 	else if (!params[1].empty())
-	{
 		handleAddRemoveModes(user, params[1]);
-	} // we already checked above that param == user's own nickname
 }
 
 /* ************************************************************************** */

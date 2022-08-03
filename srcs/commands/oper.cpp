@@ -8,17 +8,19 @@ bool isOperHost(std::string hostname) {
 	std::string		str;
 
 	file = configFile.c_str();
-	input.open(file, std::ios::in);
-	try {input.is_open(); } 
+
+	try { input.open(file, std::ios::in); } 
 	catch (std::ifstream::failure &e)
 		{ printError(e.what(), 1, true); return false; }
 	try {
-		while (getline(input, str)) {
-			if (str == hostname)
-				return true;
+		if (input.is_open()) {
+			while (getline(input, str)) {
+				if (str == hostname)
+					return true;
+			}
 		}
 	}
-	catch (std::istream::failure &e) 
+	catch (std::ifstream::failure &e) 
     	{ printError(e.what(), 1, true); return false; }
 	return false;
 }
