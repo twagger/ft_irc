@@ -1,19 +1,13 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 
-void	serverNotice(const int &fd,  Server *srv, const std::string &destNick, std::string msg) {
-	
-	std::string reply = ":" + srv->getHostname() + " NOTICE " + destNick + " " + ":" + msg;
-	srv->sendClient(fd, reply);
-}
-
 void	quit(const int &fd, const std::vector<std::string> &params, const std::string &, Server *srv) 
 {
 	std::string replyMsg;
 	User *user = srv->getUserByFd(fd);
 
 	// Send ERROR to the user encapsulated in NOTICE  ----------------------------- /
-	serverNotice(fd, srv, user->getNickname(), 
+	serverQuitNotice(fd, srv, user->getNickname(), 
 		params.empty() == true ? CLIENT_ERROR : CLIENT_ERRORMSG(params[0]));
 
 	// Make the replyMsg and get channels from the user before killing the fd ----- /
