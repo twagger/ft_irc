@@ -345,7 +345,7 @@ int checkChannelMode(const int &fd, const std::vector<std::string> &params, Serv
 	}
 	// Check that user is an operator
 	if (findUserOnChannel(itChannel->second->_operators, srv->getUserByFd(fd)) == false
-		&& params.size() > 1)
+		&& params.size() > 1 && params[1].compare("b") != 0)
 	{
 		srv->sendClient(fd, numericReply(srv, fd, "482",
 										 ERR_CHANOPRIVSNEEDED(params[0])));

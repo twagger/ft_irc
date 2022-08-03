@@ -53,7 +53,7 @@ int checkParameterInvite(std::string nickname, std::string channel,
         return (-3);
     }
     // User is already on channel
-    if (findUserOnChannel(it->second->_users, server->getUserByNickname(nickname)) == false)
+    if (findUserOnChannel(it->second->_users, server->getUserByNickname(nickname)) == true)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "443", ERR_USERONCHANNEL(userToInvite->getFullname(), channel)));
