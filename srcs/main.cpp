@@ -17,7 +17,7 @@
 
 void signalHandler( int signum ) {
 	(void)signum;
-	std::cout << "\r  \n";
+	std::cout << "\r  ";
 }
 
 

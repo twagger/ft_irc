@@ -29,6 +29,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/channel/names.cpp \
 			  srcs/user/User.cpp \
 			  srcs/commands/cap.cpp \
+			  srcs/commands/die.cpp \
 			  srcs/commands/info.cpp \
 			  srcs/commands/kill.cpp \
 			  srcs/commands/mode.cpp \

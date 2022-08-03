@@ -68,18 +68,18 @@ class Server
         Server  &operator=(Server const &rhs);
         
         // Getters
-		int         getPort(void) const;
-		std::string getPassword(void) const;
-		std::string getName(void) const;
-		std::string getHostname(void) const;
-		std::string getVersion(void) const;
-		std::string getDate(void) const;
-		User*		getUserByFd(const int &fd) const;
-		User*		getUserByNickname(const std::string &nick) const;
-		User*		getUserByUsername(const std::string &user, \
+		int         		getPort(void) const;
+		std::string 		getPassword(void) const;
+		std::string 		getName(void) const;
+		std::string 		getHostname(void) const;
+		std::string 		getVersion(void) const;
+		std::string 		getDate(void) const;
+		User*				getUserByFd(const int &fd) const;
+		User*				getUserByNickname(const std::string &nick) const;
+		User*				getUserByUsername(const std::string &user, \
                                 const std::string &host = std::string()) const;
-		std::deque<User*> getUsersByHostname(const std::string &hostname) const;
-		std::deque<User*> getAllUsers(void) const;
+		std::deque<User*> 	getUsersByHostname(const std::string &hostname) const;
+		std::deque<User*> 	getAllUsers(void) const;
 
         // Member functions
         void    start(void);
@@ -151,8 +151,7 @@ class Server
         void    _handleNewMessage(struct epoll_event event);
         void    _executeCommands(int fd, std::vector<Command> cmds);
         void    _pingClients(void);
-		void	_clearAllUsersChannels(void);
-		void	_clearAllFds(struct epoll_event *events, int nfds);
+		void	_clearAll(void);
 
         // Member attributes
         int                     _port;

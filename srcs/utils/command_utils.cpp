@@ -11,11 +11,28 @@ bool	emptyParams(const std::vector<std::string> &params) {
 	return false;
 }
 
-std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
+std::string	numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
 						+ irc->getUserByFd(fd)->getNickname() + " " + replyMsg;		
 	return (reply);
+}
+
+void	serverQuitNotice(const int &fd,  Server *srv, const std::string &destNick, std::string msg) 
+{
+	
+	std::string reply = ":" + srv->getHostname() + " NOTICE " + destNick + " " + ":" + msg;
+	srv->sendClient(fd, reply);
+}
+
+void 	informUsers(Server *srv, std::string msg) 
+{
+	std::deque<User*> users = srv->getAllUsers();
+	std::deque<User*>::iterator it = users.begin();
+	std::deque<User*>::iterator ite = users.end();
+
+	for (; it != ite; it++)
+		serverQuitNotice((*it)->getFd(), srv, (*it)->getNickname(), msg);
 }
 
 std::string WelcomeChan(Server *irc, const int &fd, std::string code,

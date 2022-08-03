@@ -331,6 +331,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["PRIVMSG"] = &privmsg;
     this->_cmdList["NOTICE"] = &notice;
     this->_cmdList["CAP"] = &cap;
+	this->_cmdList["DIE"] = &die;
 }
 
 // EXECUTE RECEIVED COMMANDS
@@ -423,24 +424,26 @@ void    Server::_pingClients(void)
 
 // CLEAR USERS/CHANNELS AND FDS
 
-void	Server::_clearAllUsersChannels(void) {
+void	Server::_clearAll(void) {
 	
+	// delete channels
 	std::map<std::string, Channel *>::iterator chanIt = this->_channelList.begin();
 	std::map<std::string, Channel *>::iterator chanIte = this->_channelList.end();
 	for (; chanIt != chanIte; chanIt++) 
 		delete chanIt->second;
+	// epoll delete on fds, close fd for each user, delete user
 	std::map<const int, User *>::iterator userIt = this->_userList.begin();
 	std::map<const int, User *>::iterator userIte = this->_userList.end();
-	for (; userIt != userIte; userIt++)
-		delete userIt->second;
-}
-
-void	Server::_clearAllFds(struct epoll_event *events, int nfds) {
-	for (int i = 0; i < nfds; i++) {
-		if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, events[i].data.fd, NULL) == -1)
+	for (; userIt != userIte; userIt++) {
+		if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, (userIt->second)->getFd(), NULL) == -1)
         	throw Server::pollDelException();
-    	close(events[i].data.fd);
+    	close((userIt->second)->getFd());
+		delete userIt->second;
 	}
+	// close epoll functional fds
+	close(this->_pollfd);
+	close(this->_sockfd);
+	std::cout << std::endl << "Server is shutting down" << std::endl << std::endl;
 }
 
 /* ************************************************************************** */
@@ -478,13 +481,7 @@ void    Server::start(void)
         // poll wait --------------------------------------------------------- /
         events_tmp = &(events[0]);
         try { nfds = this->_pollWait(pollfd, &events_tmp, MAX_EVENTS); }
-        catch (Server::pollWaitException &e)
-        {	
-			printError("Server is shutting down, clearing everything...", 1, false); 
-			_clearAllUsersChannels();
-			//_clearAllFds(events, nfds);
-			return;
-		}
+        catch (Server::pollWaitException &e) { _clearAll(); return; }
 		
         // loop on ready fds ------------------------------------------------- /
         for (int i = 0; i < nfds; ++i)
@@ -505,7 +502,9 @@ void    Server::start(void)
                 try { this->_handleNewMessage(events[i]); }
                 catch (Server::readException &e)
                 { printError(e.what(), 1, true); }
-            }
+            	catch (Server::pollWaitException &e)
+				{ _clearAll(); return; }
+			}
         }
 
         // send a PING to fds that seems inactive ---------------------------- /
