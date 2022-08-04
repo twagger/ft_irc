@@ -35,6 +35,8 @@ void	oper(const int &fd, const std::vector<std::string> &params, const std::stri
 		replyMsg = numericReply(srv, fd, "461", ERR_NEEDMOREPARAMS(std::string("OPER")));
 	else if (isOperHost(user->getHostname()) == false)
 		replyMsg = numericReply(srv, fd, "491", ERR_NOOPERHOST);
+	else if (user->hasMode(MOD_RESTRICTED))
+		replyMsg = numericReply(srv, fd, "484", ERR_RESTRICTED);
 	else if (params[1] != srv->getPassword())
 		replyMsg = numericReply(srv, fd, "464", ERR_PASSWDMISMATCH);
 	else {

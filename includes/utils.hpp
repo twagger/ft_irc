@@ -38,7 +38,7 @@ std::string eventChannel(Server *irc, const int &fd, std::string eventType,
     std::string channelName);
 void		serverQuitNotice(const int &fd,  Server *srv, const std::string
 	&destNick, std::string msg);
-void	 	informUsers(Server *srv, std::string msg); 
+void	 	informSUsers(Server *srv, std::string msg); 
 
 // Channel util functions
 std::vector<std::string> splitByComma(std::string parameter);

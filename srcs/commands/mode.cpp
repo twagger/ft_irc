@@ -46,6 +46,7 @@ void addModes(User *user, const std::string mode, int start, int stop)
 			break;
 		case 'r':
 			user->addMode(MOD_RESTRICTED);
+			user->removeMode(MOD_OPER);
 			break;
 		}
 	}
