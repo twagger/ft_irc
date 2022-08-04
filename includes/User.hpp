@@ -42,7 +42,7 @@ class User {
 		uint8_t					    _mode;
 		bool						_password;
 		bool						_authenticated;
-		std::deque<std::string>	_channelsJoined;
+		std::deque<std::string>		_channelsJoined;
 		int							_status;
         time_t                      _lastActivityTime;
         time_t                      _pingTime;

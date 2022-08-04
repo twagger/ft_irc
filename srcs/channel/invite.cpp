@@ -93,6 +93,4 @@ void invite(const int &fdUser, const std::vector<std::string> &parameter, const 
     server->sendClient(server->getUserByNickname(nickname)->getFd(),
         clientReply(server, fdUser, "INVITE " +
             nickname + " " + channel));
-    std::cout << clientReply(server, fdUser, "INVITE " +
-            nickname + " " + channel) << std::endl;
 }
