@@ -21,9 +21,11 @@ int                         printError(std::string message, int code,
 bool 						emptyParams(const std::vector<std::string> &params);
 
 // Parsing
-std::vector<std::string> 	splitBy(std::string str, const std::string &delimiter);
+//std::vector<std::string> 	splitBy(std::string str, const std::string &delimiter);
+std::vector<std::string>  	splitBy(std::string str, const std::string &delimiter, std::string *buffer);
 void  						splitCmds(std::vector<std::string> cmd_strings,
 	std::vector<Command> *cmds);
+void						displayCommands(std::vector<Command> cmds);
 
 // Replies util functions
 std::string numericReply(Server *irc, const int &fd, std::string code,

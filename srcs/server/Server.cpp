@@ -273,15 +273,20 @@ void    Server::_handleNewMessage(struct epoll_event event)
     std::vector< std::string >  cmd_strings;
     std::vector<Command>        cmds;
 
-    // fill a buffer with the message
+    // Fill a buffer with the message
     memset(buf, 0, BUF_SIZE);
     ret = recv(event.data.fd, buf, BUF_SIZE, 0);
     if (ret == -1)
         throw Server::readException();
     buf[ret] = '\0';
-	
-    // split the commands in a vector. Non blocking in case of not ok message.
-    try { cmd_strings = splitBy(buf, "\r\n"); } 
+
+	// Adding current buf to fd's buffer on server
+	this->_buffersByFd[event.data.fd].append(buf);
+
+    // Split the commands in a vector and appending/clearing the buffer
+	// Non blocking in case of not ok message.
+    try { cmd_strings = splitBy(_buffersByFd[event.data.fd], "\r\n", 
+		&(_buffersByFd[event.data.fd])); } 
     catch (std::runtime_error &e) { 
         // Send an error to the client and kill the connection
         this->sendClient(event.data.fd, ERRORMSG(std::string(e.what())));
@@ -289,22 +294,12 @@ void    Server::_handleNewMessage(struct epoll_event event)
         return;
     }
 
-    // split all commands in a vector of t_command (CMD / PARAM)
+    // Split all commands in a vector of t_command (CMD / PARAM)
     try { splitCmds(cmd_strings, &cmds); }
     catch (std::runtime_error &e) {printError(e.what(), 1, false); }
 
-    // temporary check
-    std::vector<Command>::iterator  it;
-    std::vector<std::string>::iterator  it2;
-    for (it = cmds.begin(); it < cmds.end(); ++it)
-    {
-        std::cout << "\nPREFIX : " << it->prefix << std::endl;
-        std::cout << "CMD : " << it->command << std::endl;
-        for (it2 = it->params.begin(); it2 < it->params.end(); ++it2)
-        {
-            std::cout << "PARAM : " << *it2 << std::endl;
-        }
-    }
+	// Display of commands received by the server (temporary)
+	displayCommands(cmds);
 
     // execute all commands in the vector
     this->_executeCommands(event.data.fd, cmds);
@@ -418,7 +413,7 @@ void    Server::_pingClients(void)
                 // Send en error to the client
                 ss << PONG_TIMEOUT;
                 this->sendClient(userFd, ERRORMSG(std::string("Ping timeout: ")
-                                        .append(ss.str()).append(" seconds")));
+                    .append(ss.str()).append(" seconds")));
                 // Kill connection
                 this->killConnection(userFd);
             }
@@ -433,23 +428,35 @@ void    Server::_pingClients(void)
 void	Server::_clearAll(void) {
 	
 	// delete channels
-	std::map<std::string, Channel *>::iterator chanIt = this->_channelList.begin();
-	std::map<std::string, Channel *>::iterator chanIte = this->_channelList.end();
-	for (; chanIt != chanIte; chanIt++) 
-		delete chanIt->second;
-	// epoll delete on fds, close fd for each user, delete user
-	std::map<const int, User *>::iterator userIt = this->_userList.begin();
-	std::map<const int, User *>::iterator userIte = this->_userList.end();
-	for (; userIt != userIte; userIt++) {
-		if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, (userIt->second)->getFd(), NULL) == -1)
-        	throw Server::pollDelException();
-    	close((userIt->second)->getFd());
-		delete userIt->second;
+	if (!this->_channelList.empty()) {
+		std::map<std::string, Channel *>::iterator chanIt = _channelList.begin();
+		std::map<std::string, Channel *>::iterator chanIte = _channelList.end();
+		for (; chanIt != chanIte; chanIt++) 
+			delete chanIt->second;
 	}
+
+	// delete users
+	if (!this->_userList.empty()) {
+		std::map<const int, User *>::iterator userIt = this->_userList.begin();
+		std::map<const int, User *>::iterator userIte = this->_userList.end();
+		for (; userIt != userIte; userIt++) {
+			// epoll delete on fds
+			try { epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, (userIt->second)->getFd(), NULL); }
+			catch (Server::pollDelException &e) 
+				{ printError(e.what(), 1, true); }
+			// close fd for each user & delete user
+			if (userIt->second) {
+				close((userIt->second)->getFd());
+				delete userIt->second;
+			}
+		}
+	}
+
 	// close epoll functional fds
-	close(this->_pollfd);
-	close(this->_sockfd);
-	std::cout << std::endl << "Server is shutting down" << std::endl << std::endl;
+	if (this->_sockfd)
+		close(this->_sockfd);
+	if (this->_pollfd)
+		close(this->_pollfd);
 }
 
 /* ************************************************************************** */
@@ -498,14 +505,15 @@ void    Server::start(void)
 	}
 	// EXCEPTIONS THAT END THE SERVER
 	catch (Server::socketException &e){ printError(e.what(), 1, true); return;}
-	catch (Server::bindException &e){ printError(e.what(), 1, true); return; }
-	catch (Server::pollException &e){ printError(e.what(), 1, true); return; }
-	catch (Server::pollAddException &e){ printError(e.what(), 1, true); return;}
-	catch (Server::pollWaitException &e){ _clearAll(); return; }
-	catch (Server::pollDelException &e){ printError(e.what(), 1, true); return;}
-	catch (Server::acceptException &e){ printError(e.what(), 1, true); return; }
-	catch (Server::sendException &e){ printError(e.what(), 1, true); return; }
-	catch (Server::readException &e){ printError(e.what(), 1, true); return; }
+	catch (Server::bindException &e){  _clearAll(); printError(e.what(), 1, true); return; }
+	catch (Server::pollException &e){ _clearAll(); printError(e.what(), 1, true); return; }
+	catch (Server::pollAddException &e){ _clearAll(); printError(e.what(), 1, true); return;}
+	catch (Server::pollWaitException &e){ _clearAll();
+		printError("Server is shutting down\n", 1, false); return; }
+	catch (Server::pollDelException &e){ _clearAll(); printError(e.what(), 1, true); return;}
+	catch (Server::acceptException &e){ _clearAll(); printError(e.what(), 1, true); return; }
+	catch (Server::sendException &e){ _clearAll(); printError(e.what(), 1, true); return; }
+	catch (Server::readException &e){ _clearAll(); printError(e.what(), 1, true); return; }
 }
 
 // KILL CONNECTION
