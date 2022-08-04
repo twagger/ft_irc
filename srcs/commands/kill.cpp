@@ -2,6 +2,18 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/exceptions.hpp"
 
+/**
+ * @brief The KILL command is used to cause a client-server connection to be
+ * closed by the server which has the actual connection.
+ * 
+ * Errors handled:
+ * - ERR_NOPRIVILEGES
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_NOSUCHNICK
+ * - ERR_CANTKILLSERVER
+ *   
+ */
+
 void    kill(const int &fd, const std::vector<std::string> &params, \
                        const std::string &,Server *srv)
 {
@@ -34,7 +46,7 @@ void    kill(const int &fd, const std::vector<std::string> &params, \
         // all is ok, execute the KILL
         try { srv->killConnection(target->getFd()); }
         catch (Server::pollDelException &e) { printError(e.what(), 1, true); }
-        catch (Server::invalidFdException &e) { printError(e.what(), 1, false); }
+        catch (Server::invalidFdException &e) { printError(e.what(), 1, false);}
 
         // add the nickname to the list of unavailable nicknames with a timer
         srv->_unavailableNicknames[nickname] = time(NULL);

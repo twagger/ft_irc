@@ -2,6 +2,16 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/exceptions.hpp"
 
+/**
+ * @brief The PING command is used to test the presence of an active client or
+ * server at the other end of the connection.
+ * 
+ * Errors handled:
+ * - ERR_NOORIGIN
+ * - ERR_NOSUCHSERVER
+ *   
+ */
+
 void    ping(const int &fd, const std::vector<std::string> &params, \
                        const std::string &, Server *srv)
 {

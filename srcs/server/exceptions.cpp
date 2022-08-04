@@ -68,3 +68,7 @@ cantkillserverException::cantkillserverException(std::string code)
 // 422 - nomotdException
 nomotdException::nomotdException(std::string code)
 { this->code = code; this->rpl = ERR_NOMOTD; }
+
+// 431 - nonicknamegivenException
+nonicknamegivenException::nonicknamegivenException(std::string code)
+{ this->code = code; this->rpl = ERR_NONICKNAMEGIVEN; }

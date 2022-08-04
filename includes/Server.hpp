@@ -25,7 +25,7 @@
 #define KILLTIME 3600		// in seconds = 1h
 
 // Config files
-#define OPERCONF "operhost.config"
+#define OPERCONF "conf/operhost.config"
 
 // Program infos
 #ifndef VERSION
@@ -84,15 +84,15 @@ class Server
         // Member functions
         void    start(void);
         void    sendClient(const int &fd, const std::string &message, \
-                           const int &originFd = -1) const;
+                           const int &originFd = -1);
         void    sendClient(const std::set<int> &fds, \
                             const std::string &message, \
-                            const int &originFd= -1) const;
+                            const int &originFd= -1);
         void    broadcast(const std::string &message, \
-                          const int &originFd = -1) const;
+                          const int &originFd = -1);
         void    sendChannel(const std::string &channel, \
                             const std::string &message, \
-                            const int &originFd = -1) const;
+                            const int &originFd = -1);
         void    killConnection(const int &fd);
 
         // exceptions
@@ -131,6 +131,9 @@ class Server
 
         class readException : public std::exception
         { public: virtual const char *what() const throw(); };
+
+        class closeException : public std::exception
+        { public: virtual const char *what() const throw(); };
  
         std::map<std::string, Channel *>   _channelList;
         std::map<std::string, CmdFunction> _cmdList;
@@ -164,7 +167,8 @@ class Server
         int                     _pollfd;
         int                     _sockfd;
 
-        std::map<const int, User *>   _userList;
+        std::map<const int, User *>	_userList;
+		std::map<int, std::string>	_buffersByFd;
 
 };
 

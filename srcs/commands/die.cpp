@@ -6,7 +6,7 @@ void die(const int &fd, const std::vector<std::string> &, const std::string &,
 			Server *srv) 
 {	
 	if (srv->getUserByFd(fd)->hasMode(MOD_OPER)) {
-		informUsers(srv, "Server is shutting down");
+		informSUsers(srv, "Server is shutting down");
 		throw Server::pollWaitException();
 	}
 	else 
