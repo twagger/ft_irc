@@ -4,8 +4,8 @@
 #include <iostream>
 # include <string>
 
-#define USERMODES "aiwroOs"
-#define CHANNELMODES ""
+#define USERMODES "a = away (not active); i = invisible; w = wallops (not active); r = restricted; o = Server operator; s = Server's notice"
+#define CHANNELMODES "b = ban; i = invite only; k = channel's key; o = channel's operator rights"
 #define NAMESPECIALS ";[]`_^{|}\\"
 
 // LIST OF SERVER REPLIES
