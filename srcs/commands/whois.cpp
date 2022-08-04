@@ -209,6 +209,6 @@ void whois(const int &fd, const std::vector<std::string> &params, \
         srv->sendClient(fd, numericReply(srv, fd, "317", \
             RPL_WHOISIDLE(nickname, ss.str())));
     }
-    srv->sendClient(fd, numericReply(srv, fd, "318", RPL_ENDOFWHOIS()));
+    srv->sendClient(fd, numericReply(srv, fd, "318", RPL_ENDOFWHOIS(mask)));
 }
 
