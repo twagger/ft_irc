@@ -445,8 +445,8 @@ void	Server::_clearAll(void) {
 		delete userIt->second;
 	}
 	// close epoll functional fds
-	close(this->_pollfd);
 	close(this->_sockfd);
+	close(this->_pollfd);
 	std::cout << std::endl << "Server is shutting down" << std::endl << std::endl;
 }
 
