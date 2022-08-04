@@ -48,6 +48,7 @@ void who(const int &fd, const std::vector<std::string> &params, \
     std::deque<User*>           usersList;
     std::deque<User*>           allUsers;
     std::deque<User*>::iterator it;
+    std::deque<std::string>     channelJoined;
 
     // COMMAND EXECUTION
     // Params
@@ -73,9 +74,9 @@ void who(const int &fd, const std::vector<std::string> &params, \
         // 2. Is the match a channel ? Erase all users not in that channel
         for (it = usersList.begin(); it != usersList.end(); it++)
         {
-            if (std::find((*it)->getChannelsJoined().begin(), \
-                (*it)->getChannelsJoined().end(), mask) \
-                    == (*it)->getChannelsJoined().end())
+            channelJoined = (*it)->getChannelsJoined();
+            if (std::find(channelJoined.begin(), channelJoined.end(), mask) \
+                    == channelJoined.end())
             {
                 usersList.erase(it);
             }
