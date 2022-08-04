@@ -2,6 +2,7 @@
 ################################################################################
 VERSION		= "1.0"
 VCOMMENT	= "This version is almost perfect."
+SERVERINFO  = "Every time you start this server, we plant a tree 🌲."
 HOSTNAME	= $(shell hostname)
 COMPILDATE	= "$(shell date)"
 
@@ -46,6 +47,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/notice.cpp \
 			  srcs/commands/version.cpp \
 			  srcs/commands/who.cpp \
+			  srcs/commands/whois.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/utils/welcome.cpp \
@@ -67,6 +69,7 @@ CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic -g3
 
 PROGRAMVAR		:= -DHOSTNAME=\"$(HOSTNAME)\" -DVERSION=\"$(VERSION)\" \
 				   -DVCOMMENT=\"$(VCOMMENT)\" -DCOMPILDATE=\"$(COMPILDATE)\"
+				   -DSERVERINFO=\"$(SERVERINFO)\"
 				   
 ifeq ($(DEBUG), true)
 	CPPFLAGS	+= -fsanitize=address -g3 -O0

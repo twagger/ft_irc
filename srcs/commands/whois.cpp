@@ -1,9 +1,14 @@
 #include <algorithm>
+#include <sstream>
 
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
 #include "../../includes/exceptions.hpp"
 #include "../../includes/parser.hpp"
+
+#ifndef SERVERINFO
+# define SERVERINFO "No info on this server :("
+#endif
 
 /**
  * @brief This command is used to query information about particular user.
@@ -18,7 +23,7 @@
  *   
  */
 
-std::string getCommonChannel(Server *srv, const int &fd1, const int &fd2)
+static std::string getCommonChannel(Server *srv, const int &fd1, const int &fd2)
 {
     std::deque<std::string>                 channelsJoined1;
     std::deque<std::string>                 channelsJoined2;
@@ -39,125 +44,171 @@ std::string getCommonChannel(Server *srv, const int &fd1, const int &fd2)
     return (std::string());
 }
 
-bool    isOnTheSameChannel(Server *srv, const int &fd1, const int &fd2)
+static bool    isOnTheSameChannel(Server *srv, const int &fd1, const int &fd2)
 { return (!getCommonChannel(srv, fd1, fd2).empty()); }
 
-bool    isUserChanOper(Server *srv, User *user, const std::string channel)
+static void    splitMask(std::deque<std::string> &masks, std::string mask)
 {
-    std::deque<User *>                  userList;
-    std::deque<User *>::const_iterator  it;
+    // only one mask
+    if (mask.find(',') == std::string::npos)
+    {
+        masks.push_back(mask);
+        return;
+    }
 
-    userList = srv->_channelList[channel]->_operators;
-    if (std::find(userList.begin(), userList.end(), user) == userList.end())
-        return (false);
-    return (true);
+    // multiple masks   
+    while (mask.find(',') != std::string::npos) {
+        masks.push_back(mask.substr(0, mask.find(',')));
+        mask.erase(0, mask.find(',') + 1);
+    }
+    masks.push_back(mask);
+}
+
+static void    addVisibleUser(Server *srv, const int &fd, \
+                       std::deque<User *> &usersList, User *user)
+{
+    if (isOnTheSameChannel(srv, fd, user->getFd()))
+        usersList.push_back(user);
+    else if (!user->hasMode(MOD_INVISIBLE))
+        usersList.push_back(user);
+}
+
+static std::string getChannelList(Server *srv, User *user)
+{
+    std::deque<std::string>                 chans = user->getChannelsJoined();
+    std::deque<std::string>::const_iterator itChan;
+    std::deque<User *>                      chanOps;
+    std::string                             res;
+
+    for (itChan = chans.begin(); itChan != chans.end(); ++itChan)
+    {
+        if (itChan != chans.begin())
+            res.append(" ");
+        chanOps = srv->_channelList[*itChan]->_operators;    
+        if (std::find(chanOps.begin(), chanOps.end(), user) != chanOps.end())
+            res.append("@");
+        res.append(*itChan);
+    }
+    return (res);
 }
 
 // Send information about users visible for me
 void whois(const int &fd, const std::vector<std::string> &params, \
          const std::string &, Server *srv)
 {
-    std::string                 masks;
-    std::string                 name;
-    std::string                 channel;
-    std::string                 target;
-    bool                        onlyOpers = false;
-    std::deque<User*>           usersList;
-    std::deque<User*>           allUsers;
-    std::deque<User*>::iterator it;
-    std::deque<std::string>     channelJoined;
+    // Loop and list management
+    std::string                             mask;
+    std::deque<std::string>                 masks;
+    std::deque<std::string>::const_iterator itMasks;
+    std::deque<User*>::iterator             it;
+    std::deque<User*>                       usersList;
+    std::deque<User*>                       allUsers;
+    // Infos to send back to requester
+    std::stringstream                       ss;
+    std::string                             nickname;
+    std::string                             username;
+    std::string                             realname;
+    std::string                             hostname;
+    std::string                             servername;
+    std::string                             serverinfos;
+    std::string                             channelList;
+    int                                     seconds;
+    bool                                    isOper;
 
     // COMMAND EXECUTION
     // Params
-    if (params.size() > 0)
-    {
-        if (params.size() > 1)
+    try {
+        if (params.size() == 0)
+            throw nonicknamegivenException();
+        if (params.size() > 0)
         {
-            if (!matchMask(srv->getHostname().c_str(), params[0].c_str()))
-                throw nosuchserverException(params[0]);
-            masks = params[1];
+            if (params.size() > 1)
+            {
+                if (!matchMask(srv->getHostname().c_str(), params[0].c_str())) {
+                    throw nosuchserverException(params[0]);
+                }
+                mask = params[1];
+            }
+            else
+                mask = params[0];
         }
-        else
-            masks = params[1];
     }
+    // EXCEPTIONS THAT END THE COMMAND
+    catch (nonicknamegivenException &e) {e.reply(srv, fd); return; }
+    catch (nosuchserverException &e) {e.reply(srv, fd); return; }
 
-    // 1. All visible users : same channel or non "i"
+    // 1. Split the mask parameter into a deque
+    splitMask(masks, mask);
+
     allUsers = srv->getAllUsers();
-    for (it = allUsers.begin(); it != allUsers.end(); it++)
+
+    // 2. Add users that fit the mask
+    for (itMasks = masks.begin(); itMasks != masks.end(); ++itMasks)
     {
-        // Check if user is non invisible
-        if ((*it)->hasMode(MOD_INVISIBLE) == false || (*it)->getFd() == fd) 
-            usersList.push_back(*it);
-        else if (isOnTheSameChannel(srv, fd, (*it)->getFd()) == true)
-            usersList.push_back(*it);
-    }
-
-    if (srv->_channelList.find(mask) != srv->_channelList.end()) {
-        // 2. Is the match a channel ? Erase all users not in that channel
-        for (it = usersList.begin(); it != usersList.end();)
-        {
-            channelJoined = (*it)->getChannelsJoined();
-            if (std::find(channelJoined.begin(), channelJoined.end(), mask) \
-                    == channelJoined.end())
-            {
-                it = usersList.erase(it);
+        if ((*itMasks).find('*') == std::string::npos
+            && (*itMasks).find('?') == std::string::npos){
+            // The mask is a nickname !
+            try {
+                for (it = allUsers.begin(); it != allUsers.end(); ++it)
+                {
+                    if ((*it)->getNickname().compare(*itMasks) == 0)
+                    {
+                        addVisibleUser(srv, fd, usersList, *it);
+                        break;
+                    }
+                }
+                if (it == allUsers.end())
+                    throw nosuchnickException(*itMasks);
             }
-            else
-                ++it;
+            catch (nosuchnickException &e) {e.reply(srv, fd);}
         }
-    }
-    else {
-        // 3. The mask is not a channel : Check the mask against users's Host, 
-        // Server, Real name, Nickname
-        for (it = usersList.begin(); it != usersList.end();)
-        {
-            // Host
-            if ((matchMask((*it)->getHostname().c_str(), mask.c_str()) == true)
-            // Server
-            || (matchMask(srv->getHostname().c_str(), mask.c_str()) == true)
-            // Real name
-            || (matchMask((*it)->getFullname().c_str(), mask.c_str()) == true)
-            // Nickname
-            || (matchMask((*it)->getNickname().c_str(), mask.c_str()) == true))
+        else {
+            // The mask is ... a mask
+            for (it = allUsers.begin(); it != allUsers.end(); ++it)
             {
-                ++it;
-                continue;
+                // Host
+                if ((matchMask((*it)->getHostname().c_str(), (*itMasks).c_str()))
+                // Server
+                || (matchMask(srv->getHostname().c_str(), (*itMasks).c_str()))
+                // Real name
+                || (matchMask((*it)->getFullname().c_str(), (*itMasks).c_str()))
+                // Nickname
+                || (matchMask((*it)->getNickname().c_str(), (*itMasks).c_str())))
+                {
+                    addVisibleUser(srv, fd, usersList, *it);
+                }
             }
-            else
-                it = usersList.erase(it);
         }
     }
 
-    if (onlyOpers == true) {
-        // 4. If "o" option is set, apply oper option on the list
-        for (it = usersList.begin(); it != usersList.end();)
-        {
-            // If user hasMode(MOD_OPER) == false > Remove
-            if ((*it)->hasMode(MOD_OPER) == false)
-                it = usersList.erase(it);
-            else
-                ++it;
-        }
-    }
-
-    // 5. Loop on the resulting user list and send information about users
+    // 3. Loop on the resulting user list and send information about users
     for (it = usersList.begin(); it != usersList.end(); it++)
     {
-        channel = getCommonChannel(srv, fd, (*it)->getFd());
-        srv->sendClient(fd, \
-           numericReply(srv, fd, "352", RPL_WHOREPLY(\
-            channel, \
-            (*it)->getUsername(), \
-            (*it)->getHostname(), \
-            srv->getHostname(), \
-            (*it)->getNickname(), \
-            std::string("H"), \
-            ( (*it)->hasMode(MOD_OPER) ? std::string("*") : std::string() ), \
-            ( isUserChanOper(srv, *it, channel) ? std::string("@") 
-                                                : std::string() ), \
-            (*it)->getFullname())));
+        // Infos for each user
+        nickname = (*it)->getNickname();
+        username = (*it)->getUsername();
+        realname = (*it)->getFullname();
+        hostname = (*it)->getHostname();
+        servername = srv->getHostname();
+        serverinfos = std::string(SERVERINFO);
+        seconds = difftime(time(NULL), (*it)->getLastActivityTime());
+        ss << seconds;
+        isOper = (*it)->hasMode(MOD_OPER);
+        channelList = getChannelList(srv, (*it));
+
+        // Send RPL
+        srv->sendClient(fd, numericReply(srv, fd, "311", \
+            RPL_WHOISUSER(nickname, username, hostname, realname)));
+        srv->sendClient(fd, numericReply(srv, fd, "312", \
+            RPL_WHOISSERVER(nickname, servername, serverinfos)));
+        srv->sendClient(fd, numericReply(srv, fd, "319", \
+            RPL_WHOISCHANNELS(nickname, channelList)));
+        if (isOper)
+            srv->sendClient(fd, numericReply(srv, fd, "313", \
+                RPL_WHOISOPERATOR()));
+        srv->sendClient(fd, numericReply(srv, fd, "317", \
+            RPL_WHOISIDLE(nickname, ss.str())));
     }
-    if (params.size() > 0)
-        name = params[0];
-    srv->sendClient(fd, numericReply(srv, fd, "315", RPL_ENDOFWHO(name)));
+    srv->sendClient(fd, numericReply(srv, fd, "318", RPL_ENDOFWHOIS()));
 }
+

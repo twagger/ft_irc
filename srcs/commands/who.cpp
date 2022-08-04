@@ -15,7 +15,7 @@
  *   
  */
 
-std::string getCommonChannel(Server *srv, const int &fd1, const int &fd2)
+static std::string getCommonChannel(Server *srv, const int &fd1, const int &fd2)
 {
     std::deque<std::string>                 channelsJoined1;
     std::deque<std::string>                 channelsJoined2;
@@ -36,10 +36,10 @@ std::string getCommonChannel(Server *srv, const int &fd1, const int &fd2)
     return (std::string());
 }
 
-bool    isOnTheSameChannel(Server *srv, const int &fd1, const int &fd2)
+static bool    isOnTheSameChannel(Server *srv, const int &fd1, const int &fd2)
 { return (!getCommonChannel(srv, fd1, fd2).empty()); }
 
-bool    isUserChanOper(Server *srv, User *user, const std::string channel)
+static bool    isUserChanOper(Server *srv, User *user, const std::string channel)
 {
     std::deque<User *>                  userList;
     std::deque<User *>::const_iterator  it;

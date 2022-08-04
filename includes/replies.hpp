@@ -96,9 +96,16 @@
     #define ERR_WILDTOPLEVEL(mask)                          (mask + " :Wildcard in toplevel domain\r\n")                                                // 414
     #define ERR_CANNOTSENDTOCHAN(channame)                  (channame + " :Cannot send to channel\r\n")                                                 // 404
 
-    // WHO / WHOIS
+    // WHO
     #define RPL_WHOREPLY(channel, username, host, server, nickname, presence, star, status, realname)   (channel + " " + username + " " + host + " " + server + " " + nickname + " " + presence + star + status + " :0 " + realname + "\r\n") // 352
-    #define RPL_ENDOFWHO(name)                              (name + "  :End of WHO list\r\n")                                                           // 315
+    #define RPL_ENDOFWHO(name)                              (name + " :End of WHO list\r\n")                                                            // 315
+    // WHOIS
+    #define RPL_WHOISUSER(nickname, username, hostname, realname) (nickname + " " + username + " " + hostname + " * :" + realname + "\r\n")             // 311
+    #define RPL_WHOISCHANNELS(nickname, channelslist)       (nickname + " :" + channelslist + "\r\n")                                                   // 319
+    #define RPL_WHOISIDLE(nickname, seconds)                (nickname + " " + seconds + " :seconds idle\r\n")                                           // 317
+    #define RPL_WHOISSERVER(nickname, server, servinfos)    (nickname + " " + server + " :" + servinfos + "\r\n")                                       // 312
+    #define RPL_WHOISOPERATOR(nickname)                     (nickname + " :is an IRC operator\r\n")                                                     // 313
+    #define RPL_ENDOFWHOIS(nickname)                        (nickname + " :End of WHOIS list\r\n")                                                      // 318
 
 	// OTHER ERRORS:
 	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")												// 401
