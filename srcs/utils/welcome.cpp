@@ -1,5 +1,6 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
+#include "../../includes/Server.hpp"
 
 bool 	isAuthenticationCmd(std::string cmd) {
 	if (cmd.compare("USER") == 0 || cmd.compare("NICK") == 0
