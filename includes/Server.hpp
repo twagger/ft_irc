@@ -84,15 +84,15 @@ class Server
         // Member functions
         void    start(void);
         void    sendClient(const int &fd, const std::string &message, \
-                           const int &originFd = -1) const;
+                           const int &originFd = -1);
         void    sendClient(const std::set<int> &fds, \
                             const std::string &message, \
-                            const int &originFd= -1) const;
+                            const int &originFd= -1);
         void    broadcast(const std::string &message, \
-                          const int &originFd = -1) const;
+                          const int &originFd = -1);
         void    sendChannel(const std::string &channel, \
                             const std::string &message, \
-                            const int &originFd = -1) const;
+                            const int &originFd = -1);
         void    killConnection(const int &fd);
 
         // exceptions
@@ -130,6 +130,9 @@ class Server
         { public: virtual const char *what() const throw(); };
 
         class readException : public std::exception
+        { public: virtual const char *what() const throw(); };
+
+        class closeException : public std::exception
         { public: virtual const char *what() const throw(); };
  
         std::map<std::string, Channel *>   _channelList;

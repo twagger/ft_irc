@@ -446,7 +446,8 @@ void	Server::_clearAll(void) {
 				{ printError(e.what(), 1, true); }
 			// close fd for each user & delete user
 			if (userIt->second) {
-				close((userIt->second)->getFd());
+				if (close((userIt->second)->getFd()) == -1)
+                    throw Server::closeException();
 				delete userIt->second;
 			}
 		}
@@ -454,9 +455,13 @@ void	Server::_clearAll(void) {
 
 	// close epoll functional fds
 	if (this->_sockfd)
-		close(this->_sockfd);
+		if (close(this->_sockfd) == -1) {
+            throw Server::closeException();
+        }
 	if (this->_pollfd)
-		close(this->_pollfd);
+		if (close(this->_pollfd) == -1) {
+            throw Server::closeException();
+        }
 }
 
 /* ************************************************************************** */
@@ -514,6 +519,7 @@ void    Server::start(void)
 	catch (Server::acceptException &e){ _clearAll(); printError(e.what(), 1, true); return; }
 	catch (Server::sendException &e){ _clearAll(); printError(e.what(), 1, true); return; }
 	catch (Server::readException &e){ _clearAll(); printError(e.what(), 1, true); return; }
+	catch (Server::closeException &e){ _clearAll(); printError(e.what(), 1, true); return; }
 }
 
 // KILL CONNECTION
@@ -552,25 +558,32 @@ void    Server::killConnection(const int &fd)
     if (epoll_ctl(this->_pollfd, EPOLL_CTL_DEL, fd, NULL) == -1)
         throw Server::pollDelException();
     // close the socket  ----------------------------------------------------- /
-    close(fd);
+    if (close(fd) == -1) {
+        throw Server::closeException();
+    }
 }
 
 // SEND CLIENT (ONE FD)
 void    Server::sendClient(const int &fd, const std::string &message, \
-                           const int &originFd) const
+                           const int &originFd)
 {
     if (originFd != -1 && originFd == fd)
         return;
     if (this->_userList.find(fd) == this->_userList.end())
         throw Server::invalidFdException();
     if (send(fd, message.c_str(), message.length(), MSG_NOSIGNAL) == -1)
-        throw Server::sendException();
+    {
+        if (errno == EPIPE)
+            clearUser(this, this->getUserByFd(fd));
+        else
+            throw Server::sendException();
+    }
 }
 
 // SEND CLIENT (MULTIPLE FDS)
 void    Server::sendClient(const std::set<int> &fds, \
                            const std::string &message, \
-                           const int &originFd) const
+                           const int &originFd)
 {
     std::set<int>::const_iterator it;
 
@@ -581,7 +594,7 @@ void    Server::sendClient(const std::set<int> &fds, \
 // SEND CHANNEL
 void    Server::sendChannel(const std::string &channel, \
                             const std::string &message, \
-                            const int &originFd) const
+                            const int &originFd)
 {
     std::map<std::string, Channel *>::const_iterator    itChannel;
     std::deque<User *>::const_iterator                  itUsers;
@@ -599,7 +612,7 @@ void    Server::sendChannel(const std::string &channel, \
 }
 
 // BROADCAST
-void    Server::broadcast(const std::string &message,const int &originFd) const
+void    Server::broadcast(const std::string &message,const int &originFd)
 {
     std::map<const int, User *>::const_iterator it;
     std::set<int>                               fds;
@@ -649,3 +662,6 @@ const char	*Server::sendException::what() const throw()
 
 const char	*Server::readException::what() const throw()
 { return ("Read error: "); }
+
+const char	*Server::closeException::what() const throw()
+{ return ("Close error: "); }
