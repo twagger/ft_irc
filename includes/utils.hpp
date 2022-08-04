@@ -47,6 +47,7 @@ std::string              getChannelTopic(std::string channelName, std::map<std::
     Channel *> channelList);
 std::vector<std::string> getChannelKey(std::vector<std::string> parameter);
 bool findUserOnChannel(std::deque<User *> userList, User *currentUser);
+bool findBannedUserOnChannel(std::deque<std::string> userList, std::string currentUser);
 
 // Authenticate users
 bool 		isAuthenticationCmd(std::string cmd);

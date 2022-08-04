@@ -120,3 +120,18 @@ bool findUserOnChannel(std::deque<User *> userList, User *currentUser)
     }
     return (false);
 }
+
+bool findBannedUserOnChannel(std::deque<std::string> userList, std::string currentUser)
+{
+    std::deque<std::string>::iterator it;
+    
+    if (userList.empty() == true)
+        return (false);
+    it = userList.begin();
+    for (; it != userList.end(); it++)
+    {
+        if (*it == currentUser)
+            return (true);
+    }
+    return (false);
+}

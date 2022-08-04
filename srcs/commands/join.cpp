@@ -167,8 +167,8 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
                 /* According to RFC 2811, "A user who is banned from a channel
                  * and who carries an invitation
                  * sent by a channel operator is allowed to join the channel" */
-                if (findUserOnChannel(itMap->second->_bannedUsers,
-                        server->getUserByFd(fdUser)) == true
+                if (findBannedUserOnChannel(itMap->second->_bannedUsers,
+                    server->getUserByFd(fdUser)->getNickname()) == true
                     && findUserOnChannel(itMap->second->_invitees,
                         server->getUserByFd(fdUser)) == false)
                     return (server->sendClient(fdUser, numericReply(server, fdUser,
