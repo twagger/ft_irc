@@ -35,7 +35,7 @@ int main(int ac, char **av)
     ss >> port;
     password = av[2];
 
-	// signal CTRL-C handler --------------------------------------------- /
+	// signal CTRL-C handler ------------------------------------------------- /
 	signal(SIGINT, signalHandler);
 
     // server creation ------------------------------------------------------- /
