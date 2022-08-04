@@ -1,5 +1,6 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
+#include "../../includes/Server.hpp"
 
 // nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
 //  1 =>  A-Z / a-z ";" "[", "]", "\", "`", "_", "^", "{", "|", "}"

@@ -1,5 +1,6 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
+#include "../../includes/Server.hpp"
 
 void	pass(const int &fd, const std::vector<std::string> &params, const std::string &,
 			Server *srv) 
