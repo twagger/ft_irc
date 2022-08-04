@@ -5,7 +5,17 @@
 #include "../../includes/exceptions.hpp"
 #include "../../includes/parser.hpp"
 
-bool    isOnTheSameChannel(Server *srv, const int &fd1, const int &fd2)
+/**
+ * @brief The WHO command is used by a client to generate a query which returns
+ * a list of information which 'matches' the <mask> parameter given by
+ * the client.
+ * 
+ * Errors handled:
+ * - ERR_NOSUCHSERVER
+ *   
+ */
+
+std::string getCommonChannel(Server *srv, const int &fd1, const int &fd2)
 {
     std::deque<std::string>::const_iterator it;
     std::deque<std::string>::const_iterator itRes;
@@ -18,16 +28,20 @@ bool    isOnTheSameChannel(Server *srv, const int &fd1, const int &fd2)
         itRes = std::find(user2->getChannelsJoined().begin(), \
                   user2->getChannelsJoined().end(), *it);
         if (itRes != user2->getChannelsJoined().end())
-            return (true);
+            return (*it);
     }
-    return (false);
+    return (std::string());
 }
+
+bool    isOnTheSameChannel(Server *srv, const int &fd1, const int &fd2)
+{ return (!getCommonChannel(srv, fd1, fd2).empty()); }
 
 // Send information about users visible for me
 void who(const int &fd, const std::vector<std::string> &params, \
          const std::string &, Server *srv)
 {
     std::string                 mask;
+    std::string                 name;
     bool                        onlyOpers = false;
     std::deque<User*>           usersList;
     std::deque<User*>::iterator it;
@@ -41,18 +55,18 @@ void who(const int &fd, const std::vector<std::string> &params, \
             onlyOpers = true;
     }
 
-    // Try to match all users visible to me : same channel or non "i"
+    // 1. All visible users : same channel or non "i"
     for (it = srv->getAllUsers().begin(); it != srv->getAllUsers().end(); it++)
     {
         // Check if user is non invisible
-        if ((*it)->hasMode(MOD_INVISIBLE) == false) 
+        if ((*it)->hasMode(MOD_INVISIBLE) == false || (*it)->getFd() == fd) 
             usersList.push_back(*it);
         else if (isOnTheSameChannel(srv, fd, (*it)->getFd()) == true)
             usersList.push_back(*it);
     }
 
     if (srv->_channelList.find(mask) != srv->_channelList.end()) {
-        // The mask match a channel
+        // 2. Is the match a channel ? Erase all users not in that channel
         for (it = usersList.begin(); it != usersList.end(); it++)
         {
             if (std::find((*it)->getChannelsJoined().begin(), \
@@ -64,7 +78,8 @@ void who(const int &fd, const std::vector<std::string> &params, \
         }
     }
     else {
-        // Check the mask against users's Host, Server, Real name, Nickname
+        // 3. The mask is not a channel : Check the mask against users's Host, 
+        // Server, Real name, Nickname
         for (it = usersList.begin(); it != usersList.end(); it++)
         {
             // Host
@@ -84,7 +99,7 @@ void who(const int &fd, const std::vector<std::string> &params, \
     }
 
     if (onlyOpers == true) {
-        // Apply oper option on the list
+        // 4. If "o" option is set, apply oper option on the list
         for (it = usersList.begin(); it != usersList.end(); it++)
         {
             // If user hasMode(MOD_OPER) == false > Remove
@@ -93,6 +108,22 @@ void who(const int &fd, const std::vector<std::string> &params, \
         }
     }
 
-    // Send information about all users in the list
-    
+    // 5. Loop on the resulting user list and send information about users
+    for (it = usersList.begin(); it != usersList.end(); it++)
+    {
+        srv->sendClient(fd, \
+           numericReply(srv, fd, "352", RPL_WHOREPLY(\
+            getCommonChannel(srv, fd, (*it)->getFd()), \
+            (*it)->getUsername(), \
+            (*it)->getHostname(), \
+            srv->getHostname(), \
+            (*it)->getNickname(), \
+            std::string("H"), \
+            ( (*it)->hasMode(MOD_OPER) ? std::string("*") : std::string() ), \
+            std::string(), \
+            (*it)->getFullname())));
+    }
+    if (params.size() > 0)
+        name = params[0];
+    srv->sendClient(fd, numericReply(srv, fd, "315", RPL_ENDOFWHO(name)));
 }
