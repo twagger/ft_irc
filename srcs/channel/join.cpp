@@ -145,14 +145,17 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
             {
                 if (checkKey(itChan - channel.begin(), key, itMap, server, fdUser) < 0)
                     return;
-                if (itMap->second->hasMode(MOD_INVITE) == true
-                    && findUserOnChannel(itMap->second->_invitees,
+                if (findUserOnChannel(itMap->second->_invitees,
                         server->getUserByFd(fdUser)) == true)
                     return (server->sendClient(fdUser, numericReply(server, fdUser,
                                                                     "473", ERR_INVITEONLYCHAN(*itChan))));
-                if (itMap->second->_bannedUsers.empty() == false
-                    && findUserOnChannel(itMap->second->_bannedUsers,
-                        server->getUserByFd(fdUser)) == true)
+                /* According to RFC 2811, "A user who is banned from a channel
+                 * and who carries an invitation
+                 * sent by a channel operator is allowed to join the channel" */
+                if (findUserOnChannel(itMap->second->_bannedUsers,
+                        server->getUserByFd(fdUser)) == true
+                    && findUserOnChannel(itMap->second->_invitees,
+                        server->getUserByFd(fdUser)) == false)
                     return (server->sendClient(fdUser, numericReply(server, fdUser,
                                                                     "474", ERR_BANNEDFROMCHAN(*itChan))));
                 addUserToChannel(itMap, server->getUserByFd(fdUser));

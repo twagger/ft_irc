@@ -1,5 +1,6 @@
 #include "../../includes/commands.hpp"
 #include "../../includes/utils.hpp"
+#include "../../includes/parser.hpp"
 
 /* ************************************************************************** */
 /* USER		                                                                  */
@@ -196,28 +197,59 @@ int checkUserExists(User *user, const std::vector<std::string> params, const int
 
 void handleChannelReply(const std::vector<std::string> params, const int &fd, Server *srv)
 {
+	std::string channel = params[0];
+	std::string mode = params[1];
+	std::string user = params[2];
+
 	// Case where mode is only +i
 	if (params.size() < 3)
-		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-			params[0] + " " + params[1])));
+		return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
+			channel + " " + mode)));
 	// Case where mode is ban with a user as a third parameter
-	if (params[1].find('b') != std::string::npos
-		&& params[2].find('*') == std::string::npos)
-		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-			params[0] + " " + params[1] + " " + params[2] + "!*@*")));
+	if (mode.find('b') != std::string::npos
+		&& user.find('*') == std::string::npos)
+		return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
+			channel + " " + mode + " " + user + "!*@*")));
 	// Case where mode is operator and key
-	return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-		params[0] + " " + params[1] + " " + params[2])));
+	return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
+		channel + " " + user + " " + mode)));
+}
+
+std::vector<User *>	getUser(Server *srv, std::vector<std::string> params)
+{
+	std::vector<User *> userList;
+	std::deque<User *> usersOnChannel = srv->_channelList.find(params[0])->second->_users;
+	std::deque<User *>::iterator itUser;
+	std::string channel = params[0];
+	std::string mode = params[1];
+	std::string nickname = params[2];
+
+	// Case where the mode is not ban
+	if (mode.find('b') == std::string::npos)
+		userList.push_back(srv->getUserByNickname(nickname));
+	// Case where the mode is ban but no mask is set
+	else if (nickname.find('*') == std::string::npos)
+		userList.push_back(srv->getUserByNickname(nickname));
+	// Case where the mode is ban
+	// We need to check if the mask is valid
+	else if (nickname[0] == '*')
+	{
+		for (itUser = usersOnChannel.begin(); itUser != usersOnChannel.end(); itUser++)
+		{
+			if (matchMask((*itUser)->getHostname().c_str(), nickname.c_str()) == true
+				|| matchMask(srv->getHostname().c_str(), nickname.c_str()) == true)
+		}
+	}
 }
 
 void addModesChannel(const std::vector<std::string> params, int start, int stop,
 					 const int &fd, Server *srv)
 {
 	Channel *channel = srv->_channelList.find(params[0])->second;
-	User *user = NULL;
+	std::vector<User *> user;
 	
 	if (params.size() > 2)
-		user = srv->getUserByNickname(params[2]);
+		user = getUser(srv, params);
 
 	for (int i = start; i < stop; i++)
 	{
@@ -236,10 +268,10 @@ void addModesChannel(const std::vector<std::string> params, int start, int stop,
 			break ;
 		case 'o':
 			// Check that the user exists and a user was given in parameter
-			if (checkUserExists(user, params, fd, srv, 0) < 0)
+			if (checkUserExists(user[0], params, fd, srv, 0) < 0)
 				return ;
 			channel->addMode(MOD_OPERATOR);
-			channel->addOperator(user);
+			channel->addOperator(user[0]);
 			break ;
 		case 'b':
 			// Check that the user exists and a user was given in parameter
@@ -260,10 +292,10 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 						const int &fd, Server *srv)
 {
 	Channel *channel = srv->_channelList.find(params[0])->second;
-	User *user = NULL;
+	std::vector<User *> user;
 	 
 	 if (params.size() > 2)
-	 	user = srv->getUserByNickname(params[2]);
+		user = getUser(srv, params);
 
 	for (int i = start; i < stop; i++)
 	{
@@ -278,9 +310,9 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 			channel->setKey("");
 			break ;
 		case 'o':
-			if (checkUserExists(user, params, fd, srv, 0) < 0)
+			if (checkUserExists(user[0], params, fd, srv, 0) < 0)
 				return ;
-			channel->removeOperator(user);
+			channel->removeOperator(user[0]);
 			channel->removeMode(MOD_OPERATOR);
 			break ;
 		case 'b':
