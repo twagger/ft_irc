@@ -17,16 +17,18 @@
 
 std::string getCommonChannel(Server *srv, const int &fd1, const int &fd2)
 {
+    std::deque<std::string>                 channelsJoined1;
+    std::deque<std::string>                 channelsJoined2;
     std::deque<std::string>::const_iterator it;
     std::deque<std::string>::const_iterator itRes;
     User                                    *user1 = srv->getUserByFd(fd1);
     User                                    *user2 = srv->getUserByFd(fd2);
 
-    for (it = user1->getChannelsJoined().begin(); \
-         it != user1->getChannelsJoined().end(); ++it)
+    channelsJoined1 = user1->getChannelsJoined();
+    for (it = channelsJoined1.begin(); it != channelsJoined1.end(); ++it)
     {
-        itRes = std::find(user2->getChannelsJoined().begin(), \
-                  user2->getChannelsJoined().end(), *it);
+        channelsJoined2 = user2->getChannelsJoined();
+        itRes = std::find(channelsJoined2.begin(), channelsJoined2.end(), *it);
         if (itRes != user2->getChannelsJoined().end())
             return (*it);
     }
@@ -44,6 +46,7 @@ void who(const int &fd, const std::vector<std::string> &params, \
     std::string                 name;
     bool                        onlyOpers = false;
     std::deque<User*>           usersList;
+    std::deque<User*>           allUsers;
     std::deque<User*>::iterator it;
 
     // COMMAND EXECUTION
@@ -56,7 +59,8 @@ void who(const int &fd, const std::vector<std::string> &params, \
     }
 
     // 1. All visible users : same channel or non "i"
-    for (it = srv->getAllUsers().begin(); it != srv->getAllUsers().end(); it++)
+    allUsers = srv->getAllUsers();
+    for (it = allUsers.begin(); it != allUsers.end(); it++)
     {
         // Check if user is non invisible
         if ((*it)->hasMode(MOD_INVISIBLE) == false || (*it)->getFd() == fd) 
