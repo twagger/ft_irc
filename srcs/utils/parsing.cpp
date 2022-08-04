@@ -2,17 +2,15 @@
 #include "../../includes/utils.hpp"
 
 // Split a string by irc message delimiter (\n\r) and return a string vector
-std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
+std::vector<std::string>  splitBy(std::string str, const std::string &delimiter, std::string *buffer)
 {
     std::vector<std::string>    result;
-    size_t                      end;
+	size_t                      end;
 
     // first check 
     end = str.find(delimiter);
     if (end == std::string::npos)
-        return (std::vector<std::string>()); // empty vector
-        //throw std::runtime_error("IRC message must end with CRLF");
-
+        return (std::vector<std::string>());
     // save first command in vector
     if (end + delimiter.length() > MAX_CMD_LEN)
         throw std::runtime_error("Request too long");
@@ -31,6 +29,9 @@ std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
         str.erase(0, end + delimiter.length());
         end = str.find(delimiter);
     }
+	(*buffer).clear();
+	if (!str.empty())
+		(*buffer) = str;
     return (result);
 }
 
@@ -114,4 +115,19 @@ void  splitCmds(std::vector<std::string> cmd_strings, std::vector<Command> *cmds
             }
         }
     }
+}
+
+void	displayCommands(std::vector<Command> cmds) {
+
+	std::vector<Command>::iterator  it;
+	std::vector<std::string>::iterator  it2;
+	for (it = cmds.begin(); it < cmds.end(); ++it)
+	{
+		std::cout << "\nPREFIX : " << it->prefix << std::endl;
+		std::cout << "CMD : " << it->command << std::endl;
+		for (it2 = it->params.begin(); it2 < it->params.end(); ++it2)
+		{
+			std::cout << "PARAM : " << *it2 << std::endl;
+		}
+	}
 }

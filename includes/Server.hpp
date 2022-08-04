@@ -25,7 +25,7 @@
 #define KILLTIME 3600		// in seconds = 1h
 
 // Config files
-#define OPERCONF "operhost.config"
+#define OPERCONF "conf/operhost.config"
 
 // Program infos
 #ifndef VERSION
@@ -164,7 +164,8 @@ class Server
         int                     _pollfd;
         int                     _sockfd;
 
-        std::map<const int, User *>   _userList;
+        std::map<const int, User *>	_userList;
+		std::map<int, std::string>	_buffersByFd;
 
 };
 
