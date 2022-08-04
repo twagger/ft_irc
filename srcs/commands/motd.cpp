@@ -30,14 +30,14 @@ std::string createModtStr(Server *srv, const int &fd, std::string &filename)
 
     // Read the file one line at a time and append the line to the reply
     replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("\
-        Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - \
-        benvinguts - velkommen"))));
+		Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - \
+		benvinguts - velkommen"))));
 	try {
 		while (std::getline(infile, line))
             replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(line)));
 	} catch (std::ios_base::failure &e) {}
     replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("Des \
-        bisous de la Space team <3"))));
+		bisous de la Space team <3"))));
 
 	return (replyMsg);
 }

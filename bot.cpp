@@ -49,7 +49,7 @@ bool connectServiceBot(int *sockfd) {
 
 	str_to = "PASS pwd\r\nUSER amongus 16 * :IRC bot\r\nNICK Impostor\r\n";
 	if (send(*sockfd, str_to.c_str(), str_to.size(), 0) == -1)
-		perror("send");
+		printError("send", 1, true);
 	std::cout << "IRCbot connection request: " << std::endl << str_to << std::endl;
 	return true;
 }
@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
 	char buf[MAXDATASIZE];
 	std::string str_to;
 
-	if (argc != 2 && argc != 3) {
-		std::cerr << "usage: ./bot hostname [PORT]" << std::endl;
+	if (argc != 3 && argc != 4) {
+		std::cerr << "usage: ./bot hostname password [PORT]" << std::endl;
 		exit(1);
 	}
 	else if (argc == 3)
@@ -77,15 +77,14 @@ int main(int argc, char *argv[])
 	while (1) {
 
 		if ((numbytes = recv(sockfd, buf, MAXDATASIZE, 0)) == -1) {
-			perror("recv");
+			printError("recv", 1, true);
 			exit(1);
 		}
 		else if (numbytes > 0) {
 			buf[numbytes] = '\0';
-			printf("Received: %s",buf);
+			printf("%s", buf);
 		}
 	}
-
 	close(sockfd);
 	return 0;
 }

@@ -4,14 +4,11 @@
 #include <iostream>
 # include <string>
 
-#define USERMODES "a = away (not active); i = invisible; w = wallops (not active); r = restricted; o = Server operator; s = Server's notice"
+#define USERMODES "a = away (not active); B = bot; i = invisible; w = wallops (not active); r = restricted; o = Server operator; s = Server's notice"
 #define CHANNELMODES "b = ban; i = invite only; k = channel's key; o = channel's operator rights"
 #define NAMESPECIALS ";[]`_^{|}\\"
 
 // LIST OF SERVER REPLIES
-// find them here: https://datatracker.ietf.org/doc/html/rfc2812#section-5.1
-
-// USE AS: 	numericReply(irc, fd, "461", ERR_NEEDMOREPARAMS(std::string("CMD")));
 
 // CONNECTION REGISTRATION
 
@@ -19,7 +16,9 @@
 	#define	RPL_WELCOME(nick, username, clientHost)			("Welcome to the Internet Relay Network " + nick + "!" + username + "@" + clientHost + "\r\n")		// 001
 	#define	RPL_YOURHOST(serverName, version)				("Your host is " + serverName + ", running version " + version + "\r\n")							// 002
 	#define	RPL_CREATED(date)								("This server was created " + date + "\r\n")														// 003
-	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " " + userModes + " " + channelModes + "\r\n")				// 004
+	#define RPL_MYINFO(serverName, version, userModes, channelModes) (serverName + " " + version + " User modes: " + userModes + " Channel modes: " + channelModes + "\r\n")				// 004
+	// SERVICE MESSAGES
+	#define RPL_YOURESERVICE(servicename)					("You are service " + servicename + "\r\n")															//383
 
 	// CHANNELS
 	#define RPL_TOPIC(channelName, topic)					(channelName + " :" + topic + "\r\n")																// 332
@@ -60,22 +59,15 @@
 	#define ERR_KEYSET(channel)								(channel + " Channel key already set" + "\r\n")												// 467
 	#define ERR_UNKNOWNMODE(mode, channel)					(mode +  ":is unknown mode char to me for " + channel + "\r\n")								// 472
 
-	// USER
-	// #define ERR_NEEDMOREPARAMS 461
-	// #define  ERR_ALREADYREGISTRED 462
-
 	// OPER
 	#define RPL_YOUREOPER									(":You are now an IRC operator\r\n")														// 381
 	#define ERR_PASSWDMISMATCH								(":Password incorrect\r\n")																	// 464
 	#define ERR_NOOPERHOST									(":No O-lines for your host\r\n")															// 491
-	// #define ERR_NEEDMOREPARAMS 461
-
+	
 	// USER MODE
 	#define RPL_UMODEIS(userModeStr) 						(userModeStr + "\r\n")																		// 221
 	#define ERR_UMODEUNKNOWNFLAG 							(":Unknown MODE flag\r\n")																	// 501
 	#define ERR_USERSDONTMATCH 								(":Cannot change mode for other users\r\n")													// 502
-	//	#define	ERR_NOSUCHNICK(nickname)						(nickname + " :No such nick/channel" + "\r\n")	
-	// #define ERR_NEEDMOREPARAMS 461
 
     // MOTD
     #define ERR_NOMOTD                                      (":MOTD File is missing\r\n")                                                               // 422
@@ -99,7 +91,8 @@
     // WHO
     #define RPL_WHOREPLY(channel, username, host, server, nickname, presence, star, status, realname)   (channel + " " + username + " " + host + " " + server + " " + nickname + " " + presence + star + status + " :0 " + realname + "\r\n") // 352
     #define RPL_ENDOFWHO(name)                              (name + " :End of WHO list\r\n")                                                            // 315
-    // WHOIS
+    
+	// WHOIS
     #define RPL_WHOISUSER(nickname, username, hostname, realname) (nickname + " " + username + " " + hostname + " * :" + realname + "\r\n")             // 311
     #define RPL_WHOISCHANNELS(nickname, channelslist)       (nickname + " :" + channelslist + "\r\n")                                                   // 319
     #define RPL_WHOISIDLE(nickname, seconds)                (nickname + " " + seconds + " :seconds idle\r\n")                                           // 317
@@ -116,9 +109,8 @@
 	#define	ERR_NOPRIVILEGES        						(":Permission denied - You are not an IRC operator\r\n")			        	            // 481
     #define ERR_CANTKILLSERVER								(":You can't kill a server!\r\n")	                                                        // 483
 
-	// LIST OF CLIENT ORIGINATED REPLIES
 
-	// Use as: clientReply()
+	// LIST OF CLIENT ORIGINATED REPLIES
 
 	//ADDITIONAL CLIENT REPLIES
     #define	PING(origin)                                    ("PING " + origin + "\r\n")
