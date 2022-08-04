@@ -20,13 +20,13 @@ SRCS		= srcs/main.cpp \
 			  srcs/server/Server.cpp \
 		      srcs/server/exceptions.cpp \
 			  srcs/channel/channel.cpp \
-			  srcs/channel/join.cpp \
-			  srcs/channel/part.cpp \
-			  srcs/channel/invite.cpp \
-			  srcs/channel/kick.cpp \
-			  srcs/channel/topic.cpp \
-			  srcs/channel/list.cpp \
-			  srcs/channel/names.cpp \
+			  srcs/commands/join.cpp \
+			  srcs/commands/part.cpp \
+			  srcs/commands/invite.cpp \
+			  srcs/commands/kick.cpp \
+			  srcs/commands/topic.cpp \
+			  srcs/commands/list.cpp \
+			  srcs/commands/names.cpp \
 			  srcs/user/User.cpp \
 			  srcs/commands/cap.cpp \
 			  srcs/commands/die.cpp \
