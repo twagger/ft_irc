@@ -142,9 +142,9 @@ class Server
 
         // Private member functions
         void    _initCommandList(void);
-        int     _createSocket(void);
+        void    _createSocket(void);
         void    _bindSocket(int sockfd, struct sockaddr_in *srv_addr);
-        int     _createPoll(int sockfd);
+        void    _createPoll(int sockfd);
         int     _pollWait(int pollfd, struct epoll_event **events, \
                            int max_events);
         void    _acceptConnection(int sockfd, int pollfd);

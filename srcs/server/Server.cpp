@@ -166,8 +166,9 @@ void	Server::_createSocket(void)
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
         throw Server::socketException();
-    if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1)
+    if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1) {
         throw Server::socketException();
+	}
 	this->_sockfd = sockfd;
 }
 
@@ -204,8 +205,9 @@ void	Server::_createPoll(int sockfd)
     memset(&ev, 0, sizeof(struct epoll_event));
     ev.events = EPOLLIN;
     ev.data.fd = sockfd;
-    if (epoll_ctl(pollfd, EPOLL_CTL_ADD, sockfd, &ev) == -1)
+    if (epoll_ctl(pollfd, EPOLL_CTL_ADD, sockfd, &ev) == -1) {
         throw Server::pollException();
+	}
 	this->_pollfd = pollfd;
 }
 
@@ -363,8 +365,6 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
 				// send exception
 				catch (Server::invalidFdException &e)
 				{ printError(e.what(), 1, false); }
-				catch (Server::sendException &e)
-				{ printError(e.what(), 1, true); }
 			}
         }
         else // the command is unknown, send something to the client
@@ -373,8 +373,6 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
                numericReply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command)));}
             catch (Server::invalidFdException &e)
             { printError(e.what(), 1, false); }
-            catch (Server::sendException &e)
-            { printError(e.what(), 1, true); }
         }
     }
 }
@@ -398,8 +396,6 @@ void    Server::_pingClients(void)
         if (user->getStatus() == ST_ALIVE && seconds > PING_TIMEOUT)
         {
             try { this->sendClient(userFd, PING(this->_hostname)); }
-            catch (Server::sendException &e)
-            { printError(e.what(), 1, true); }
             catch (Server::invalidFdException &e)
             { printError(e.what(), 1, false); }
             user->setStatus(ST_PINGED);
