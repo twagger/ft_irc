@@ -22,9 +22,10 @@ bool 						emptyParams(const std::vector<std::string> &params);
 
 // Parsing
 //std::vector<std::string> 	splitBy(std::string str, const std::string &delimiter);
+std::vector<std::string>  	splitBy(std::string str, const std::string &delimiter, std::string *buffer);
 void  						splitCmds(std::vector<std::string> cmd_strings,
 	std::vector<Command> *cmds);
-	std::vector<std::string>  splitBy(std::string str, const std::string &delimiter, std::string *buffer);
+void						displayCommands(std::vector<Command> cmds);
 
 // Replies util functions
 std::string numericReply(Server *irc, const int &fd, std::string code,
@@ -40,14 +41,12 @@ void		serverQuitNotice(const int &fd,  Server *srv, const std::string
 void	 	informUsers(Server *srv, std::string msg); 
 
 // Channel util functions
-std::vector<std::string> 		splitByComma(std::string parameter);
-bool                     		isChannel(std::string channel_name);
-std::string              		getChannelTopic(std::string channelName,
-	std::map<std::string, Channel *> channelList);
-std::vector<std::string> 		getChannelKey(std::vector<std::string> parameter);
-std::deque<User *>::iterator 	findUserOnChannel(std::deque<User *> userList,
-	User *currentUser);
-std::vector<char>::iterator 	findMode(std::vector<char> listMode, char mode);
+std::vector<std::string> splitByComma(std::string parameter);
+bool                     isChannel(std::string channel_name);
+std::string              getChannelTopic(std::string channelName, std::map<std::string,
+    Channel *> channelList);
+std::vector<std::string> getChannelKey(std::vector<std::string> parameter);
+bool findUserOnChannel(std::deque<User *> userList, User *currentUser);
 
 // Authenticate users
 bool 		isAuthenticationCmd(std::string cmd);

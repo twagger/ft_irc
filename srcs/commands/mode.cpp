@@ -137,6 +137,28 @@ void UserMode(const int &fd, const std::vector<std::string> &params, Server *srv
 /* CHANNEL	                                                                  */
 /* ************************************************************************** */
 
+/**
+ * @brief Add or remove a channel mode
+ * 
+ * Mode supported:
+ * - i = set the channel to invite only. Users won't be able to join an existing channel
+ * 		if they are not invited by an operator on the channel
+ * - b = ban an existing user on the channel. The user will be added to the ban list.
+ * 		He won't be able to join unless the ban is removed
+ * - o = give to a user the operator rights. This flag can only be set by an operator.
+ * - k = add or remove a key from the channel.
+ * 		Users won't be able to join the channel without this key
+ *   
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_USERNOTINCHANNEL
+ * - ERR_KEYSET
+ * - ERR_NOSUCHCHANNEL
+ * - ERR_CHANOPRIVSNEEDED
+ * - ERR_UNKNOWNMODE
+ *   
+ */
+
 void listBannedUser(const int &fdUser, Server *server,
               Channel *channel)
 {
@@ -146,7 +168,7 @@ void listBannedUser(const int &fdUser, Server *server,
 
     for (itBannedUser = listBannedUser.begin(); itBannedUser != listBannedUser.end();
 		itBannedUser++)
-        nicknameList += (*itBannedUser)->getNickname() + " ";
+        nicknameList += (*itBannedUser)->getNickname() + "!*@* ";
     server->sendClient(fdUser, numericReply(server, fdUser,
         "367", RPL_BANLIST(channel->getChannelName(), nicknameList)));
     server->sendClient(fdUser, numericReply(server, fdUser,
@@ -170,6 +192,22 @@ int checkUserExists(User *user, const std::vector<std::string> params, const int
 		return (-3);
 	}
 	return (0);
+}
+
+void handleChannelReply(const std::vector<std::string> params, const int &fd, Server *srv)
+{
+	// Case where mode is only +i
+	if (params.size() < 3)
+		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
+			params[0] + " " + params[1])));
+	// Case where mode is ban with a user as a third parameter
+	if (params[1].find('b') != std::string::npos
+		&& params[2].find('*') == std::string::npos)
+		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
+			params[0] + " " + params[1] + " " + params[2] + "!*@*")));
+	// Case where mode is operator and key
+	return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
+		params[0] + " " + params[1] + " " + params[2])));
 }
 
 void addModesChannel(const std::vector<std::string> params, int start, int stop,
@@ -215,11 +253,7 @@ void addModesChannel(const std::vector<std::string> params, int start, int stop,
 				ERR_UNKNOWNMODE(params[1], params[0]))));
 		}
 	}
-	if (params.size() < 3)
-		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-			params[0] + " " + params[1])));
-	return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-		params[0] + " " + params[1] + " " + params[2])));
+	handleChannelReply(params, fd, srv);
 }
 
 void removeModesChannel(const std::vector<std::string> params, int start, int stop,
@@ -260,11 +294,7 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 				ERR_UNKNOWNMODE(params[1], params[0]))));
 		}
 	}
-	if (params.size() < 3)
-		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-			params[0] + " " + params[1])));
-	return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-		params[0] + " " + params[1] + " " + params[2])));
+	handleChannelReply(params, fd, srv);
 }
 
 void handleAddRemoveModesChannel(const int &fd, const std::vector<std::string> params,
@@ -291,8 +321,6 @@ void handleAddRemoveModesChannel(const int &fd, const std::vector<std::string> p
 int checkChannelMode(const int &fd, const std::vector<std::string> &params, Server *srv)
 {
 	std::map<std::string, Channel *>::iterator itChannel;
-	std::deque<User *>::iterator itUser;
-	std::deque<User *>::iterator itOperator;
 
 	// Check that channel list is not empty
 	if (srv->_channelList.empty() == true)
@@ -310,16 +338,15 @@ int checkChannelMode(const int &fd, const std::vector<std::string> &params, Serv
 		return (-2);
 	}
 	// Check that user is on channel
-	itUser = findUserOnChannel(itChannel->second->_users, srv->getUserByFd(fd));
-	if (itUser == itChannel->second->_users.end())
+	if (findUserOnChannel(itChannel->second->_users, srv->getUserByFd(fd)) == false)
 	{
 		srv->sendClient(fd, numericReply(srv, fd, "441",
 										 ERR_USERNOTINCHANNEL(srv->getUserByFd(fd)->getNickname(), params[0])));
 		return (-3);
 	}
 	// Check that user is an operator
-	itOperator = findUserOnChannel(itChannel->second->_operators, srv->getUserByFd(fd));
-	if (itOperator == itChannel->second->_operators.end())
+	if (findUserOnChannel(itChannel->second->_operators, srv->getUserByFd(fd)) == false
+		&& params.size() > 1 && params[1].compare("b") != 0)
 	{
 		srv->sendClient(fd, numericReply(srv, fd, "482",
 										 ERR_CHANOPRIVSNEEDED(params[0])));
