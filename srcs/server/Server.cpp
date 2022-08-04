@@ -1,22 +1,21 @@
 // Standard headers
-#include <netinet/in.h>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
 #include <iostream>
+#include <map>
+#include <vector>
+#include <algorithm>
+#include <sstream>
+// C Libraries
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include <sys/epoll.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <map>
-#include <vector>
-#include <algorithm>
-
 // Custom headers
 #include "../../includes/Server.hpp"
 #include "../../includes/channel.hpp"
@@ -281,7 +280,12 @@ void    Server::_handleNewMessage(struct epoll_event event)
 	
     // split the commands in a vector. Non blocking in case of not ok message.
     try { cmd_strings = splitBy(buf, "\r\n"); } 
-    catch (std::runtime_error &e) { printError(e.what(), 1, false); }
+    catch (std::runtime_error &e) { 
+        // Send an error to the client and kill the connection
+        this->sendClient(event.data.fd, ERRORMSG(std::string(e.what())));
+        this->killConnection(event.data.fd);
+        return;
+    }
 
     // split all commands in a vector of t_command (CMD / PARAM)
     try { splitCmds(cmd_strings, &cmds); }
@@ -386,6 +390,7 @@ void    Server::_pingClients(void)
     User                            *user;
     double                          seconds;
     std::map<int, User *>::iterator it;
+    std::stringstream               ss;
 
     // loop on every active connection
     for (it = this->_userList.begin(); it != this->_userList.end();)
@@ -403,6 +408,7 @@ void    Server::_pingClients(void)
             catch (Server::invalidFdException &e)
             { printError(e.what(), 1, false); return; }
             user->setStatus(ST_PINGED);
+            user->setPingTime();
             ++it;
         }
         else if (user->getStatus() == ST_PINGED) 
@@ -413,6 +419,10 @@ void    Server::_pingClients(void)
             {
                 // Move the iterator to the next user before removing user 
                 ++it;
+                // Send en error to the client
+                ss << PONG_TIMEOUT;
+                this->sendClient(userFd, ERRORMSG(std::string("Ping timeout: ")
+                                        .append(ss.str()).append(" seconds")));
                 // Kill connection
                 this->killConnection(userFd);
             }
