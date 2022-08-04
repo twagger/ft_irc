@@ -38,7 +38,7 @@ Server::Server(int port, std::string password, std::string name)
 
     timeinfo = localtime(&rawtime);
 	_date = std::string(asctime(timeinfo));
-	this->_initCommandList(); 
+	this->_initCommandList();
 }
 
 Server::Server(Server const &src)
@@ -333,6 +333,8 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["NOTICE"] = &notice;
     this->_cmdList["CAP"] = &cap;
 	this->_cmdList["DIE"] = &die;
+	this->_cmdList["WHO"] = &who;
+	this->_cmdList["WHOIS"] = &whois;
 }
 
 // EXECUTE RECEIVED COMMANDS

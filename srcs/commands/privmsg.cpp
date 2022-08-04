@@ -11,6 +11,21 @@
 
 #define MAX_TARGETS 100
 
+/**
+ * @brief PRIVMSG is used to send private messages between users, as well as to
+ * send messages to channels.  <msgtarget> is usually the nickname of
+ * the recipient of the message, or a channel name.
+ * 
+ * Errors handled:
+ * - ERR_NORECIPIENT
+ * - ERR_NOTEXTTOSEND
+ * - ERR_CANNOTSENDTOCHAN
+ * - ERR_WILDTOPLEVEL
+ * - ERR_TOOMANYTARGETS
+ * - ERR_NOSUCHNICK
+ *   
+ */
+
 /* ************************************************************************** */
 /* STRUCTURE TO HOST CLIENT FD OR CHANNEL NAME AND TARGET OF THE MESSAGE      */
 /* ************************************************************************** */

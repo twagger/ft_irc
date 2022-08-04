@@ -7,6 +7,15 @@
 # define MOTD_FILE "conf/motd.txt"
 #endif
 
+/**
+ * @brief The MOTD command is used to get the "Message Of The Day" of the given
+ * server, or current server if <target> is omitted.
+ * 
+ * Errors handled:
+ * - ERR_NOMOTD
+ *   
+ */
+
 std::string createModtStr(Server *srv, const int &fd, std::string &filename)
 {
 	std::ifstream   infile;
@@ -20,12 +29,15 @@ std::string createModtStr(Server *srv, const int &fd, std::string &filename)
 	{ throw nomotdException(); }
 
     // Read the file one line at a time and append the line to the reply
-    replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - benvinguts - velkommen"))));
+    replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("\
+        Bienvenue - welcome - bouno vengudo - i bisimila - degemer mad - \
+        benvinguts - velkommen"))));
 	try {
 		while (std::getline(infile, line))
             replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(line)));
 	} catch (std::ios_base::failure &e) {}
-    replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("Des bisous de la Space team <3"))));
+    replyMsg.append(numericReply(srv, fd, "372", RPL_MOTD(std::string("Des \
+        bisous de la Space team <3"))));
 
 	return (replyMsg);
 }
