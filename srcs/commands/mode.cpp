@@ -176,8 +176,8 @@ void listBannedUser(const int &fdUser, Server *server,
 		"368", RPL_ENDOFBANLIST(channel->getChannelName())));
 }
 
-int checkUserExists(User *user, const std::vector<std::string> params, const int &fd,
-	Server *srv, int bannedList)
+int checkUserExists(User *user, const std::vector<std::string> params,
+	const int &fd, Server *srv, int bannedList)
 {
 	if (user == NULL && params.size() > 2)
 	{
@@ -210,46 +210,19 @@ void handleChannelReply(const std::vector<std::string> params, const int &fd, Se
 		&& user.find('*') == std::string::npos)
 		return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
 			channel + " " + mode + " " + user + "!*@*")));
-	// Case where mode is operator and key
+	// Case where mode is operator and key or ban with *
 	return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
-		channel + " " + user + " " + mode)));
-}
-
-std::vector<User *>	getUser(Server *srv, std::vector<std::string> params)
-{
-	std::vector<User *> userList;
-	std::deque<User *> usersOnChannel = srv->_channelList.find(params[0])->second->_users;
-	std::deque<User *>::iterator itUser;
-	std::string channel = params[0];
-	std::string mode = params[1];
-	std::string nickname = params[2];
-
-	// Case where the mode is not ban
-	if (mode.find('b') == std::string::npos)
-		userList.push_back(srv->getUserByNickname(nickname));
-	// Case where the mode is ban but no mask is set
-	else if (nickname.find('*') == std::string::npos)
-		userList.push_back(srv->getUserByNickname(nickname));
-	// Case where the mode is ban
-	// We need to check if the mask is valid
-	else if (nickname[0] == '*')
-	{
-		for (itUser = usersOnChannel.begin(); itUser != usersOnChannel.end(); itUser++)
-		{
-			if (matchMask((*itUser)->getHostname().c_str(), nickname.c_str()) == true
-				|| matchMask(srv->getHostname().c_str(), nickname.c_str()) == true)
-		}
-	}
+		channel + " " + mode + " " + user)));
 }
 
 void addModesChannel(const std::vector<std::string> params, int start, int stop,
 					 const int &fd, Server *srv)
 {
 	Channel *channel = srv->_channelList.find(params[0])->second;
-	std::vector<User *> user;
+	User *user = NULL;
 	
 	if (params.size() > 2)
-		user = getUser(srv, params);
+		user = srv->getUserByNickname(params[2]);
 
 	for (int i = start; i < stop; i++)
 	{
@@ -268,17 +241,17 @@ void addModesChannel(const std::vector<std::string> params, int start, int stop,
 			break ;
 		case 'o':
 			// Check that the user exists and a user was given in parameter
-			if (checkUserExists(user[0], params, fd, srv, 0) < 0)
+			if (checkUserExists(user, params, fd, srv, 0) < 0)
 				return ;
 			channel->addMode(MOD_OPERATOR);
-			channel->addOperator(user[0]);
+			channel->addOperator(user);
 			break ;
 		case 'b':
 			// Check that the user exists and a user was given in parameter
 			if (checkUserExists(user, params, fd, srv, 1) < 0)
 				return ;
-			channel->addMode(MOD_BAN);
 			channel->addBannedUser(user);
+			channel->addMode(MOD_BAN);
 			break ;
 		default:
 			return (srv->sendClient(fd, numericReply(srv, fd, "472",
@@ -292,11 +265,10 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 						const int &fd, Server *srv)
 {
 	Channel *channel = srv->_channelList.find(params[0])->second;
-	std::vector<User *> user;
+	User	*user;
 	 
-	 if (params.size() > 2)
-		user = getUser(srv, params);
-
+	 if (params.size() > 2 && params[2].find('*') == std::string::npos)
+		user = srv->getUserByNickname(params[2]);
 	for (int i = start; i < stop; i++)
 	{
 		switch (params[1][i])
@@ -310,16 +282,16 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 			channel->setKey("");
 			break ;
 		case 'o':
-			if (checkUserExists(user[0], params, fd, srv, 0) < 0)
+			if (checkUserExists(user, params, fd, srv, 0) < 0)
 				return ;
-			channel->removeOperator(user[0]);
+			channel->removeOperator(user);
 			channel->removeMode(MOD_OPERATOR);
 			break ;
 		case 'b':
-			if (checkUserExists(user, params, fd, srv, 0) < 0)
+			if (checkUserExists(user, params, fd, srv, 1) < 0)
 				return ;
-			channel->removeMode(MOD_BAN);
 			channel->removeBannedUser(user);
+			channel->removeMode(MOD_BAN);
 			break ;
 		default:
 			return (srv->sendClient(fd, numericReply(srv, fd, "472",
@@ -333,17 +305,19 @@ void handleAddRemoveModesChannel(const int &fd, const std::vector<std::string> p
 								 Server *srv)
 {
 	std::pair<char, int> pair;
+	std::string mode = params[1];
+
 	for (unsigned int i = 0; i < params[1].size(); i++)
 	{
-		if (params[1][i] == '+' || params[1][i] == '-')
+		if (mode[i] == '+' || mode[i] == '-')
 		{
 			findPair(params[1], i, &pair);
 		}
-		if (params[1][i] == '+' && pair.second > 0)
+		if (mode[i] == '+' && pair.second > 0)
 		{
 			addModesChannel(params, i + 1, pair.second + 1, fd, srv);
 		}
-		else if (params[1][i] == '-' && pair.second > 0)
+		else if (mode[i] == '-' && pair.second > 0)
 		{
 			removeModesChannel(params, i + 1, pair.second + 1, fd, srv);
 		}
@@ -419,7 +393,6 @@ void ChannelMode(const int &fd, const std::vector<std::string> &params, Server *
 void mode(const int &fd, const std::vector<std::string> &params, const std::string &,
 		  Server *srv)
 {
-
 	if (params.empty() || params[0].empty())
 	{
 		return (srv->sendClient(fd, numericReply(srv, fd, "461",
