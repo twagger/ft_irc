@@ -45,6 +45,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/privmsg.cpp \
 			  srcs/commands/notice.cpp \
 			  srcs/commands/version.cpp \
+			  srcs/commands/who.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/utils/welcome.cpp \

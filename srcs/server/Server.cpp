@@ -332,6 +332,7 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["NOTICE"] = &notice;
     this->_cmdList["CAP"] = &cap;
 	this->_cmdList["DIE"] = &die;
+	this->_cmdList["WHO"] = &who;
 }
 
 // EXECUTE RECEIVED COMMANDS

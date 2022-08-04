@@ -48,7 +48,7 @@ void who(const int &fd, const std::vector<std::string> &params, \
 
     // COMMAND EXECUTION
     // Params
-    if (params.size() >= 1)
+    if (params.size() > 0)
     {
         mask = params[0];
         if (params.size() > 1 and params[1].compare("o") == 0)
