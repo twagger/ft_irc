@@ -38,8 +38,13 @@ int checkPartParameter(std::map<std::string, Channel *> channelList,
 void checkChannelMustBeDeleted(Server *server,
                                std::map<std::string, Channel *>::iterator channelPos)
 {
-    if (channelPos->second->_users.empty() == true)
+    Channel *channel = channelPos->second;
+
+    if (channel->_users.empty() == true)
+    {
         server->_channelList.erase(channelPos);
+        delete channel;
+    }
 }
 
 void part(const int &fdUser, const std::vector<std::string> &parameter,
