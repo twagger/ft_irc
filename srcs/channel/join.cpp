@@ -3,6 +3,24 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief Create or join an existing channel with or without key
+ * 
+ * Mode supported:
+ * - i
+ * - b
+ * - o
+ * - k
+ *   
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_INVITEONLYCHAN
+ * - ERR_NOSUCHCHANNEL
+ * - ERR_BANNEDFROMCHAN
+ * - ERR_BADCHANNELKEY
+ *   
+ */
+
 void channelReply(Server *server, const int &fdUser, std::string channelName)
 {
     // Reply if the user successfully joined the channel
@@ -20,23 +38,29 @@ void channelReply(Server *server, const int &fdUser, std::string channelName)
     server->sendClient(fdUser, userList + endOfNames);
 }
 
-void createChannel(std::string channelName, int pos, std::vector<std::string> key,
-                   User *currentUser, Server *server)
+void createChannel(std::string channel, const size_t &pos,
+                    std::vector<std::string> key, User *currentUser, Server *server)
 {
+    Channel *newChannel;
+    std::vector<std::string>::iterator it;
+
     if (key.empty() == false)
     {
-        std::vector<std::string>::iterator it = key.begin() + pos;
-        Channel *newChannel = new Channel(channelName, *it, currentUser);
-        server->_channelList.insert(std::pair<std::string, Channel *>(channelName,
+        it = key.begin() + pos;
+        if ((*it).compare("x") != 0)
+            newChannel = new Channel(channel, *it, currentUser);
+        else
+            newChannel = new Channel(channel, currentUser);
+        server->_channelList.insert(std::pair<std::string, Channel *>(channel,
                                                                       newChannel));
-        currentUser->addChannelJoined(channelName);
+        currentUser->addChannelJoined(channel);
     }
     else
     {
-        Channel *newChannel = new Channel(channelName, currentUser);
-        server->_channelList.insert(std::pair<std::string, Channel *>(channelName,
+        newChannel = new Channel(channel, currentUser);
+        server->_channelList.insert(std::pair<std::string, Channel *>(channel,
                                                                       newChannel));
-        currentUser->addChannelJoined(channelName);
+        currentUser->addChannelJoined(channel);
     }
 }
 
@@ -48,9 +72,15 @@ int checkKey(size_t pos, std::vector<std::string> key,
     std::vector<std::string>::iterator it;
     std::string keyToCheck;
 
+    keySetInChannel = itMap->second->getKey();
+    if (keySetInChannel.empty() == false && key.empty() == true)
+    {
+        server->sendClient(fdUser, numericReply(server, fdUser,
+                                                "475", ERR_BADCHANNELKEY(itMap->second->getChannelName())));
+        return (-1);
+    }
     if (key.empty() == true)
         return (0);
-    keySetInChannel = itMap->second->getKey();
     it = key.begin() + pos;
     keyToCheck = *it;
 
@@ -61,20 +91,6 @@ int checkKey(size_t pos, std::vector<std::string> key,
         return (-1);
     }
     return (0);
-}
-
-int checkInviteBan(std::deque<User *> listOfUser, User *currentUser)
-{
-    std::deque<User *>::iterator it = listOfUser.begin();
-
-    for (; it != listOfUser.end(); it++)
-    {
-        if (currentUser == *it)
-        {
-            return (0);
-        }
-    }
-    return (-1);
 }
 
 int checkChannel(std::string channel, Server *server, const int &fdUser)
@@ -110,13 +126,11 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
     std::vector<std::string> key;
     std::vector<std::string>::iterator itChan;
     std::map<std::string, Channel *>::iterator itMap;
-    std::vector<char>::iterator itMode;
 
     channel = splitByComma(parameter[0]);
     if (parameter.size() > 1)
         key = splitByComma(parameter[1]);
 
-    itChan = channel.begin();
     itChan = channel.begin();
     for (; itChan != channel.end(); itChan++)
     {
@@ -131,24 +145,25 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
             {
                 if (checkKey(itChan - channel.begin(), key, itMap, server, fdUser) < 0)
                     return;
-                itMode = findMode(itMap->second->_mode, 'i');
-                if (itMap->second->_mode.empty() == false
-                    && itMode != itMap->second->_mode.end()
-                    && checkInviteBan(itMap->second->_invitees, server->getUserByFd(fdUser)) < 0)
+                if (itMap->second->hasMode(MOD_INVITE) == true
+                    && findUserOnChannel(itMap->second->_invitees,
+                        server->getUserByFd(fdUser)) == true)
                     return (server->sendClient(fdUser, numericReply(server, fdUser,
                                                                     "473", ERR_INVITEONLYCHAN(*itChan))));
                 if (itMap->second->_bannedUsers.empty() == false
-                    && checkInviteBan(itMap->second->_bannedUsers, server->getUserByFd(fdUser)) < 0)
+                    && findUserOnChannel(itMap->second->_bannedUsers,
+                        server->getUserByFd(fdUser)) == true)
                     return (server->sendClient(fdUser, numericReply(server, fdUser,
                                                                     "474", ERR_BANNEDFROMCHAN(*itChan))));
                 addUserToChannel(itMap, server->getUserByFd(fdUser));
             }
+            // Case where channel doesn't exist
             else
                 createChannel(*itChan, itChan - channel.begin(), key,
                               server->getUserByFd(fdUser), server);
             channelReply(server, fdUser, *itChan);
         }
-        // Case where channel doesn't exist
+        // Case where no channel exists
         else
         {
             createChannel(*itChan, itChan - channel.begin(), key,

@@ -1,8 +1,9 @@
 #include "../../includes/Server.hpp"
 #include "../../includes/utils.hpp"
 
-
-bool emptyParams(const std::vector<std::string> &params) {
+bool	emptyParams(const std::vector<std::string> &params) {
+	if (params.empty())
+		return true;
 	for (unsigned int i = 0; i < params.size(); i++) {
 		if (params[i].empty()) 	
 			return true;
@@ -10,11 +11,29 @@ bool emptyParams(const std::vector<std::string> &params) {
 	return false;
 }
 
-std::string numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
+std::string	numericReply(Server *irc, const int &fd, std::string code, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getHostname() + " " + code + " "
 						+ irc->getUserByFd(fd)->getNickname() + " " + replyMsg;		
 	return (reply);
+}
+
+void	serverQuitNotice(const int &fd,  Server *srv, const std::string &destNick, std::string msg) 
+{
+	std::string reply = ":" + srv->getHostname() + " NOTICE " + destNick + " " + ":" + msg;
+	srv->sendClient(fd, reply);
+}
+
+void 	informSUsers(Server *srv, std::string msg) 
+{
+	std::deque<User*> users = srv->getAllUsers();
+	std::deque<User*>::iterator it = users.begin();
+	std::deque<User*>::iterator ite = users.end();
+
+	for (; it != ite; it++) {
+		if ((*it)->hasMode(MOD_SRVNOTICES))
+			serverQuitNotice((*it)->getFd(), srv, (*it)->getNickname(), msg);
+	}
 }
 
 std::string WelcomeChan(Server *irc, const int &fd, std::string code,
@@ -87,25 +106,14 @@ bool isChannel(std::string channelName)
     return (false);
 }
 
-std::deque<User *>::iterator findUserOnChannel(std::deque<User *> userList, User *currentUser)
+bool findUserOnChannel(std::deque<User *> userList, User *currentUser)
 {
     std::deque<User *>::iterator it = userList.begin();
 
     for (; it != userList.end(); it++)
     {
         if (*it == currentUser)
-            return (it);
+            return (true);
     }
-    return (it);
-}
-
-std::vector<char>::iterator findMode(std::vector<char> listMode, char mode)
-{
-    std::vector<char>::iterator it = listMode.begin();
-    for (; it != listMode.end(); it++)
-    {
-        if (*it == mode)
-            return (it);
-    }
-    return (it);
+    return (false);
 }

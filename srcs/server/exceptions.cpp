@@ -64,3 +64,7 @@ needmoreparamsException::needmoreparamsException(std::string command, \
 // 483 - cantkillserverException
 cantkillserverException::cantkillserverException(std::string code)
 { this->code = code; this->rpl = ERR_CANTKILLSERVER; }
+
+// 422 - nomotdException
+nomotdException::nomotdException(std::string code)
+{ this->code = code; this->rpl = ERR_NOMOTD; }

@@ -42,6 +42,23 @@ bool isInKillList(Server *srv, std::string nick) {
 	return (false);
 }
 
+void sendClientOrChannel(Server *srv, const int &fd, User *user, std::string replyMsg)
+{
+	std::deque<std::string> listChannelJoined;
+	std::deque<std::string>::iterator itChannel;
+	std::string latestChannelJoined;
+
+	// Case where the user didn't join any channel
+	if (user->getChannelsJoined().empty() == true)
+		srv->sendClient(fd, replyMsg);
+	// Case where the user joined some channel
+	// Every user on the channel must be noticed
+	listChannelJoined = user->getChannelsJoined();
+	for (itChannel = listChannelJoined.begin(); itChannel != listChannelJoined.end();
+		itChannel++)
+		srv->sendChannel(*itChannel, replyMsg);
+}
+
 void nick(const int &fd, const std::vector<std::string> &params, const std::string &,
 			Server *srv) 
 {	
@@ -76,6 +93,6 @@ void nick(const int &fd, const std::vector<std::string> &params, const std::stri
 			user->setNickname(params[0]);
 		}
 	}
-	srv->sendClient(fd, replyMsg);
+	sendClientOrChannel(srv, fd, user, replyMsg);
 	return ;
 }

@@ -8,17 +8,19 @@ bool isOperHost(std::string hostname) {
 	std::string		str;
 
 	file = configFile.c_str();
-	input.open(file, std::ios::in);
-	try {input.is_open(); } 
+
+	try { input.open(file, std::ios::in); } 
 	catch (std::ifstream::failure &e)
 		{ printError(e.what(), 1, true); return false; }
 	try {
-		while (getline(input, str)) {
-			if (str == hostname)
-				return true;
+		if (input.is_open()) {
+			while (getline(input, str)) {
+				if (str == hostname)
+					return true;
+			}
 		}
 	}
-	catch (std::istream::failure &e) 
+	catch (std::ifstream::failure &e) 
     	{ printError(e.what(), 1, true); return false; }
 	return false;
 }
@@ -33,6 +35,8 @@ void	oper(const int &fd, const std::vector<std::string> &params, const std::stri
 		replyMsg = numericReply(srv, fd, "461", ERR_NEEDMOREPARAMS(std::string("OPER")));
 	else if (isOperHost(user->getHostname()) == false)
 		replyMsg = numericReply(srv, fd, "491", ERR_NOOPERHOST);
+	else if (user->hasMode(MOD_RESTRICTED))
+		replyMsg = numericReply(srv, fd, "484", ERR_RESTRICTED);
 	else if (params[1] != srv->getPassword())
 		replyMsg = numericReply(srv, fd, "464", ERR_PASSWDMISMATCH);
 	else {

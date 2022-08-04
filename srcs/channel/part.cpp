@@ -3,6 +3,17 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief Leave an existing channel
+ * If all users part from the channel the channel will be destroyed
+ * 
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_NOTONCHANNEL
+ * - ERR_NOSUCHCHANNEL
+ *   
+ */
+
 int checkPartParameter(std::map<std::string, Channel *> channelList,
                        std::string channelName, User *currentUser, Server *server, const int &fdUser)
 {
@@ -15,7 +26,7 @@ int checkPartParameter(std::map<std::string, Channel *> channelList,
         return (-1);
     }
     // Current user must be part of the channel
-    if (findUserOnChannel(it->second->_users, currentUser) == it->second->_users.end())
+    if (findUserOnChannel(it->second->_users, currentUser) == false)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "442", ERR_NOTONCHANNEL(channelName)));
@@ -58,10 +69,10 @@ void part(const int &fdUser, const std::vector<std::string> &parameter,
                                server, fdUser) < 0)
             return;
         std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(*it);
-        checkChannelMustBeDeleted(server, channelPos);
         // Effectively part from channel
         server->sendChannel(*it, clientReply(server, fdUser, "PART " + *it + " :" + partMessage));
         channelPos->second->removeUser(server->getUserByFd(fdUser));
         server->getUserByFd(fdUser)->removeChannelJoined(*it);
+        checkChannelMustBeDeleted(server, channelPos);
     }
 }

@@ -3,6 +3,13 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief List all nicknames on a channel
+ * 
+ * No error handled
+ *   
+ */
+
 void listUser(const int &fdUser, Server *server,
               std::map<std::string, Channel *>::iterator itChannel)
 {
@@ -14,6 +21,7 @@ void listUser(const int &fdUser, Server *server,
 
     for (itUser = listUser.begin(); itUser != listUser.end(); itUser++)
     {
+        std::cout << "size = " << listUser.size() << std::endl;
         // Case if user is an operator
         for (itOperator = listOperator.begin(); itOperator != listOperator.end();
              itOperator++)

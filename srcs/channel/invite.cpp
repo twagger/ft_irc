@@ -3,6 +3,21 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief Invite a user to a channel
+ * The user will be added to the invitee list
+ * The user will be able to join an existing channel with mode i.
+ * 
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_NOTONCHANNEL
+ * - ERR_NOSUCHNICK
+ * - ERR_USERONCHANNEL
+ * - ERR_NOSUCHCHANNEL
+ * - ERR_CHANOPRIVSNEEDED
+ *   
+ */
+
 int checkParameterInvite(std::string nickname, std::string channel,
                          const int &fdUser, Server *server, User *userToInvite)
 {
@@ -38,7 +53,7 @@ int checkParameterInvite(std::string nickname, std::string channel,
         return (-3);
     }
     // User is already on channel
-    if (findUserOnChannel(it->second->_users, server->getUserByNickname(nickname)) == it->second->_users.end())
+    if (findUserOnChannel(it->second->_users, server->getUserByNickname(nickname)) == true)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "443", ERR_USERONCHANNEL(userToInvite->getFullname(), channel)));
@@ -46,16 +61,15 @@ int checkParameterInvite(std::string nickname, std::string channel,
     }
     // Current user must be in channel
     if (findUserOnChannel(it->second->_users,
-                          server->getUserByFd(fdUser)) == it->second->_users.end())
+                          server->getUserByFd(fdUser)) == false)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "442", ERR_NOTONCHANNEL(channel)));
         return (-5);
     }
     // Current user must be an operator if channel is invite only
-    std::vector<char>::iterator itMode = findMode(it->second->_mode, 'i');
-    if (itMode != it->second->_mode.end() && findUserOnChannel(it->second->_operators,
-                                                               server->getUserByFd(fdUser)) == it->second->_operators.end())
+    if (it->second->hasMode(MOD_INVITE) && findUserOnChannel(it->second->_operators,
+                                                               server->getUserByFd(fdUser)) == false)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "482", ERR_CHANOPRIVSNEEDED(channel)));
@@ -69,15 +83,14 @@ void invite(const int &fdUser, const std::vector<std::string> &parameter, const 
     std::string nickname = parameter[0];
     std::string channel = parameter[1];
     User *userToInvite = server->getUserByNickname(nickname);
+    Channel *channelPos;
 
     if (checkParameterInvite(nickname, channel, fdUser, server, userToInvite) < 0)
         return;
     // Add user to the list of invitee and return reply
-    std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(channel);
-    channelPos->second->addUser(server->getUserByNickname(nickname));
-    server->sendClient(fdUser, clientReply(server, fdUser, "INVITE " +
-            server->getUserByNickname(nickname)->getNickname()) + " " + channel);
+    channelPos = server->_channelList.find(channel)->second;
+    channelPos->addInvitee(server->getUserByNickname(nickname));
     server->sendClient(server->getUserByNickname(nickname)->getFd(),
         clientReply(server, fdUser, "INVITE " +
-            server->getUserByNickname(nickname)->getNickname()) + " " + channel);
+            nickname + " " + channel));
 }

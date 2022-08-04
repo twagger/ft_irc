@@ -15,7 +15,7 @@ std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
 
     // save first command in vector
     if (end + delimiter.length() > MAX_CMD_LEN)
-        throw std::runtime_error("IRC message shall not exceed 512 characters");
+        throw std::runtime_error("Request too long");
     result.push_back(str.substr(0, end));
     
     // update str
@@ -26,8 +26,7 @@ std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
     while (end != std::string::npos)
     {
         if (end + delimiter.length() > MAX_CMD_LEN)
-            throw std::runtime_error(\
-                                 "IRC message shall not exceed 512 characters");
+            throw std::runtime_error("Request too long");
         result.push_back(str.substr(0, end));
         str.erase(0, end + delimiter.length());
         end = str.find(delimiter);
@@ -42,9 +41,8 @@ std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
  * @param cmd_strings Vector of commands, not splitted by space
  * @return vector of Command where [ PREFIX ], CMD and PARAMS are separated
  */
-const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
+void  splitCmds(std::vector<std::string> cmd_strings, std::vector<Command> *cmds)
 {
-    std::vector<Command>                result;
     std::vector<std::string>::iterator  mess;
     size_t                              end;
     std::string                         prefix;
@@ -57,7 +55,7 @@ const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
         {
             if (mess->find(':') == 0) // the only token is a prefix :'(
                 throw std::runtime_error("IRC message must have a command");
-            result.push_back(*(new Command(mess->substr(0, end))));
+            cmds->push_back(Command(mess->substr(0, end)));
         }
         else // CMD + params
         {
@@ -69,19 +67,19 @@ const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
                 end = mess->find(' ');
                 if (end == std::string::npos)
                 {
-                    result.push_back(*(new Command(*mess, prefix)));
+                    cmds->push_back(Command(*mess, prefix));
                     mess->clear();
                 }
                 else
                 {
-                    result.push_back(*(new Command(mess->substr(0, end), \
-                                       prefix)));
+                    cmds->push_back(Command(mess->substr(0, end), \
+                                       prefix));
                     mess->erase(0, end + 1);
                 }
             }
             else // CMD WITH NO PREFIX
             { 
-                result.push_back(*(new Command(mess->substr(0, end))));
+                cmds->push_back(Command(mess->substr(0, end)));
                 end = mess->find(' ');
                 if (end == std::string::npos)
                     mess->clear();
@@ -96,7 +94,7 @@ const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
                     // if long param starting with ":"
                     if (mess->find(':') == 0)
                     {
-                        result.back().params.push_back(mess->substr(1, \
+                        cmds->back().params.push_back(mess->substr(1, \
                                                            mess->length() - 1));
                         end = std::string::npos;
                     }
@@ -104,10 +102,10 @@ const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
                     {
                         end = mess->find(' ');
                         if (end == std::string::npos)
-                            result.back().params.push_back(*mess);
+                            cmds->back().params.push_back(*mess);
                         else
                         {
-                            result.back().params
+                            cmds->back().params
                                 .push_back(mess->substr(0, end));
                             mess->erase(0, end + 1);
                         }
@@ -116,6 +114,4 @@ const std::vector<Command>  splitCmds(std::vector<std::string> cmd_strings)
             }
         }
     }
-    
-    return (result);
 }
