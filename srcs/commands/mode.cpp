@@ -168,7 +168,7 @@ void listBannedUser(const int &fdUser, Server *server,
 
     for (itBannedUser = listBannedUser.begin(); itBannedUser != listBannedUser.end();
 		itBannedUser++)
-        nicknameList += (*itBannedUser)->getNickname() + " ";
+        nicknameList += (*itBannedUser)->getNickname() + "!*@* ";
     server->sendClient(fdUser, numericReply(server, fdUser,
         "367", RPL_BANLIST(channel->getChannelName(), nicknameList)));
     server->sendClient(fdUser, numericReply(server, fdUser,
@@ -192,6 +192,22 @@ int checkUserExists(User *user, const std::vector<std::string> params, const int
 		return (-3);
 	}
 	return (0);
+}
+
+void handleChannelReply(const std::vector<std::string> params, const int &fd, Server *srv)
+{
+	// Case where mode is only +i
+	if (params.size() < 3)
+		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
+			params[0] + " " + params[1])));
+	// Case where mode is ban with a user as a third parameter
+	if (params[1].find('b') != std::string::npos
+		&& params[2].find('*') == std::string::npos)
+		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
+			params[0] + " " + params[1] + " " + params[2] + "!*@*")));
+	// Case where mode is operator and key
+	return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
+		params[0] + " " + params[1] + " " + params[2])));
 }
 
 void addModesChannel(const std::vector<std::string> params, int start, int stop,
@@ -237,11 +253,7 @@ void addModesChannel(const std::vector<std::string> params, int start, int stop,
 				ERR_UNKNOWNMODE(params[1], params[0]))));
 		}
 	}
-	if (params.size() < 3)
-		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-			params[0] + " " + params[1])));
-	return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-		params[0] + " " + params[1] + " " + params[2])));
+	handleChannelReply(params, fd, srv);
 }
 
 void removeModesChannel(const std::vector<std::string> params, int start, int stop,
@@ -282,11 +294,7 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 				ERR_UNKNOWNMODE(params[1], params[0]))));
 		}
 	}
-	if (params.size() < 3)
-		return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-			params[0] + " " + params[1])));
-	return(srv->sendChannel(params[0], clientReply(srv, fd, "MODE " +
-		params[0] + " " + params[1] + " " + params[2])));
+	handleChannelReply(params, fd, srv);
 }
 
 void handleAddRemoveModesChannel(const int &fd, const std::vector<std::string> params,
