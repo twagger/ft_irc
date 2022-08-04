@@ -3,6 +3,16 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief View or change the topic of a channel
+ * 
+ * Errors handled:
+ * - ERR_NEEDMOREPARAMS
+ * - ERR_NOTONCHANNEL
+ * - ERR_NOSUCHCHANNEL
+ *   
+ */
+
 int checkTopicParameter(std::string topic, std::map<std::string, Channel *>::iterator itChannel,
     Server *server, const int &fdUser)
 {
@@ -11,7 +21,7 @@ int checkTopicParameter(std::string topic, std::map<std::string, Channel *>::ite
         return (-1);
     // Current user is not in user list
     User *currentUser = server->getUserByFd(fdUser);
-    if (findUserOnChannel(itChannel->second->_users, currentUser) == itChannel->second->_users.end())
+    if (findUserOnChannel(itChannel->second->_users, currentUser) == false)
     {
         server->sendClient(fdUser, numericReply(server, fdUser, "442", ERR_NOTONCHANNEL(itChannel->first)));
         return (-2);

@@ -3,6 +3,13 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/commands.hpp"
 
+/**
+ * @brief List channels with their topics
+ * 
+ * No error handled
+ *   
+ */
+
 void listAllChannel(const int &fdUser, Server *server)
 {
     std::map<std::string, Channel *>::iterator itChannel;

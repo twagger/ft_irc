@@ -39,14 +39,12 @@ void		serverQuitNotice(const int &fd,  Server *srv, const std::string
 void	 	informUsers(Server *srv, std::string msg); 
 
 // Channel util functions
-std::vector<std::string> 		splitByComma(std::string parameter);
-bool                     		isChannel(std::string channel_name);
-std::string              		getChannelTopic(std::string channelName,
-	std::map<std::string, Channel *> channelList);
-std::vector<std::string> 		getChannelKey(std::vector<std::string> parameter);
-std::deque<User *>::iterator 	findUserOnChannel(std::deque<User *> userList,
-	User *currentUser);
-std::vector<char>::iterator 	findMode(std::vector<char> listMode, char mode);
+std::vector<std::string> splitByComma(std::string parameter);
+bool                     isChannel(std::string channel_name);
+std::string              getChannelTopic(std::string channelName, std::map<std::string,
+    Channel *> channelList);
+std::vector<std::string> getChannelKey(std::vector<std::string> parameter);
+bool findUserOnChannel(std::deque<User *> userList, User *currentUser);
 
 // Authenticate users
 bool 		isAuthenticationCmd(std::string cmd);

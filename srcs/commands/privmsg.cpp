@@ -1,5 +1,6 @@
 #include <deque>
 #include <set>
+#include <map>
 #include <sstream>
 
 #include "../../includes/commands.hpp"
@@ -40,125 +41,27 @@ struct Target {
 /* ************************************************************************** */
 /* UTILITY FUNCTIONS                                                          */
 /* ************************************************************************** */
-void    checkChannelRights(Server *srv, const int &fd, \
-                                                    const std::string channel)
+// Split the message by comma into multiple targets
+std::map<std::string, std::deque<Target> > splitTargets(std::string targets)
 {
-    std::map<std::string, Channel *>::const_iterator    itChan;
-    std::deque<User*>                                   userList;
-    std::deque<User*>                                   banList;
-    std::deque<User*>::const_iterator                   it;
-    bool                                                result;
+    std::map<std::string, std::deque<Target> > map;
 
-    // Get the list of users in the channel
-    itChan = srv->_channelList.find(channel);
-    if (itChan == srv->_channelList.end())
-        throw nosuchnickException(channel);
+    // only one target
+    if (targets.find(',') == std::string::npos)
+    {
+        map[targets] = std::deque<Target>();
+        return (map);
+    }
 
-    // Get lists
-    userList = itChan->second->_users;
-    banList = itChan->second->_bannedUsers;
-
-    // Check the user fd against users of the channel then banlist
-    result = false;
-    // Check user list
-    for (it = userList.begin(); it != userList.end(); ++it)
+    // multiple targets    
+    std::string temp;
+    std::istringstream stream(targets);
+    while (std::getline(stream, temp, ','))
     {
-        if ((*it)->getFd() == fd)
-        {
-            result = true;
-            break;
-        }
+        transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+        map[temp] = std::deque<Target>();
     }
-    if (result == false)
-        throw cannotsendtochanException(channel);
-    else {
-        // Check banlist
-        for (it = banList.begin(); it != banList.end(); ++it)
-        {
-            if ((*it)->getFd() == fd)
-            {
-                result = false;
-                break;
-            }
-        }
-    }
-    if (result == false)
-        throw cannotsendtochanException(channel);
-}
-
-void    paramGrammarCheck(const std::string user, const std::string host, \
-                       const std::string servername, const std::string nickname)
-{
-    // For basic grammar checking
-    std::string nickControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN\
-                             OPQRSTUVWXYZ-[]\\`_^{|}");
-    std::string userControl("\0\r\n @");
-    std::string hostControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN\
-                             OPQRSTUVWXYZ-.:");
-    std::string serverControl("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKL\
-                               MNOPQRSTUVWXYZ-.");
-    
-    // Basic grammar check
-    if (!nickname.empty())
-    {
-        if (nickname.find_first_not_of(nickControl) != std::string::npos)
-            throw grammarException("Grammar : nickname");
-        if (nickname.length() < 1 || nickname.length() > 9)
-            throw grammarException("Grammar : nickname");
-        if (nickname[0] == '-' || std::isdigit(nickname[0]))
-            throw grammarException("Grammar : nickname");
-    }
-    if (!user.empty())
-    {
-        if (user.find_first_of(userControl) != std::string::npos)
-            throw grammarException("Grammar : user");
-        if (user.length() < 1)
-            throw grammarException("Grammar : user");
-    }
-    if (!servername.empty())
-    {
-        if (servername.find_first_not_of(serverControl) != std::string::npos)
-            throw grammarException("Grammar : servername");
-    }
-    if (!host.empty())
-    {
-        if (host.find_first_not_of(hostControl) != std::string::npos)
-            throw grammarException("Grammar : hostname");
-    }
-}
-
-void cleanTargetsList(std::deque<Target> &target)
-{
-    std::deque<Target>::iterator    it;
-    std::set<int>                   alreadyFds;
-    std::set<std::string>           alreadyChannels;
-
-    // Clean target fds or channel that appears multiple time
-    for (it = target.begin(); it != target.end();)
-    {
-        if (it->fd != -1)
-        {
-            if (alreadyFds.find(it->fd) == alreadyFds.end())
-            {
-                alreadyFds.insert(it->fd);
-                ++it;
-            }
-            else
-                target.erase(it++);
-        }
-        else if (!(it->channel.empty()))
-        {
-            if (alreadyChannels.find(it->channel) == alreadyChannels.end())
-            {
-                alreadyChannels.insert(it->channel);
-                ++it;
-            }
-            else
-                target.erase(it++);
-        }
-        else
-            ++it;
-    }
+    return (map);
 }
 
 /* ************************************************************************** */
@@ -175,7 +78,7 @@ const std::string extractChannelName(const std::string str, Server *srv)
         for (int i = 0; i < 5; ++i)
         {
             if (!std::isdigit(str[i]))
-                throw grammarException("Grammar : channel name");
+                throw nosuchnickException(str);
         }
         pos = 6;
     }
@@ -183,10 +86,11 @@ const std::string extractChannelName(const std::string str, Server *srv)
         name = str.substr(pos, str.find(':') - pos);
     else
         name = str.substr(pos, std::string::npos);
-    
+
     // Check if channel exists
     if (srv->_channelList.find(name) == srv->_channelList.end())
         throw nosuchnickException(name);
+    
     return (name);
 }
 
@@ -201,54 +105,57 @@ int   extractUserFd(const std::string str, Server *srv)
 
     // string matching using
     if (str.find('%') != std::string::npos) {
-        // USER / HOST / SERVERNAME
-        user = str.substr(0, str.find('%') - 1);
+        // USER % HOST
+        user = str.substr(0, str.find('%'));
         host = str.substr(str.find('%') + 1);
-        if (host.find('@')) {
+        if (host.find('@') != std::string::npos) {
+            // USER % HOST @ SERVERNAME
             servername = host.substr(host.find('@') + 1);
             host.erase(host.find('@'));
         }
     }
     else if (str.find('!') != std::string::npos) {
-        // NICKNAME
-        nickname = str.substr(0, str.find('!') - 1);
+        // NICKNAME ! USER @ HOST
+        nickname = str.substr(0, str.find('!'));
         user = str.substr(str.find('!') + 1);
         if (user.find('@') == std::string::npos)
-            throw grammarException("Grammar : nickname");
+            throw nosuchnickException(str);
         host = user.substr(user.find('@') + 1);
         user.erase(user.find('@'));
     }
+    else if (str.find('@') != std::string::npos) {
+        // USER @ SERVERNAME
+        user = str.substr(0, str.find('@'));
+        servername = str.substr(str.find('@') + 1);
+    }
     else
         nickname = str;
-
-    // Param check
-    paramGrammarCheck(user, host, servername, nickname);
 
     // User search and return
     if (!nickname.empty())
     {
         resultUser = srv->getUserByNickname(nickname);
         if (resultUser == NULL)
-            throw nosuchnickException(user);
+            throw nosuchnickException(str);
     }
     else if (!user.empty() && !host.empty())
     {
         resultUser = srv->getUserByUsername(user, host);
         if (resultUser == NULL)
-            throw nosuchnickException(user.append("%").append(host));
+            throw nosuchnickException(str);
     }
     else if (!user.empty())
     {
         resultUser = srv->getUserByUsername(user);
         if (resultUser == NULL)
-            throw nosuchnickException(user);
+            throw nosuchnickException(str);
     }
 
     return (resultUser->getFd());
 }
 
 // MASK
-void    computeMask(const std::string &str, Server *srv, \
+void    computeMask(const int &fd, const std::string &str, Server *srv, \
                     std::deque<Target> &target)
 {
     std::deque<User*>                   userList;
@@ -256,6 +163,10 @@ void    computeMask(const std::string &str, Server *srv, \
     std::string                         mask;
     size_t                              toplevel;
     
+    // Check user privileges : must be oper to use mask
+    if (!srv->getUserByFd(fd)->hasMode(MOD_OPER))
+        throw noprivilegesException();
+
     // Check the mask for exceptions
     mask = str.substr(1);
     toplevel = mask.find_last_of('.');
@@ -288,7 +199,7 @@ void    computeMask(const std::string &str, Server *srv, \
 /* ************************************************************************** */
 /* SPECIFIC FUNCTIONS TO CREATE A COLLECTION OF TARGETS FOR THE MAIN FUNCTION */
 /* ************************************************************************** */
-void getTargetsFromString(const std::string &str, \
+void getTargetsFromString(const int &fd, const std::string &str, \
                           std::deque<Target> &target, Server *srv)
 {
     if (str[0] == '+' || str[0] == '&' || str[0] == '!'
@@ -299,7 +210,8 @@ void getTargetsFromString(const std::string &str, \
     else if (str[0] == '$' 
              || (str[0] == '#' && str.find('.') != std::string::npos)) {
         // MASK
-        computeMask(str, srv, target);
+        try { computeMask(fd, str, srv, target); }
+        catch (noprivilegesException &e) { e.reply(srv, fd); }  
     }
     else {
         // USER
@@ -313,67 +225,63 @@ void getTargetsFromString(const std::string &str, \
 void privmsg(const int &fd, const std::vector<std::string> &params, \
                         const std::string &, Server *srv)
 {
-    std::vector<std::string>                    targets;
-    std::vector<std::string>::const_iterator    it;
-    std::string                                 msgtarget;
-    std::string                                 message;
-    std::deque<Target>                          target;
-    std::deque<Target>::iterator                itg;
-    std::stringstream                           ss;
-    int                                         nbTargets = 0;
+    std::map<std::string, std::deque<Target> >              targets;
+    std::map<std::string, std::deque<Target> >::iterator    it;
+    std::string                                             msgtarget;
+    std::string                                             message;
+    std::deque<Target>                                      target;
+    std::deque<Target>::iterator                            itTarg;
+    std::stringstream                                       ss;
 
     // COMMAND EXECUTION
-    try
-    {
+    try {
         // check nb of param
         if (params.size() == 0)
             throw norecipientException("PRIVMSG");
         if (params.size() == 1)
             throw notexttosendException();
-        
-        // Two params, iterate throught the first to and send
+
         msgtarget = params[0];
         message = params[1];
-        targets = splitByComma(msgtarget);
         
-        // First loop WITH NO SEND to count the exact number of targets
-        for (it = targets.begin(); it != targets.end(); ++it)
-        {
-            getTargetsFromString(*it, target, srv);
-            nbTargets += target.size();
-        }
-        ss << nbTargets; 
-        if (nbTargets > MAX_TARGETS)
+        // Split targets into a map
+        targets = splitTargets(msgtarget);
+        
+        // Too many targets ?
+        if (targets.size() > MAX_TARGETS)
             throw toomanytargetsException(msgtarget, ss.str(), "Aborted.");
-
-        // Clean the targets list from doubles
-        cleanTargetsList(target);
-
-        // Second loop TO SEND all messages
-        for (itg = target.begin(); itg != target.end(); ++itg)
-        {
-            // HANDLE HERE : RPL_AWAY, ERR_CANNOTSENDTOCHAN
-            if (itg->fd != -1) {
-                // Send to user
-                srv->sendClient(itg->fd, \
-                        clientReply(srv, fd, PRIVMSG(itg->target, message)));
-            }
-            else if (!itg->channel.empty()) {
-                // Send to channel
-                checkChannelRights(srv, fd, itg->channel);
-                srv->sendChannel(itg->channel, \
-                    clientReply(srv, fd, PRIVMSG(itg->target, message)), fd);
-            }
-        }
+        
     }
-    
-    // EXCEPTIONS
-    catch (grammarException &e) { printError(e.what(), 1, false); return; }
+    // EXCEPTIONS THAT END THE COMMAND
     catch (norecipientException &e) {e.reply(srv, fd); return; }
-    catch (nosuchnickException &e) {e.reply(srv, fd); return; }
     catch (notexttosendException &e) {e.reply(srv, fd); return; }
     catch (toomanytargetsException &e) {e.reply(srv, fd); return; }
-    catch (notoplevelException &e) {e.reply(srv, fd); return; }
-    catch (wildtoplevelException &e) {e.reply(srv, fd); return; }
-    catch (cannotsendtochanException &e) {e.reply(srv, fd); return; }
+    
+    // Loop to SEND all messages
+    for (it = targets.begin(); it != targets.end(); ++it)
+    {
+        try {
+            getTargetsFromString(fd, it->first, it->second, srv);
+            target = it->second;
+            for (itTarg = target.begin(); itTarg != target.end(); ++itTarg)
+            {
+                // Check target validity here instead of upper
+                if (itTarg->fd != -1) {
+                    // Send to user (we don't handle AWAY flag on user)
+                    srv->sendClient(itTarg->fd, \
+                        clientReply(srv, fd, PRIVMSG(itTarg->target, message)));
+                }
+                else if (!itTarg->channel.empty()) {
+                    // Send to channel : no exception cannot send because 
+                    //  we do not handle the needed chan mode for this
+                    srv->sendChannel(itTarg->channel, clientReply(srv, fd, \
+                                     PRIVMSG(itTarg->target, message)), fd);
+                }
+            }
+        }
+        // EXCEPTIONS THAT DON'T END THE COMMAND
+        catch (nosuchnickException &e) {e.reply(srv, fd);}
+        catch (notoplevelException &e) {e.reply(srv, fd);}
+        catch (wildtoplevelException &e) {e.reply(srv, fd);}
+    }
 }
