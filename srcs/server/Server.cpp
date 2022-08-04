@@ -158,16 +158,17 @@ std::deque<User*>   Server::getAllUsers(void) const
 /* Private member functions                                                   */
 /* ************************************************************************** */
 // CREATE SOCKET
-int Server::_createSocket(void)
+void	Server::_createSocket(void)
 {
     int sockfd;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
         throw Server::socketException();
-    if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1)
+    if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1) {
         throw Server::socketException();
-    return (sockfd);
+	}
+	this->_sockfd = sockfd;
 }
 
 // BIND SOCKET
@@ -188,7 +189,7 @@ void    Server::_bindSocket(int sockfd, struct sockaddr_in *srv_addr)
 }
 
 // CREATE POLL
-int Server::_createPoll(int sockfd)
+void	Server::_createPoll(int sockfd)
 {
     int                 pollfd;
     struct epoll_event  ev;
@@ -203,9 +204,10 @@ int Server::_createPoll(int sockfd)
     memset(&ev, 0, sizeof(struct epoll_event));
     ev.events = EPOLLIN;
     ev.data.fd = sockfd;
-    if (epoll_ctl(pollfd, EPOLL_CTL_ADD, sockfd, &ev) == -1)
+    if (epoll_ctl(pollfd, EPOLL_CTL_ADD, sockfd, &ev) == -1) {
         throw Server::pollException();
-    return (pollfd);
+	}
+	this->_pollfd = pollfd;
 }
 
 // WAIT POLL
@@ -366,9 +368,7 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
 				try { exec_command(fd, it->params, it->prefix, this); }
 				// send exception
 				catch (Server::invalidFdException &e)
-				{ printError(e.what(), 1, false); return; }
-				catch (Server::sendException &e)
-				{ printError(e.what(), 1, true); return; }
+				{ printError(e.what(), 1, false); }
 			}
         }
         else // the command is unknown, send something to the client
@@ -376,9 +376,7 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
             try { this->sendClient(fd, \
                numericReply(this, fd, "421", ERR_UNKNOWNCOMMAND(it->command)));}
             catch (Server::invalidFdException &e)
-            { printError(e.what(), 1, false); return; }
-            catch (Server::sendException &e)
-            { printError(e.what(), 1, true); return; }
+            { printError(e.what(), 1, false); }
         }
     }
 }
@@ -403,10 +401,8 @@ void    Server::_pingClients(void)
         if (user->getStatus() == ST_ALIVE && seconds > PING_TIMEOUT)
         {
             try { this->sendClient(userFd, PING(this->_hostname)); }
-            catch (Server::sendException &e)
-            { printError(e.what(), 1, true); return; }
             catch (Server::invalidFdException &e)
-            { printError(e.what(), 1, false); return; }
+            { printError(e.what(), 1, false); }
             user->setStatus(ST_PINGED);
             user->setPingTime();
             ++it;
@@ -463,65 +459,53 @@ void	Server::_clearAll(void) {
 void    Server::start(void)
 {
     // socket
-    int                 sockfd;
     struct sockaddr_in  srv_addr;
     // epoll
-    int                 pollfd;
     int                 nfds;
     struct epoll_event  events[MAX_EVENTS];
     struct epoll_event  *events_tmp;
 
-    // socket creation and param --------------------------------------------- /
-    try { sockfd = this->_createSocket(); }
-    catch (Server::socketException &e){ printError(e.what(), 1, true); return;}
-    this->_sockfd = sockfd;
+	try {
+		// socket creation and param ----------------------------------------- /
+		this->_createSocket();
 
-    // binding to ip address + port and switch to passive mode --------------- /
-    try { this->_bindSocket(sockfd, &srv_addr); }
-    catch (Server::bindException &e) { printError(e.what(), 1, true); return; }
+		// binding to ip address + port and switch to passive mode ----------- /
+		this->_bindSocket(this->_sockfd, &srv_addr);
 
-    // poll creation --------------------------------------------------------- /
-    try { pollfd = this->_createPoll(sockfd); }
-    catch (Server::pollException &e) { printError(e.what(), 1, true); return; }
-    this->_pollfd = pollfd;
+		// poll creation ----------------------------------------------------- /
+		this->_createPoll(this->_sockfd);
 
-    // server loop ----------------------------------------------------------- /
-    while (1)
-    {
-        // poll wait --------------------------------------------------------- /
-        events_tmp = &(events[0]);
-        try { nfds = this->_pollWait(pollfd, &events_tmp, MAX_EVENTS); }
-        catch (Server::pollWaitException &e) { _clearAll(); return; }
-		
-        // loop on ready fds ------------------------------------------------- /
-        for (int i = 0; i < nfds; ++i)
-        {
-            // handle new connection requests -------------------------------- /
-            if (events[i].data.fd == sockfd)            
-            {
-                try { this->_acceptConnection(sockfd, pollfd); }
-                catch (Server::acceptException &e)
-                { printError(e.what(), 1, true); return; }
-                catch (Server::pollAddException &e)
-                { printError(e.what(), 1, true); return; }
-                catch (Server::passwordException &e)
-                { printError(e.what(), 1, true); }
-            }
-            else // new message from existing connection --------------------- /
-            {
-                try { this->_handleNewMessage(events[i]); }
-                catch (Server::readException &e)
-                { printError(e.what(), 1, true); }
-            	catch (Server::pollWaitException &e)
-				{ _clearAll(); return; }
+		// server loop ------------------------------------------------------- /
+		while (1)
+		{
+			// poll wait ----------------------------------------------------- /
+			events_tmp = &(events[0]);
+			nfds = this->_pollWait(this->_pollfd, &events_tmp, MAX_EVENTS);
+			
+			// loop on ready fds --------------------------------------------- /
+			for (int i = 0; i < nfds; ++i)
+			{
+				// handle new connection requests ---------------------------- /
+				if (events[i].data.fd == this->_sockfd)            
+					this->_acceptConnection(this->_sockfd, this->_pollfd);
+				else // new message from existing connection ----------------- /
+					this->_handleNewMessage(events[i]);
 			}
-        }
 
-        // send a PING to fds that seems inactive ---------------------------- /
-        try { this->_pingClients(); }
-        catch (Server::pollDelException &e)
-        { printError(e.what(), 1, true); return; }
-    }
+			// send a PING to fds that seems inactive ------------------------ /
+			this->_pingClients();
+		}
+	}
+	// EXCEPTIONS THAT END THE SERVER
+	catch (Server::socketException &e){ printError(e.what(), 1, true); return;}
+	catch (Server::bindException &e){ printError(e.what(), 1, true); return; }
+	catch (Server::pollException &e){ printError(e.what(), 1, true); return; }
+	catch (Server::pollAddException &e){ printError(e.what(), 1, true); return;}
+	catch (Server::pollWaitException &e){ _clearAll(); return; }
+	catch (Server::pollDelException &e){ printError(e.what(), 1, true); return;}
+	catch (Server::acceptException &e){ printError(e.what(), 1, true); return; }
+	catch (Server::sendException &e){ printError(e.what(), 1, true); return; }
+	catch (Server::readException &e){ printError(e.what(), 1, true); return; }
 }
 
 // KILL CONNECTION
