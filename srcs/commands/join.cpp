@@ -18,6 +18,7 @@
  * - ERR_NOSUCHCHANNEL
  * - ERR_BANNEDFROMCHAN
  * - ERR_BADCHANNELKEY
+ * - ERR_USERONCHANNEL
  *   
  */
 
@@ -95,6 +96,8 @@ int checkKey(size_t pos, std::vector<std::string> key,
 
 int checkChannel(std::string channel, Server *server, const int &fdUser)
 {
+    std::map<std::string, Channel *>::iterator itMap;
+
     if (channel.empty() == true)
     {
         server->sendClient(fdUser, numericReply(server, fdUser, "461", ERR_NEEDMOREPARAMS(std::string("JOIN"))));
@@ -103,12 +106,23 @@ int checkChannel(std::string channel, Server *server, const int &fdUser)
     if (channel.size() > 50)
     {
         server->sendClient(fdUser, numericReply(server, fdUser, "403", ERR_NOSUCHCHANNEL(channel)));
-        return (-1);
+        return (-2);
     }
     if (isChannel(channel) == false || channel.find(',') != std::string::npos)
     {
         server->sendClient(fdUser, numericReply(server, fdUser, "476", ERR_BADCHANMASK(channel)));
-        return (-1);
+        return (-3);
+    }
+    if (server->_channelList.empty() == true)
+        return (0);
+    itMap = server->_channelList.find(channel);
+    if (itMap == server->_channelList.end())
+        return (0);
+    if (findUserOnChannel(itMap->second->_users, server->getUserByFd(fdUser)) == true)
+    {
+        server->sendClient(fdUser, numericReply(server, fdUser,
+            "443", ERR_USERONCHANNEL(server->getUserByFd(fdUser)->getNickname(), channel)));
+        return (-4);
     }
     return (0);
 }
