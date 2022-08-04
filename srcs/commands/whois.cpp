@@ -205,7 +205,7 @@ void whois(const int &fd, const std::vector<std::string> &params, \
             RPL_WHOISCHANNELS(nickname, channelList)));
         if (isOper)
             srv->sendClient(fd, numericReply(srv, fd, "313", \
-                RPL_WHOISOPERATOR()));
+                RPL_WHOISOPERATOR(nickname)));
         srv->sendClient(fd, numericReply(srv, fd, "317", \
             RPL_WHOISIDLE(nickname, ss.str())));
     }
