@@ -282,32 +282,10 @@ void    Server::_handleNewMessage(struct epoll_event event)
 	// Adding current buf to fd's buffer on server
 	this->_buffersByFd[event.data.fd].append(buf);
 
-	std::cout << "[DEBUG] buf " << buf << std::endl;
-	std::cout << "[DEBUG] buffer map " << this->_buffersByFd[event.data.fd] << std::endl;
- 
-    // split the fd's buffer in a vector of commands. Non blocking in case of not ok message.
-	
-	// Finding in the current buffer the last \r\n to retrieve end of buf for next command
-	// buffer = this->_buffersByFd[event.data.fd];
-	// cmdsBuffer = this->_buffersByFd[event.data.fd];
-	// while ((pos = buffer.find("\r\n")) != std::string::npos)
-	// {
-	// 	if (pos + 1 < buffer.size()) {
-	// 		buffer = buffer.substr(pos + 1, buffer.size());
-	// 	}
-	// 	std::cout << "[DEBUG] buffer in while " << buffer << std::endl;
-	// }
-	// if (pos > 0)
-	// 	cmdsBuffer = this->_buffersByFd[event.data.fd].substr(0, pos +1);
-	// std::cout << "[DEBUG] cmds after while " << cmdsBuffer << std::endl;
-	// this->_buffersByFd[event.data.fd].clear();
-	// std::cout << "[DEBUG] buffer map after clear " << this->_buffersByFd[event.data.fd] << std::endl;
-	// this->_buffersByFd[event.data.fd].append(buffer);
-	// std::cout << "[DEBUG] buffer map after append last bit " << this->_buffersByFd[event.data.fd] << std::endl;
-
-    try { cmd_strings = splitBy(this->_buffersByFd[event.data.fd], "\r\n"); } 
+	// splitting the fd's buffer into commands and appending and/or clearing the buffer
+    try { cmd_strings = splitBy(_buffersByFd[event.data.fd], "\r\n", 
+		&(_buffersByFd[event.data.fd])); } 
     catch (std::runtime_error &e) { printError(e.what(), 1, false); }
-
     
 	// split all commands in a vector of t_command (CMD / PARAM)
     try { splitCmds(cmd_strings, &cmds); }

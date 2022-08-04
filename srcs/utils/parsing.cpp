@@ -2,19 +2,15 @@
 #include "../../includes/utils.hpp"
 
 // Split a string by irc message delimiter (\n\r) and return a string vector
-std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
+std::vector<std::string>  splitBy(std::string str, const std::string &delimiter, std::string *buffer)
 {
     std::vector<std::string>    result;
-    size_t                      end;
+	size_t                      end;
 
     // first check 
     end = str.find(delimiter);
-    if (end == std::string::npos) {
-		this->_buffersByFd[event.data.fd].append(str);
-        return (std::vector<std::string>()); // empty vector
-        //throw std::runtime_error("IRC message must end with CRLF");
-	}
-
+    if (end == std::string::npos)
+        return (std::vector<std::string>());
     // save first command in vector
     if (end + delimiter.length() > MAX_CMD_LEN)
         throw std::runtime_error("IRC message shall not exceed 512 characters");
@@ -34,7 +30,9 @@ std::vector<std::string>  splitBy(std::string str, const std::string &delimiter)
         str.erase(0, end + delimiter.length());
         end = str.find(delimiter);
     }
-	this->_buffersByFd[event.data.fd].append(str.substr(end, str.size()));
+	(*buffer).clear();
+	if (!str.empty())
+		(*buffer) = str;
     return (result);
 }
 
