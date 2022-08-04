@@ -6,6 +6,7 @@
 ## Other
 .DS_Store
 ircserv
+helper
 
 # Debug files
 *.dSYM/
