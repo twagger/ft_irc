@@ -243,10 +243,6 @@ void    Server::_acceptConnection(int sockfd, int pollfd)
     // create a new empty user
     this->_userList[newfd] = new User(newfd, inet_ntoa(client_addr.sin_addr));
 
-	// TO DELETE
-	// hostent *host = gethostbyname(inet_ntoa(client_addr.sin_addr));
-	// std::cout << "[DEBUG] sin addr " << host->h_name << std::endl;
-
     // add the new fd to the poll
     memset(&ev, 0, sizeof(struct epoll_event));
     ev.events = EPOLLIN | EPOLLET;
@@ -309,6 +305,8 @@ void    Server::_handleNewMessage(struct epoll_event event)
 // INIT COMMAND LIST OF THE SERVER
 void    Server::_initCommandList(void) // functions to complete
 {
+    this->_cmdList["CAP"] = &cap;
+	this->_cmdList["DIE"] = &die;
     this->_cmdList["PASS"] = &pass;
     this->_cmdList["NICK"] = &nick;
 	this->_cmdList["USER"] = &user;
@@ -331,10 +329,9 @@ void    Server::_initCommandList(void) // functions to complete
     this->_cmdList["INFO"] = &info;
     this->_cmdList["PRIVMSG"] = &privmsg;
     this->_cmdList["NOTICE"] = &notice;
-    this->_cmdList["CAP"] = &cap;
-	this->_cmdList["DIE"] = &die;
 	this->_cmdList["WHO"] = &who;
 	this->_cmdList["WHOIS"] = &whois;
+	this->_cmdList["SERVICE"] = &service;
 }
 
 // EXECUTE RECEIVED COMMANDS

@@ -3,7 +3,8 @@
 
 bool 	isAuthenticationCmd(std::string cmd) {
 	if (cmd.compare("USER") == 0 || cmd.compare("NICK") == 0
-		|| cmd.compare("PASS") == 0 || cmd.compare("QUIT") == 0)
+		|| cmd.compare("PASS") == 0 || cmd.compare("QUIT") == 0
+		|| cmd.compare("SERVICE") == 0)
 		return true;
 	return false;
 }
@@ -19,10 +20,10 @@ bool	isAuthenticatable(User *user)
 	return true;
 }
 
-void addModeI(Server *srv, User *user, const int fd) {
+void addDefaultMode(Server *srv, User *user, const int fd, uint8_t mod) {
 	std::vector<std::string> params;
+	user->addMode(mod);
 	params.push_back(user->getNickname());
-	params.push_back("+i");
 	mode(fd, params, "MODE", srv);
 }
 
@@ -31,18 +32,25 @@ void	authenticateUser(const int fd, Server *srv)
 	std::string					replyMsg;
 	std::vector<std::string>	params;
 	User*						user = srv->getUserByFd(fd);
+	bool						isNotBot = !user->hasMode(MOD_BOT);
 
-	replyMsg.append(numericReply(srv, fd, "001",
-		RPL_WELCOME(user->getNickname(), user->getUsername(), user->getHostname())));
+	if (isNotBot)
+		replyMsg.append(numericReply(srv, fd, "001",
+			RPL_WELCOME(user->getNickname(), user->getUsername(), user->getHostname())));
+	else
+		replyMsg.append(numericReply(srv, fd, "383",
+			RPL_YOURESERVICE(user->getNickname())));	
 	replyMsg.append(numericReply(srv, fd, "002",
 		RPL_YOURHOST(srv->getHostname(), srv->getVersion())));
-	replyMsg.append(numericReply(srv, fd, "003",
-		RPL_CREATED(srv->getDate())));
+	if (isNotBot)
+		replyMsg.append(numericReply(srv, fd, "003", RPL_CREATED(srv->getDate())));
 	replyMsg.append(numericReply(srv, fd, "004",
 		RPL_MYINFO(srv->getHostname(), srv->getVersion(), USERMODES, CHANNELMODES)));
 	srv->sendClient(fd, replyMsg);
-	motd(fd, params, "MOTD", srv);
-	addModeI(srv, user, fd);
+	if (isNotBot) {
+		motd(fd, params, "MOTD", srv);
+		addDefaultMode(srv, user, fd, MOD_INVISIBLE);
+	}
 	user->setAuthenticated(true);																							// is client answering smth?
 	return ;
 }

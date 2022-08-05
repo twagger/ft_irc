@@ -41,6 +41,7 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/ping.cpp \
 			  srcs/commands/pong.cpp \
 			  srcs/commands/quit.cpp \
+			  srcs/commands/service.cpp \
 			  srcs/commands/time.cpp \
 			  srcs/commands/user.cpp \
 			  srcs/commands/privmsg.cpp \

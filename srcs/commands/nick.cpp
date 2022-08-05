@@ -67,21 +67,16 @@ void nick(const int &fd, const std::vector<std::string> &params, const std::stri
 
 	if (user != 0 && user->getPassword() == true)
 	{
-		if (params.empty() || params[0].empty()) {
+		if (params.empty() || params[0].empty()) 
 			replyMsg = numericReply(srv, fd, "431", ERR_NONICKNAMEGIVEN);
-		}
-		else if (forbiddenNick(params[0]) == true) {
+		else if (forbiddenNick(params[0]) == true) 
 			replyMsg = numericReply(srv, fd, "432", ERR_ERRONEUSNICKNAME(params[0]));
-		}
-		else if (srv->getUserByNickname(params[0]) != 0) {
+		else if (srv->getUserByNickname(params[0]) != 0) 
 			replyMsg = numericReply(srv, fd, "433", ERR_NICKNAMEINUSE(params[0]));
-		}
-		else if (isInKillList(srv, params[0])) {
+		else if (isInKillList(srv, params[0]))
 			replyMsg = numericReply(srv, fd, "437", ERR_UNAVAILRESOURCE(params[0]));
-		}
-		else if (user->hasMode(MOD_RESTRICTED)) {
+		else if (user->hasMode(MOD_RESTRICTED))
 			replyMsg = numericReply(srv, fd, "484", ERR_RESTRICTED);
-		}
 		else if (user->getNickname() == "*") {
 			user->setNickname(params[0]);
 			if (isAuthenticatable(user)) 

@@ -37,6 +37,9 @@
 #ifndef COMPILDATE
 # define COMPILDATE "Sun 25 Sep 1983 10:00:00 AM CEST"
 #endif
+#ifndef HOSTADDRESS
+# define HOSTADDRESS "42paris.fr"
+#endif
 
 
 // Utility structure
