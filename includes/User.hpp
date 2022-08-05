@@ -46,6 +46,7 @@ class User {
 		int							_status;
         time_t                      _lastActivityTime;
         time_t                      _pingTime;
+		bool						_isBot;
 
 
 	public:
@@ -67,6 +68,7 @@ class User {
 		int							getStatus(void) const;
         time_t  					getLastActivityTime(void) const;
         time_t  					getPingTime(void) const;
+		bool 						getIsBot(void) const;
 
 		void setNickname(std::string nickname);
 		void setUsername(std::string username);
@@ -77,6 +79,7 @@ class User {
 		void setStatus(int status);
 		void setLastActivityTime(void);
 		void setPingTime(void);
+		void setIsBot(bool bot);
 
         // mode
 		void addMode(uint8_t mode);
