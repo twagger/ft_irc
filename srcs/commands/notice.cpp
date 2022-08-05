@@ -245,9 +245,9 @@ static void getTargetsFromString(const int &fd, const std::string &str, \
 }
 
 /* ************************************************************************** */
-/* IRC COMMAND : PRIVMSG                                                      */
+/* IRC COMMAND : NOTICE                                                       */
 /* ************************************************************************** */
-void privmsg(const int &fd, const std::vector<std::string> &params, \
+void notice(const int &fd, const std::vector<std::string> &params, \
                         const std::string &, Server *srv)
 {
     std::map<std::string, std::deque<Target> >              targets;
@@ -262,7 +262,7 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
     try {
         // check nb of param
         if (params.size() == 0)
-            throw norecipientException("PRIVMSG");
+            throw norecipientException("NOTICE");
         if (params.size() == 1)
             throw notexttosendException();
 
@@ -278,9 +278,9 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
         
     }
     // EXCEPTIONS THAT END THE COMMAND
-    catch (norecipientException &e) {e.reply(srv, fd); return; }
-    catch (notexttosendException &e) {e.reply(srv, fd); return; }
-    catch (toomanytargetsException &e) {e.reply(srv, fd); return; }
+    catch (norecipientException &e) { return; }
+    catch (notexttosendException &e) { return; }
+    catch (toomanytargetsException &e) { return; }
     
     // Loop to SEND all messages
     for (it = targets.begin(); it != targets.end(); ++it)
@@ -307,9 +307,9 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
             }
         }
         // EXCEPTIONS THAT DON'T END THE COMMAND
-        catch (nosuchnickException &e) {e.reply(srv, fd);}
-        catch (notoplevelException &e) {e.reply(srv, fd);}
-        catch (wildtoplevelException &e) {e.reply(srv, fd);}
-        catch (cannotsendtochanException &e) {e.reply(srv, fd);}
+        catch (nosuchnickException &e) {}
+        catch (notoplevelException &e) {}
+        catch (wildtoplevelException &e) {}
+        catch (cannotsendtochanException &e) {}
     }
 }
