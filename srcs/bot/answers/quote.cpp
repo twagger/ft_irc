@@ -2,6 +2,7 @@
 #include <deque>
 #include <cstdlib>
 #include <fstream>
+#include <ctime>
 
 #include <iostream>
 #define FILENAME "conf/botquotes.txt"
@@ -13,6 +14,9 @@ std::string botQuote(void)
 	std::string	            line;
     std::deque<std::string> quotes;
     int                     quoteNum;
+
+    // initialize random seed
+    std::srand(time(NULL));
 
     // Try to open file
 	infile.exceptions(std::ifstream::failbit);
@@ -27,6 +31,6 @@ std::string botQuote(void)
 	} catch (std::ios_base::failure &e) {}
 
     // pick one quote in the list
-    quoteNum = rand() % quotes.size();
+    quoteNum = std::rand() % quotes.size();
     return (quotes[quoteNum]);
 }
