@@ -48,7 +48,7 @@ void createChannel(std::string channel, const size_t &pos,
     if (key.empty() == false)
     {
         it = key.begin() + pos;
-        if ((*it).compare("x") != 0)
+        if (key.size() > pos && (*it).compare("x") != 0)
             newChannel = new Channel(channel, *it, currentUser);
         else
             newChannel = new Channel(channel, currentUser);
@@ -85,7 +85,7 @@ int checkKey(size_t pos, std::vector<std::string> key,
     it = key.begin() + pos;
     keyToCheck = *it;
 
-    if (keyToCheck.compare(keySetInChannel) != 0)
+    if (keyToCheck.empty() == false && keyToCheck.compare(keySetInChannel) != 0)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "475", ERR_BADCHANNELKEY(itMap->second->getChannelName())));
