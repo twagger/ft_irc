@@ -31,7 +31,8 @@
 /* Constructors & destructor                                                  */
 /* ************************************************************************** */
 Server::Server(int port, std::string password, std::string name)
-: _port(port), _password(password), _name(name), _hostname(HOSTNAME), _version(VERSION)
+: _port(port), _password(password), _name(name), _hostname(HOSTNAME), _version(VERSION),
+    _pollfd(0), _sockfd(0)
 { 
 	time_t      rawtime = time(NULL);
     struct tm   *timeinfo;

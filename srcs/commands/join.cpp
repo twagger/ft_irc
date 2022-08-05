@@ -22,21 +22,19 @@
  *   
  */
 
-void channelReply(Server *server, const int &fdUser, std::string channelName)
+void channelReply(Server *server, const int &fdUser, std::string channelName,
+    std::vector<std::string> parameters)
 {
     // Reply if the user successfully joined the channel
     // Use send for all the user of a channel (vector of fd)
     std::string event = clientReply(server, fdUser, "JOIN " + channelName);
-    std::string userList = WelcomeChan(server, fdUser, "353",
-                                     server->_channelList.find(channelName),
-                                     channelName);
     std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
     std::vector<std::string> parameterTopic;
 
     parameterTopic.push_back(channelName);
     server->sendChannel(channelName, event);
     topic(fdUser, parameterTopic, channelName, server);
-    server->sendClient(fdUser, userList + endOfNames);
+    names(fdUser, parameters, channelName, server);
 }
 
 void createChannel(std::string channel, const size_t &pos,
@@ -48,7 +46,7 @@ void createChannel(std::string channel, const size_t &pos,
     if (key.empty() == false)
     {
         it = key.begin() + pos;
-        if ((*it).compare("x") != 0)
+        if (key.size() > pos && (*it).compare("x") != 0)
             newChannel = new Channel(channel, *it, currentUser);
         else
             newChannel = new Channel(channel, currentUser);
@@ -85,7 +83,7 @@ int checkKey(size_t pos, std::vector<std::string> key,
     it = key.begin() + pos;
     keyToCheck = *it;
 
-    if (keyToCheck.compare(keySetInChannel) != 0)
+    if (keyToCheck.empty() == false && keyToCheck.compare(keySetInChannel) != 0)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "475", ERR_BADCHANNELKEY(itMap->second->getChannelName())));
@@ -141,6 +139,9 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
     std::vector<std::string>::iterator itChan;
     std::map<std::string, Channel *>::iterator itMap;
 
+    if (parameter.size() == 0)
+        return (server->sendClient(fdUser, numericReply(server, fdUser,
+            "461", ERR_NEEDMOREPARAMS(std::string("JOIN")))));
     channel = splitByComma(parameter[0]);
     if (parameter.size() > 1)
         key = splitByComma(parameter[1]);
@@ -167,8 +168,8 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
                 /* According to RFC 2811, "A user who is banned from a channel
                  * and who carries an invitation
                  * sent by a channel operator is allowed to join the channel" */
-                if (findUserOnChannel(itMap->second->_bannedUsers,
-                        server->getUserByFd(fdUser)) == true
+                if (findBannedUserOnChannel(itMap->second->_bannedUsers,
+                    server->getUserByFd(fdUser)->getNickname()) == true
                     && findUserOnChannel(itMap->second->_invitees,
                         server->getUserByFd(fdUser)) == false)
                     return (server->sendClient(fdUser, numericReply(server, fdUser,
@@ -179,14 +180,14 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
             else
                 createChannel(*itChan, itChan - channel.begin(), key,
                               server->getUserByFd(fdUser), server);
-            channelReply(server, fdUser, *itChan);
+            channelReply(server, fdUser, *itChan, parameter);
         }
         // Case where no channel exists
         else
         {
             createChannel(*itChan, itChan - channel.begin(), key,
                           server->getUserByFd(fdUser), server);
-            channelReply(server, fdUser, *itChan);
+            channelReply(server, fdUser, *itChan, parameter);
         }
     }
 }

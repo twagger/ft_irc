@@ -159,12 +159,12 @@ void listBannedUser(const int &fdUser, Server *server,
               Channel *channel)
 {
     std::string nicknameList;
-    std::deque<User *> listBannedUser = channel->_bannedUsers;
-    std::deque<User *>::iterator itBannedUser;
+    std::deque<std::string> listBannedUser = channel->_bannedUsers;
+    std::deque<std::string>::iterator itBannedUser;
 
     for (itBannedUser = listBannedUser.begin(); itBannedUser != listBannedUser.end();
 		itBannedUser++)
-        nicknameList += (*itBannedUser)->getNickname() + "!*@* ";
+        nicknameList += *itBannedUser + "!*@* ";
     server->sendClient(fdUser, numericReply(server, fdUser,
         "367", RPL_BANLIST(channel->getChannelName(), nicknameList)));
     server->sendClient(fdUser, numericReply(server, fdUser,
@@ -194,8 +194,10 @@ void handleChannelReply(const std::vector<std::string> params, const int &fd, Se
 {
 	std::string channel = params[0];
 	std::string mode = params[1];
-	std::string user = params[2];
+	std::string user;
 
+	if (params.size() > 2)
+		std::string user = params[2];
 	// Case where mode is only +i
 	if (params.size() < 3)
 		return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
@@ -245,7 +247,7 @@ void addModesChannel(const std::vector<std::string> params, int start, int stop,
 			// Check that the user exists and a user was given in parameter
 			if (checkUserExists(user, params, fd, srv, 1) < 0)
 				return ;
-			channel->addBannedUser(user);
+			channel->addBannedUser(user->getNickname());
 			channel->addMode(MOD_BAN);
 			break ;
 		default:
@@ -285,7 +287,7 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 		case 'b':
 			if (checkUserExists(user, params, fd, srv, 1) < 0)
 				return ;
-			channel->removeBannedUser(user);
+			channel->removeBannedUser(user->getNickname());
 			channel->removeMode(MOD_BAN);
 			break ;
 		default:

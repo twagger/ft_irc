@@ -33,9 +33,6 @@ void						displayCommands(std::vector<Command> cmds);
 std::string numericReply(Server *irc, const int &fd, std::string code,
 			std::string replyMsg);
 std::string	clientReply(Server *irc, const int &fd, std::string replyMsg);
-std::string WelcomeChan(Server *irc, const int &fd, std::string code,
-    std::map<std::string, Channel *>::iterator itMap,
-    std::string channelName);
 std::string eventChannel(Server *irc, const int &fd, std::string eventType,
     std::string channelName);
 void		serverQuitNotice(const int &fd,  Server *srv, const std::string
@@ -49,6 +46,7 @@ std::string              getChannelTopic(std::string channelName, std::map<std::
     Channel *> channelList);
 std::vector<std::string> getChannelKey(std::vector<std::string> parameter);
 bool findUserOnChannel(std::deque<User *> userList, User *currentUser);
+bool findBannedUserOnChannel(std::deque<std::string> userList, std::string currentUser);
 
 // Authenticate users
 bool 		isAuthenticationCmd(std::string cmd);

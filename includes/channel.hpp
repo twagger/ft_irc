@@ -30,11 +30,11 @@ private:
 
 public:
     /** Public attributes **/
-    uint8_t             _mode;
-    std::deque<User *>  _operators;
-    std::deque<User *>  _users;
-    std::deque<User *>  _bannedUsers;
-    std::deque<User *>  _invitees;
+    uint8_t                 _mode;
+    std::deque<User *>      _operators;
+    std::deque<User *>      _users;
+    std::deque<std::string> _bannedUsers;
+    std::deque<User *>      _invitees;
 
     /** Constructors and destructor **/
 
@@ -64,10 +64,10 @@ public:
     void addUser(User *newUser);
     void removeUser(User *userToDelete);
     void removeOperator(User *userToDelete);
-    void removeBannedUser(User *userToDelete);
+    void removeBannedUser(std::string userToDelete);
     void removeInvitee(User *userToDelete);
     void addOperator(User *newOperator);
-    void addBannedUser(User *newBannedUser);
+    void addBannedUser(std::string newBannedUser);
     void addInvitee(User *newInvitee);
 
     // mode

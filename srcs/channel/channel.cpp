@@ -62,7 +62,7 @@ void Channel::addOperator(User *newOperator)
     this->_operators.push_back(newOperator);
 }
 
-void Channel::addBannedUser(User *newBannedUser)
+void Channel::addBannedUser(std::string newBannedUser)
 {
     this->_bannedUsers.push_back(newBannedUser);
 }
@@ -91,9 +91,9 @@ void Channel::removeOperator(User *userToDelete)
     }
 }
 
-void Channel::removeBannedUser(User *userToDelete)
+void Channel::removeBannedUser(std::string userToDelete)
 {
-    std::deque<User *>::iterator pos = std::find(this->_bannedUsers.begin(),
+    std::deque<std::string>::iterator pos = std::find(this->_bannedUsers.begin(),
         this->_bannedUsers.end(), userToDelete);
     if (pos != this->_bannedUsers.end())
     {

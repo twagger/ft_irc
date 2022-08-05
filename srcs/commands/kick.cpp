@@ -37,22 +37,15 @@ int checkChannelExist(std::string channel, const int &fdUser, Server *server)
     return (0);
 }
 
-int checkGeneralParameter(std::vector<std::string> channel, std::vector<std::string> user,
-                          Server *server, const int &fdUser)
+int checkGeneralParameter(std::vector<std::string> channel, Server *server,
+    const int &fdUser)
 {
-    // user and channel must not be empty
-    if (user.empty() == true || channel.empty() == true)
-    {
-        server->sendClient(fdUser, numericReply(server, fdUser,
-                                                "461", ERR_NEEDMOREPARAMS(std::string("KICK"))));
-        return (-1);
-    }
     // channelList must not be empty
     if (server->_channelList.empty() == true)
     {
         server->sendClient(fdUser, numericReply(server, fdUser,
                                                 "403", ERR_NOSUCHCHANNEL(channel[0])));
-        return (-2);
+        return (-1);
     }
     return (0);
 }
@@ -123,12 +116,15 @@ void kick(const int &fdUser, const std::vector<std::string> &parameter, const st
     std::vector<std::string> user;
     std::string kickMessage;
     
+    if (parameter.size() < 2)
+        return (server->sendClient(fdUser, numericReply(server, fdUser,
+            "461", ERR_NEEDMOREPARAMS(std::string("KICK")))));
     channel = splitByComma(parameter[0]);
     if (parameter.size() > 1)
         user = splitByComma(parameter[1]);
     if (parameter.size() > 2)
         kickMessage = parameter[2];
-    if (checkGeneralParameter(channel, user, server, fdUser) < 0)
+    if (checkGeneralParameter(channel, server, fdUser) < 0)
         return;
     if (channel.size() == 1)
         return (oneChannelCase(channel[0], user, kickMessage, server, fdUser));
