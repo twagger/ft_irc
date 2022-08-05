@@ -13,9 +13,9 @@
 
 #define BOTNAME 	"Impostor"
 
-#define PORT 		6667    /* Le port où le client se connectera */
+#define PORT 		6667
 
-#define MAXDATASIZE 100 /* Tampon d'entrée */
+#define MAXDATASIZE 100
 
 
 void closefd(int fd) {
@@ -27,9 +27,9 @@ void closefd(int fd) {
 bool setupClientBot(int *sockfd, const char *hostname, int port) {
 
 	struct hostent *he;
-	struct sockaddr_in their_addr; /* Adresse de celui qui se connecte */
+	struct sockaddr_in their_addr;
 
-	if ((he=gethostbyname(hostname)) == NULL) {  /* Info de l'hôte */
+	if ((he=gethostbyname(hostname)) == NULL) {
 		printError("gethostbyame error", 1, true);
 		return (false);
 	}
@@ -37,10 +37,10 @@ bool setupClientBot(int *sockfd, const char *hostname, int port) {
 		printError("socket error", 1, true);
 		return (false);
 	}
-	their_addr.sin_family = AF_INET;      /* host byte order */
-	their_addr.sin_port = htons(port);    /* short, network byte order */
+	their_addr.sin_family = AF_INET;
+	their_addr.sin_port = htons(port);
 	their_addr.sin_addr = *((struct in_addr *)he->h_addr);
-	bzero(&(their_addr.sin_zero), 8);     /* zero pour le reste de struct */
+	bzero(&(their_addr.sin_zero), 8);
 	if (connect(*sockfd, (struct sockaddr *)&their_addr, \
 										sizeof(struct sockaddr)) == -1) {
 		printError("connect error", 1, true);
@@ -69,7 +69,7 @@ bool connectServiceBot(int *sockfd, std::string password, std::string botName) {
 	return (true);
 }
 
-int	connect(std::string received, int registered, int *sockfd, std::string pwd, std::string *botName) {
+int	reconnect(std::string received, int registered, int *sockfd, std::string pwd, std::string *botName) {
 	if (registered == 0 && received.find("383") != std::string::npos)
 		return (1);
 	else if (registered == 0 && received.find("433") != std::string::npos) {
@@ -84,14 +84,16 @@ int	connect(std::string received, int registered, int *sockfd, std::string pwd, 
 
 int main(int argc, char *argv[])
 {
-	int sockfd = 0;
-	int numbytes = 1;
-	int port;
-	char buf[MAXDATASIZE];
+	int 		sockfd = 0;
+	int 		numbytes = 1;
+	char 		buf[MAXDATASIZE];
+	int 		port = PORT;
+	// For connection:
+	std::string botName = BOTNAME;
 	std::string pwd = argv[2];
 	std::string received;
-	std::string botName = BOTNAME;
 	int 		registered = 0;
+
 
 	if (argc != 3 && argc != 4) {
 		std::cerr << "usage: ./bot hostname password [PORT]" << std::endl;
@@ -99,8 +101,7 @@ int main(int argc, char *argv[])
 	}
 	else if (argc == 4)
 		port = std::atol(argv[3]);
-	else
-		port = PORT;
+
 	
 	if (setupClientBot(&sockfd, argv[1], port) == false)
 		return (1);
@@ -109,21 +110,25 @@ int main(int argc, char *argv[])
 		return (1);
 	}
 	while (1) {
-		// try to register if registration failed because nickname unavailable
+		// try to re-register if registration failed because nickname unavailable
 		if (registered == 0)
-			if ((registered = connect(received, registered, &sockfd, pwd, &botName)) == -1) {
+			if ((registered = reconnect(received, registered, &sockfd, pwd, &botName)) == -1) {
 				closefd(sockfd);
 				return (1);
 		}
-		// receive server replies
+		// clear buf here before another recv
+
+
+		// receive server replies - can be modified / duplicat
 		if ((numbytes = recv(sockfd, buf, MAXDATASIZE, 0)) == -1) {
 			printError("recv", 1, true);
 			return (1);
 		}
 		if (numbytes > 0) {
 			buf[numbytes] = '\0';
+
+			// necessary to get reply's number for reconnect
 			received = buf;
-			std::cout << received << std::endl;
 		}
 	}
 	closefd(sockfd);
