@@ -32,23 +32,23 @@ void addModes(User *user, const std::string mode, int start, int stop)
 	{
 		switch (mode[i])
 		{
-		case 'a':
-			break;
-		case 'w':
-			user->addMode(MOD_WALLOPS);
-			break;
-		case 'i':
-			user->addMode(MOD_INVISIBLE);
-			break;
-		case 'o':
-			break;
-		case 's':
-			user->addMode(MOD_SRVNOTICES);
-			break;
-		case 'r':
-			user->addMode(MOD_RESTRICTED);
-			user->removeMode(MOD_OPER);
-			break;
+			case 'a':
+				break;
+			case 'w':
+				user->addMode(MOD_WALLOPS);
+				break;
+			case 'i':
+				user->addMode(MOD_INVISIBLE);
+				break;
+			case 'o':
+				break;
+			case 's':
+				user->addMode(MOD_SRVNOTICES);
+				break;
+			case 'r':
+				user->addMode(MOD_RESTRICTED);
+				user->removeMode(MOD_OPER);
+				break;
 		}
 	}
 }
@@ -59,22 +59,22 @@ void removeModes(User *user, const std::string mode, int start, int stop)
 	{
 		switch (mode[i])
 		{
-		case 'a':
-			break;
-		case 'w':
-			user->removeMode(MOD_WALLOPS);
-			break;
-		case 'i':
-			user->removeMode(MOD_INVISIBLE);
-			break;
-		case 'o':
-			user->removeMode(MOD_OPER);
-			break;
-		case 's':
-			user->removeMode(MOD_SRVNOTICES);
-			break;
-		case 'r':
-			break;
+			case 'a':
+				break;
+			case 'w':
+				user->removeMode(MOD_WALLOPS);
+				break;
+			case 'i':
+				user->removeMode(MOD_INVISIBLE);
+				break;
+			case 'o':
+				user->removeMode(MOD_OPER);
+				break;
+			case 's':
+				user->removeMode(MOD_SRVNOTICES);
+				break;
+			case 'r':
+				break;
 		}
 	}
 }
@@ -101,17 +101,11 @@ void handleAddRemoveModes(User *user, const std::string modes)
 	for (unsigned int i = 0; i < modes.size(); i++)
 	{
 		if (modes[i] == '+' || modes[i] == '-')
-		{
 			findPair(modes, i, &pair);
-		}
 		if (modes[i] == '+' && pair.second > 0)
-		{
 			addModes(user, modes, i, pair.second + 1);
-		}
 		else if (modes[i] == '-' && pair.second > 0)
-		{
 			removeModes(user, modes, i, pair.second + 1);
-		}
 	}
 }
 

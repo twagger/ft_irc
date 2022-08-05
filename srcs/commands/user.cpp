@@ -66,6 +66,7 @@ void user(const int &fd, const std::vector<std::string> &params, const std::stri
 			return ;
 		}
 	}
-	srv->sendClient(fd, replyMsg);
+	if (!replyMsg.empty())
+		srv->sendClient(fd, replyMsg);
 	return ;
 }
