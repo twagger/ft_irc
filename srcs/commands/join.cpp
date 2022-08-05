@@ -22,21 +22,19 @@
  *   
  */
 
-void channelReply(Server *server, const int &fdUser, std::string channelName)
+void channelReply(Server *server, const int &fdUser, std::string channelName,
+    std::vector<std::string> parameters)
 {
     // Reply if the user successfully joined the channel
     // Use send for all the user of a channel (vector of fd)
     std::string event = clientReply(server, fdUser, "JOIN " + channelName);
-    std::string userList = WelcomeChan(server, fdUser, "353",
-                                     server->_channelList.find(channelName),
-                                     channelName);
     std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
     std::vector<std::string> parameterTopic;
 
     parameterTopic.push_back(channelName);
     server->sendChannel(channelName, event);
     topic(fdUser, parameterTopic, channelName, server);
-    server->sendClient(fdUser, userList + endOfNames);
+    names(fdUser, parameters, channelName, server);
 }
 
 void createChannel(std::string channel, const size_t &pos,
@@ -182,14 +180,14 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
             else
                 createChannel(*itChan, itChan - channel.begin(), key,
                               server->getUserByFd(fdUser), server);
-            channelReply(server, fdUser, *itChan);
+            channelReply(server, fdUser, *itChan, parameter);
         }
         // Case where no channel exists
         else
         {
             createChannel(*itChan, itChan - channel.begin(), key,
                           server->getUserByFd(fdUser), server);
-            channelReply(server, fdUser, *itChan);
+            channelReply(server, fdUser, *itChan, parameter);
         }
     }
 }

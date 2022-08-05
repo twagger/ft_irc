@@ -36,33 +36,6 @@ void 	informSUsers(Server *srv, std::string msg)
 	}
 }
 
-std::string WelcomeChan(Server *irc, const int &fd, std::string code,
-    std::map<std::string, Channel *>::iterator itMap, std::string channelName)
-{
-    std::string nicknameList;
-    std::deque<User *> listUser = itMap->second->_users;
-    std::deque<User *> listOperator = itMap->second->_operators;
-    std::deque<User *>::iterator itUser;
-    std::deque<User *>::iterator itOperator;
-
-    for (itUser = listUser.begin(); itUser != listUser.end(); itUser++)
-    {
-        // Case if user is an operator
-        for (itOperator = listOperator.begin(); itOperator != listOperator.end();
-            itOperator++)
-        {
-            if (*itUser == *itOperator)
-                nicknameList += "@"; 
-        }
-        nicknameList += (*itUser)->getNickname() + " ";
-    }
-	std::string reply = ":" + irc->getHostname() + " " + code + " "
-						+ irc->getUserByFd(fd)->getNickname() + " = "
-                        + channelName + " ";
-    reply += nicknameList + "\r\n";		
-	return (reply);
-}
-
 std::string clientReply(Server *irc, const int &originFd, std::string replyMsg)
 {
 	std::string reply = ":" + irc->getUserByFd(originFd)->getNickname() + "!"

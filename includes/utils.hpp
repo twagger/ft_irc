@@ -31,9 +31,6 @@ void						displayCommands(std::vector<Command> cmds);
 std::string numericReply(Server *irc, const int &fd, std::string code,
 			std::string replyMsg);
 std::string	clientReply(Server *irc, const int &fd, std::string replyMsg);
-std::string WelcomeChan(Server *irc, const int &fd, std::string code,
-    std::map<std::string, Channel *>::iterator itMap,
-    std::string channelName);
 std::string eventChannel(Server *irc, const int &fd, std::string eventType,
     std::string channelName);
 void		serverQuitNotice(const int &fd,  Server *srv, const std::string

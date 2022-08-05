@@ -18,6 +18,7 @@ void listUser(const int &fdUser, Server *server,
     std::deque<User *> listOperator = itChannel->second->_operators;
     std::deque<User *>::iterator itUser;
     std::deque<User *>::iterator itOperator;
+    std::string reply;
 
     for (itUser = listUser.begin(); itUser != listUser.end(); itUser++)
     {
@@ -30,9 +31,11 @@ void listUser(const int &fdUser, Server *server,
         }
         nicknameList += (*itUser)->getNickname() + " ";
     }
-    server->sendClient(fdUser, numericReply(server, fdUser,
-                                            "353", RPL_NAMREPLY(itChannel->first,
-                                            nicknameList)));
+    reply = ":" + server->getHostname() + " " + "353" + " "
+						+ server->getUserByFd(fdUser)->getNickname() + " = "
+                        + itChannel->second->getChannelName() + " ";
+    reply += nicknameList + "\r\n";		
+    server->sendClient(fdUser, reply);
 }
 
 void listUserInChannel(const int &fdUser, Server *server)
