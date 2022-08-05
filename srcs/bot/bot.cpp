@@ -41,9 +41,9 @@ bool setupClientBot(int *sockfd, const char *hostname, int port) {
 	}
 	their_addr.sin_family = AF_INET;
 	their_addr.sin_port = htons(port);
-	their_addr.sin_addr = *((struct in_addr *)he->h_addr);
+	their_addr.sin_addr = *(reinterpret_cast<struct in_addr*>(he->h_addr));
 	bzero(&(their_addr.sin_zero), 8);
-	if (connect(*sockfd, (struct sockaddr *)&their_addr, \
+	if (connect(*sockfd, reinterpret_cast<struct sockaddr*>(&their_addr), \
 										sizeof(struct sockaddr)) == -1) {
 		printError("connect error", 1, true);
 		closefd(*sockfd);
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 {
 	int 		sockfd = 0;
 	int 		numbytes = 1;
-	char 		buf[MAXDATASIZE];
+	char 		buf[MAXDATASIZE + 1];
 	int 		port = PORT;
 	// For connection:
 	std::string botName = BOTNAME;
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 
 	if (argc != 3 && argc != 4) {
 		std::cerr << "usage: ./bot hostname password [PORT]" << std::endl;
-		exit(1);
+		return (1);
 	}
 	else if (argc == 4)
 		port = std::atol(argv[3]);
