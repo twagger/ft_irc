@@ -13,6 +13,8 @@ std::string userModesToStr(User *user)
 	modes.append("+");
 	if (user->hasMode(MOD_AWAY))
 		modes.append("a");
+	if (user->hasMode(MOD_BOT))
+		modes.append("B");
 	if (user->hasMode(MOD_WALLOPS))
 		modes.append("w");
 	if (user->hasMode(MOD_INVISIBLE))
@@ -122,7 +124,7 @@ void UserMode(const int &fd, const std::vector<std::string> &params, Server *srv
 	else if (params[0] != user->getNickname())
 		return (srv->sendClient(fd, numericReply(srv, fd, "502",
 												 ERR_USERSDONTMATCH)));
-	else if (params[1].find_first_not_of(USERMODES))
+	else if (params[1].find_first_not_of("aBiwros") != std::string::npos)
 		return (srv->sendClient(fd, numericReply(srv, fd, "501",
 												 ERR_UMODEUNKNOWNFLAG)));
 	else if (!params[1].empty())
