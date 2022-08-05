@@ -200,8 +200,10 @@ void handleChannelReply(const std::vector<std::string> params, const int &fd, Se
 {
 	std::string channel = params[0];
 	std::string mode = params[1];
-	std::string user = params[2];
+	std::string user;
 
+	if (params.size() > 2)
+		std::string user = params[2];
 	// Case where mode is only +i
 	if (params.size() < 3)
 		return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
