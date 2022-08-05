@@ -28,7 +28,6 @@ void channelReply(Server *server, const int &fdUser, std::string channelName,
     // Reply if the user successfully joined the channel
     // Use send for all the user of a channel (vector of fd)
     std::string event = clientReply(server, fdUser, "JOIN " + channelName);
-    std::string endOfNames = numericReply(server, fdUser, "366", RPL_ENDOFNAMES(channelName));
     std::vector<std::string> parameterTopic;
 
     parameterTopic.push_back(channelName);
