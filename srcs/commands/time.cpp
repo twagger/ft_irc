@@ -28,6 +28,7 @@ void time(const int &fd, \
         }
         timeinfo = localtime(&rawtime);
         strTime = std::string(asctime(timeinfo));
+        strTime = strTime.substr(0, strTime.length() - 1);
         srv->sendClient(fd, \
            numericReply(srv, fd, "391", RPL_TIME(srv->getHostname(), strTime)));
     }
