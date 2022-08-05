@@ -44,6 +44,8 @@ static bool    isUserChanOper(Server *srv, User *user, const std::string channel
     std::deque<User *>                  userList;
     std::deque<User *>::const_iterator  it;
 
+    if (channel.empty())
+        return (false);
     userList = srv->_channelList[channel]->_operators;
     if (std::find(userList.begin(), userList.end(), user) == userList.end())
         return (false);

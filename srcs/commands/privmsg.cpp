@@ -64,6 +64,31 @@ std::map<std::string, std::deque<Target> > splitTargets(std::string targets)
     return (map);
 }
 
+bool    isUserBannedOnChannel(Server *srv, const int &fd, \
+                              const std::string &channel)
+{
+    User                                    *sender;
+    std::deque<std::string>                 bannedNicks;
+    std::deque<std::string>::const_iterator it;
+    std::string                             senderNick;
+
+    sender = srv->getUserByFd(fd);
+    if (sender)
+    {
+        senderNick = sender->getNickname();
+        if (srv->_channelList.find(channel) != srv->_channelList.end())
+        {
+            bannedNicks = srv->_channelList[channel]->_bannedUsers;
+            for (it = bannedNicks.begin(); it != bannedNicks.end(); ++it) {
+                if (senderNick.compare(*it) == 0) {
+                    return (true);
+                }
+            }
+        }
+    }
+    return (false);
+}
+
 /* ************************************************************************** */
 /* SPECIFIC FUNCTIONS TO EXTRACT USER FD, CHANNEL NAME OR TO COMPUTE MASK     */
 /* ************************************************************************** */
@@ -274,6 +299,8 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
                 else if (!itTarg->channel.empty()) {
                     // Send to channel : no exception cannot send because 
                     //  we do not handle the needed chan mode for this
+                    if (isUserBannedOnChannel(srv, fd, itTarg->channel))
+                        throw cannotsendtochanException(itTarg->channel);
                     srv->sendChannel(itTarg->channel, clientReply(srv, fd, \
                                      PRIVMSG(itTarg->target, message)), fd);
                 }
@@ -283,5 +310,6 @@ void privmsg(const int &fd, const std::vector<std::string> &params, \
         catch (nosuchnickException &e) {e.reply(srv, fd);}
         catch (notoplevelException &e) {e.reply(srv, fd);}
         catch (wildtoplevelException &e) {e.reply(srv, fd);}
+        catch (cannotsendtochanException &e) {e.reply(srv, fd);}
     }
 }
