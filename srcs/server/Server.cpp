@@ -446,8 +446,10 @@ void	Server::_clearAll(void) {
 				{ printError(e.what(), 1, true); }
 			// close fd for each user & delete user
 			if (userIt->second) {
-				if (close((userIt->second)->getFd()) == -1)
-                    throw Server::closeException();
+				if (close((userIt->second)->getFd()) == -1) {
+                    printError("Close error : ", 1, true);
+                    return;
+                }
 				delete userIt->second;
 			}
 		}
@@ -456,11 +458,13 @@ void	Server::_clearAll(void) {
 	// close epoll functional fds
 	if (this->_sockfd)
 		if (close(this->_sockfd) == -1) {
-            throw Server::closeException();
+            printError("Close error : ", 1, true);
+            return;
         }
 	if (this->_pollfd)
 		if (close(this->_pollfd) == -1) {
-            throw Server::closeException();
+            printError("Close error : ", 1, true);
+            return;
         }
 }
 

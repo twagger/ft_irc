@@ -54,11 +54,20 @@ SRCS		= srcs/main.cpp \
 			  srcs/utils/welcome.cpp \
 			  srcs/utils/command_utils.cpp \
 			  srcs/parser/mask.cpp
+
+BOTSRCS		= srcs/bot/bot.cpp \
+			  srcs/bot/utils.cpp \
+			  srcs/bot/answers/ping.cpp \
+			  srcs/bot/answers/quote.cpp \
+			  srcs/bot/answers/time.cpp
+
 OBJS		= $(SRCS:.cpp=.o)
+BOTOBJS		= $(BOTSRCS:.cpp=.o)
 
 # EXECUTABLES & LIBRARIES
 ################################################################################
 NAME		= ircserv
+BOTNAME		= ircbot
 
 # DIRECTORIES
 ################################################################################
@@ -88,14 +97,21 @@ endif
 $(NAME):	$(OBJS)
 			$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) $(HEADERS)
 
+$(BOTNAME):	$(BOTOBJS)
+			$(CC) $(CPPFLAGS) $(BOTOBJS) -o $(BOTNAME) $(HEADERS)
+
 all:		$(NAME)
 
 clean:
 			$(RM) $(OBJS)
+			$(RM) $(BOTOBJS)
 
 fclean:		clean
 			$(RM) $(NAME)
+			$(RM) $(BOTNAME)
 
 re:			fclean all
 
-.PHONY:		all clean fclean cpp.o re
+bonus:		$(NAME) $(BOTNAME)
+
+.PHONY:		all clean fclean cpp.o re bonus

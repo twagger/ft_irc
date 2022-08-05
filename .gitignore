@@ -7,6 +7,7 @@
 .DS_Store
 ircserv
 helper
+ircbot
 
 # Debug files
 *.dSYM/

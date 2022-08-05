@@ -2,6 +2,7 @@
 #include <stdlib.h> 
 #include <errno.h>
 #include <string>
+#include <cstring>
 #include <iostream> 
 #include <string.h> 
 #include <netdb.h> 
@@ -9,7 +10,8 @@
 #include <netinet/in.h> 
 #include <sys/socket.h> 
 #include <unistd.h>
-#include "./includes/utils.hpp"
+
+#include "../../includes/bot.hpp"
 
 #define BOTNAME 	"Impostor"
 
@@ -81,6 +83,50 @@ int	reconnect(std::string received, int registered, int *sockfd, std::string pwd
 	return (0);
 }
 
+// HANDLE MESSAGES FROM THE SERVER
+int handleMessage(const std::string &message, const int &fd)
+{
+    std::string response;
+	std::string command;
+	std::string target;
+
+    // ping 
+    if (message.find("PING") != std::string::npos)
+        response = botPing(message);
+
+    // other commands
+    else if (message.find("PRIVMSG") != std::string::npos)
+    {
+        // Extract the target
+        target = message.substr(1, message.find("PRIVMSG") - 1);
+        // extract the command
+        command = message.substr(message.find(':', message.find("PRIVMSG")));
+        command = command.substr(0, command.find("\r\n"));
+        if (command.compare(":QUOTE") == 0){
+            // QUOTE
+            response = botQuote();
+        }
+        else if (command.compare(":TIME") == 0){
+            // TIME
+            response = botTime();
+        }
+        if (!response.empty())
+            response = std::string("PRIVMSG ").append(target)
+                                              .append(":").append(response)
+                                              .append("\r\n");
+        std::cout << "RES : " << response << std::endl;
+    }
+    // Send reply
+    if (!response.empty())
+    {
+        if (send(fd, response.c_str(), response.length(), 0) == -1)
+        {
+            perror("send");
+            return (-1);
+        }
+    }
+    return (0);
+}
 
 int main(int argc, char *argv[])
 {
@@ -110,25 +156,28 @@ int main(int argc, char *argv[])
 		return (1);
 	}
 	while (1) {
-		// try to re-register if registration failed because nickname unavailable
+		
+		// clear buf here before another recv
+        std::memset(buf, 0, MAXDATASIZE);
+        if ((numbytes = recv(sockfd, buf, MAXDATASIZE, 0)) == -1) {
+            perror("recv");
+            return (1);
+        }
+        else if (numbytes > 0) {
+			buf[numbytes] = '\0';
+			std::cout << "Received: " << buf << std::endl;
+		}
+        received = std::string(buf);
+        if (handleMessage(received, sockfd) == -1)
+        {
+            close(sockfd);
+            return (1);
+        }
+        // try to re-register if registration failed because nickname unavailable
 		if (registered == 0)
 			if ((registered = reconnect(received, registered, &sockfd, pwd, &botName)) == -1) {
 				closefd(sockfd);
 				return (1);
-		}
-		// clear buf here before another recv
-
-
-		// receive server replies - can be modified / duplicat
-		if ((numbytes = recv(sockfd, buf, MAXDATASIZE, 0)) == -1) {
-			printError("recv", 1, true);
-			return (1);
-		}
-		if (numbytes > 0) {
-			buf[numbytes] = '\0';
-
-			// necessary to get reply's number for reconnect
-			received = buf;
 		}
 	}
 	closefd(sockfd);
