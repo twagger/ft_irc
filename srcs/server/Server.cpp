@@ -579,10 +579,8 @@ void    Server::sendClient(const int &fd, const std::string &message, \
         throw Server::invalidFdException();
     if (send(fd, message.c_str(), message.length(), MSG_NOSIGNAL) == -1)
     {
-        if (errno == EPIPE)
-            clearUser(this, this->getUserByFd(fd));
-        else
-            throw Server::sendException();
+        clearUser(this, this->getUserByFd(fd));
+        throw Server::sendException();
     }
 }
 
