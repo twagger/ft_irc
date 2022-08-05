@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
 
 	while (1) {
 
+        std::memset(buf, 0, MAXDATASIZE);
         if ((numbytes = recv(sockfd, buf, MAXDATASIZE, 0)) == -1) {
             perror("recv");
             exit(1);
@@ -135,7 +136,7 @@ int main(int argc, char *argv[])
         {
             close(sockfd);
             return (1);
-        } 
+        }
 	}
 	close(sockfd);
 	return (0);

@@ -9,8 +9,7 @@ std::string botPing(const std::string &message)
 
     response
         .append("PONG ")
-        .append(message.substr(message.find("PING") + 5))
-        .append("\r\n");
+        .append(message.substr(message.find("PING") + 5));
 
     return (response);
 }
