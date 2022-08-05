@@ -3,7 +3,6 @@
 
 # include <string>
 # include <iostream>
-# include <stdint.h>
 # include <vector>
 # include <deque>
 # include <ctime>
@@ -39,7 +38,7 @@ class User {
 		std::string					_username;			
 		std::string 				_fullname;
 		std::string					_hostname;
-		uint8_t					    _mode;
+		short					    _mode;
 		bool						_password;
 		bool						_authenticated;
 		std::deque<std::string>		_channelsJoined;
@@ -61,7 +60,7 @@ class User {
 		std::string 				getUsername(void) const;
 		std::string 				getFullname(void) const;
 		std::string 				getHostname(void) const;
-		uint8_t 					getMode(void) const;
+		short 					getMode(void) const;
 		bool 						getPassword(void) const;
 		bool 						getAuthenticated(void) const;
 		std::deque<std::string>		getChannelsJoined(void) const;
@@ -82,9 +81,9 @@ class User {
 		void setIsBot(bool bot);
 
         // mode
-		void addMode(uint8_t mode);
-		void removeMode(uint8_t mode);
-        bool hasMode(uint8_t mode);
+		void addMode(short mode);
+		void removeMode(short mode);
+        bool hasMode(short mode);
 
 		bool addChannelJoined(std::string channelName);			// if channel is already in the list, return false, else add + return true 
 		bool removeChannelJoined(std::string channelName);		// if channel is found in the list, erase it + return true, else do nothing and return false

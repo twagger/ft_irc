@@ -36,7 +36,7 @@ std::string					User::getNickname(void) const { return this->_nickname; }
 std::string					User::getUsername(void) const { return this->_username; }
 std::string					User::getFullname(void) const { return this->_fullname; }
 std::string					User::getHostname(void) const { return this->_hostname; }
-uint8_t					    User::getMode(void) const { return this->_mode; }
+short					    User::getMode(void) const { return this->_mode; }
 bool 						User::getPassword(void) const { return this->_password; }
 bool 						User::getAuthenticated(void) const {
 	return this->_authenticated;
@@ -47,7 +47,7 @@ std::deque<std::string>		User::getChannelsJoined(void) const {
 int							User::getStatus(void) const { return this->_status; }
 time_t  					User::getLastActivityTime(void) const { return this->_lastActivityTime; }
 time_t  					User::getPingTime(void) const { return this->_pingTime; }
-bool                        User::hasMode(uint8_t mode) { return ((this->_mode & mode) > 0); }
+bool                        User::hasMode(short mode) { return ((this->_mode & mode) > 0); }
 bool 						User::getIsBot(void) const { return this->_isBot; }
 
 // SETTERS
@@ -62,8 +62,8 @@ void User::setAuthenticated(bool authenticated) {
 void User::setStatus(int status) { this->_status = status; }
 void User::setLastActivityTime(void) { this->_lastActivityTime = time(NULL); }
 void User::setPingTime(void) { this->_pingTime = time(NULL); }
-void User::addMode(uint8_t mode) { this->_mode |= mode; }
-void User::removeMode(uint8_t mode) { this->_mode &= ~mode; }
+void User::addMode(short mode) { this->_mode |= mode; }
+void User::removeMode(short mode) { this->_mode &= ~mode; }
 void User::setIsBot(bool bot) { this->_isBot = bot; }
 
 // CHANNEL JOINED MANAGEMENT
