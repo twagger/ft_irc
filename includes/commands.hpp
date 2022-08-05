@@ -47,4 +47,8 @@ void 	die(const int &fd, const std::vector<std::string> &params, const std::stri
 void    privmsg(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void    notice(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
+// User based queries
+void    who(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+void    whois(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
+
 #endif

@@ -108,8 +108,11 @@ bool isChannel(std::string channelName)
 
 bool findUserOnChannel(std::deque<User *> userList, User *currentUser)
 {
-    std::deque<User *>::iterator it = userList.begin();
-
+    std::deque<User *>::iterator it;
+    
+    if (userList.empty() == true)
+        return (false);
+    it = userList.begin();
     for (; it != userList.end(); it++)
     {
         if (*it == currentUser)

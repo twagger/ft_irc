@@ -2,6 +2,16 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/exceptions.hpp"
 
+/**
+ * @brief PONG message is a reply to ping message. If it is sent by client to 
+ * the server, then the server updates the client status to mark it as alive.
+ * 
+ * Errors handled:
+ * - ERR_NOORIGIN
+ * - ERR_NOSUCHSERVER
+ *   
+ */
+
 void pong(const int &fd, const std::vector<std::string> &params, \
                        const std::string &, Server *srv)
 {

@@ -38,8 +38,13 @@ int checkPartParameter(std::map<std::string, Channel *> channelList,
 void checkChannelMustBeDeleted(Server *server,
                                std::map<std::string, Channel *>::iterator channelPos)
 {
-    if (channelPos->second->_users.empty() == true)
+    Channel *channel = channelPos->second;
+
+    if (channel->_users.empty() == true)
+    {
         server->_channelList.erase(channelPos);
+        delete channel;
+    }
 }
 
 void part(const int &fdUser, const std::vector<std::string> &parameter,
@@ -47,6 +52,9 @@ void part(const int &fdUser, const std::vector<std::string> &parameter,
 {
     std::vector<std::string> channel;
     std::string partMessage;
+    Channel *currentChannel;
+    std::map<std::string, Channel *>::iterator itMap;
+    std::vector<std::string>::iterator it;
 
     channel = splitByComma(parameter[0]);
     // Not enough parameter
@@ -61,18 +69,25 @@ void part(const int &fdUser, const std::vector<std::string> &parameter,
     if (parameter.size() > 1)
         partMessage = parameter[1];
 
-    std::vector<std::string>::iterator it = channel.begin();
+    it = channel.begin();
     // Check part parameters
     for (; it != channel.end(); it++)
     {
         if (checkPartParameter(server->_channelList, *it, server->getUserByFd(fdUser),
                                server, fdUser) < 0)
             return;
-        std::map<std::string, Channel *>::iterator channelPos = server->_channelList.find(*it);
+        
+        itMap = server->_channelList.find(*it);
+        currentChannel = itMap->second;
         // Effectively part from channel
         server->sendChannel(*it, clientReply(server, fdUser, "PART " + *it + " :" + partMessage));
-        channelPos->second->removeUser(server->getUserByFd(fdUser));
+        currentChannel->removeUser(server->getUserByFd(fdUser));
         server->getUserByFd(fdUser)->removeChannelJoined(*it);
-        checkChannelMustBeDeleted(server, channelPos);
+        // Check if the user was invited and remove him from the invitee list
+        if (findUserOnChannel(currentChannel->_invitees,
+            server->getUserByFd(fdUser)) == true)
+            currentChannel->removeInvitee(server->getUserByFd(fdUser));
+        // If channel is empty it must be deleted
+        checkChannelMustBeDeleted(server, itMap);
     }
 }

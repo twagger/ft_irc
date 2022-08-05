@@ -2,6 +2,7 @@
 ################################################################################
 VERSION		= "1.0"
 VCOMMENT	= "This version is almost perfect."
+SERVERINFO  = "Every time you start this server, we plant a tree 🌲."
 HOSTNAME	= $(shell hostname)
 COMPILDATE	= "$(shell date)"
 
@@ -20,13 +21,13 @@ SRCS		= srcs/main.cpp \
 			  srcs/server/Server.cpp \
 		      srcs/server/exceptions.cpp \
 			  srcs/channel/channel.cpp \
-			  srcs/channel/join.cpp \
-			  srcs/channel/part.cpp \
-			  srcs/channel/invite.cpp \
-			  srcs/channel/kick.cpp \
-			  srcs/channel/topic.cpp \
-			  srcs/channel/list.cpp \
-			  srcs/channel/names.cpp \
+			  srcs/commands/join.cpp \
+			  srcs/commands/part.cpp \
+			  srcs/commands/invite.cpp \
+			  srcs/commands/kick.cpp \
+			  srcs/commands/topic.cpp \
+			  srcs/commands/list.cpp \
+			  srcs/commands/names.cpp \
 			  srcs/user/User.cpp \
 			  srcs/commands/cap.cpp \
 			  srcs/commands/die.cpp \
@@ -45,6 +46,8 @@ SRCS		= srcs/main.cpp \
 			  srcs/commands/privmsg.cpp \
 			  srcs/commands/notice.cpp \
 			  srcs/commands/version.cpp \
+			  srcs/commands/who.cpp \
+			  srcs/commands/whois.cpp \
 			  srcs/utils/errors.cpp \
 			  srcs/utils/parsing.cpp \
 			  srcs/utils/welcome.cpp \
@@ -74,7 +77,8 @@ HEADERS		= -Iincludes -Isrcs/server
 CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic -g3
 
 PROGRAMVAR		:= -DHOSTNAME=\"$(HOSTNAME)\" -DVERSION=\"$(VERSION)\" \
-				   -DVCOMMENT=\"$(VCOMMENT)\" -DCOMPILDATE=\"$(COMPILDATE)\"
+				   -DVCOMMENT=\"$(VCOMMENT)\" -DCOMPILDATE=\"$(COMPILDATE)\" \
+				   -DSERVERINFO=\"$(SERVERINFO)\"
 				   
 ifeq ($(DEBUG), true)
 	CPPFLAGS	+= -fsanitize=address -g3 -O0

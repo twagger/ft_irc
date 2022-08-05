@@ -71,4 +71,7 @@ class cantkillserverException : public ircException
 class nomotdException : public ircException
 { public: nomotdException(std::string code = "422");};
 
+class nonicknamegivenException : public ircException
+{ public: nonicknamegivenException(std::string code = "431");};
+
 #endif
