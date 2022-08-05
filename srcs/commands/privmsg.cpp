@@ -42,7 +42,7 @@ struct Target {
 /* UTILITY FUNCTIONS                                                          */
 /* ************************************************************************** */
 // Split the message by comma into multiple targets
-std::map<std::string, std::deque<Target> > splitTargets(std::string targets)
+static std::map<std::string, std::deque<Target> > splitTargets(std::string targets)
 {
     std::map<std::string, std::deque<Target> > map;
 
@@ -64,7 +64,7 @@ std::map<std::string, std::deque<Target> > splitTargets(std::string targets)
     return (map);
 }
 
-bool    isUserBannedOnChannel(Server *srv, const int &fd, \
+static bool    isUserBannedOnChannel(Server *srv, const int &fd, \
                               const std::string &channel)
 {
     User                                    *sender;
@@ -93,7 +93,7 @@ bool    isUserBannedOnChannel(Server *srv, const int &fd, \
 /* SPECIFIC FUNCTIONS TO EXTRACT USER FD, CHANNEL NAME OR TO COMPUTE MASK     */
 /* ************************************************************************** */
 // CHANNEL
-const std::string extractChannelName(const std::string str, Server *srv)
+static const std::string extractChannelName(const std::string str, Server *srv)
 {
     int         pos = 0;
     std::string name;
@@ -120,7 +120,7 @@ const std::string extractChannelName(const std::string str, Server *srv)
 }
 
 // USER
-int   extractUserFd(const std::string str, Server *srv)
+static int   extractUserFd(const std::string str, Server *srv)
 {
     std::string user;
     std::string host;
@@ -180,7 +180,7 @@ int   extractUserFd(const std::string str, Server *srv)
 }
 
 // MASK
-void    computeMask(const int &fd, const std::string &str, Server *srv, \
+static void    computeMask(const int &fd, const std::string &str, Server *srv, \
                     std::deque<Target> &target)
 {
     std::deque<User*>                   userList;
@@ -224,7 +224,7 @@ void    computeMask(const int &fd, const std::string &str, Server *srv, \
 /* ************************************************************************** */
 /* SPECIFIC FUNCTIONS TO CREATE A COLLECTION OF TARGETS FOR THE MAIN FUNCTION */
 /* ************************************************************************** */
-void getTargetsFromString(const int &fd, const std::string &str, \
+static void getTargetsFromString(const int &fd, const std::string &str, \
                           std::deque<Target> &target, Server *srv)
 {
     if (str[0] == '+' || str[0] == '&' || str[0] == '!'

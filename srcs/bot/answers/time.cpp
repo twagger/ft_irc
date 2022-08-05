@@ -11,6 +11,7 @@ std::string botTime(void)
 
     timeinfo = localtime(&rawtime);
     strTime = std::string(asctime(timeinfo));
+    strTime = strTime.substr(0, strTime.length() - 1);
 
     return (strTime);
 }

@@ -264,7 +264,7 @@ void removeModesChannel(const std::vector<std::string> params, int start, int st
 						const int &fd, Server *srv)
 {
 	Channel *channel = srv->_channelList.find(params[0])->second;
-	User	*user;
+	User	*user = NULL;
 	 
 	 if (params.size() > 2 && params[2].find('*') == std::string::npos)
 		user = srv->getUserByNickname(params[2]);
