@@ -56,11 +56,11 @@ void part(const int &fdUser, const std::vector<std::string> &parameter,
     std::map<std::string, Channel *>::iterator itMap;
     std::vector<std::string>::iterator it;
 
-    channel = splitByComma(parameter[0]);
-    // Not enough parameter
-    if (channel.empty() == true)
+    if (parameter.size() < 1)
         return (server->sendClient(fdUser, numericReply(server, fdUser,
                                                         "461", ERR_NEEDMOREPARAMS(std::string("PART")))));
+    channel = splitByComma(parameter[0]);
+    // Not enough parameter
     // If channel list is empty, you can't part from any channel
     if (server->_channelList.empty() == true)
         return (server->sendClient(fdUser, numericReply(server, fdUser, "403",

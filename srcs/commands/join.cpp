@@ -141,6 +141,9 @@ void join(const int &fdUser, const std::vector<std::string> &parameter, const st
     std::vector<std::string>::iterator itChan;
     std::map<std::string, Channel *>::iterator itMap;
 
+    if (parameter.size() == 0)
+        return (server->sendClient(fdUser, numericReply(server, fdUser,
+            "461", ERR_NEEDMOREPARAMS(std::string("JOIN")))));
     channel = splitByComma(parameter[0]);
     if (parameter.size() > 1)
         key = splitByComma(parameter[1]);

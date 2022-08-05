@@ -80,11 +80,17 @@ int checkParameterInvite(std::string nickname, std::string channel,
 
 void invite(const int &fdUser, const std::vector<std::string> &parameter, const std::string &, Server *server)
 {
-    std::string nickname = parameter[0];
-    std::string channel = parameter[1];
-    User *userToInvite = server->getUserByNickname(nickname);
+    std::string nickname;
+    std::string channel;
+    User *userToInvite;
     Channel *channelPos;
 
+    if (parameter.size() < 2)
+        return (server->sendClient(fdUser, numericReply(server, fdUser,
+            "461", ERR_NEEDMOREPARAMS(std::string("INVITE")))));
+    nickname = parameter[0];
+    channel = parameter[1];
+    userToInvite = server->getUserByNickname(nickname);
     if (checkParameterInvite(nickname, channel, fdUser, server, userToInvite) < 0)
         return;
     // Add user to the list of invitee and return reply
