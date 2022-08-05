@@ -19,6 +19,8 @@
 int                         printError(std::string message, int code,
 	bool with_errno);
 bool 						emptyParams(const std::vector<std::string> &params);
+bool						forbiddenNick(std::string param);
+bool 						isNumber(std::string num);
 
 // Parsing
 //std::vector<std::string> 	splitBy(std::string str, const std::string &delimiter);

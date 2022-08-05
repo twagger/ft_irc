@@ -51,4 +51,8 @@ void    notice(const int &fd, const std::vector<std::string> &params, const std:
 void    who(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 void    whois(const int &fd, const std::vector<std::string> &params, const std::string &prefix, Server *srv);
 
+// Services commands
+void service(const int &fd, const std::vector<std::string> &params, const std::string &, 
+		Server *srv);
+
 #endif

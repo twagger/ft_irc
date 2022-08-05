@@ -18,7 +18,7 @@
 //		w - user receives wallops;							=> 2	0000 0010			
 //     	i - marks a users as invisible; 					=> 3	0000 0100
 //      o - operator flag;  								=> 4	0000 1000
-//      O - local operator flag;							=> 5	0001 0000
+//      B - marks a bot;									=> 5	0001 0000
 //      s - marks a user for receipt of server notices.		=> 6	0010 0000
 //      r - restricted user connection;	 					=> 7	0100 0000
 
@@ -27,7 +27,7 @@
 #define MOD_WALLOPS     (1 << 2)
 #define MOD_INVISIBLE   (1 << 3)
 #define MOD_OPER        (1 << 4)
-#define MOD_LOCALOP     (1 << 5)
+#define MOD_BOT    		(1 << 5)
 #define MOD_SRVNOTICES  (1 << 6)
 #define MOD_RESTRICTED  (1 << 7)
 
