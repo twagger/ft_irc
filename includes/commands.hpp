@@ -1,5 +1,5 @@
-#ifndef MISCELLANEOUS_CMDS_HPP
-# define MISCELLANEOUS_CMDS_HPP
+#ifndef COMMANDS_HPP
+# define COMMANDS_HPP
 
 # include <vector>
 # include <string>
