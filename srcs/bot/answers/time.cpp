@@ -2,7 +2,7 @@
 #include <deque>
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
+
 std::string botTime(void)
 {
     time_t      rawtime = time(NULL);

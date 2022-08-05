@@ -113,6 +113,6 @@ void Channel::removeInvitee(User *userToDelete)
 
 /* Mode */
 
-void Channel::addMode(uint8_t mode) { this->_mode |= mode; }
-void Channel::removeMode(uint8_t mode) { this->_mode &= ~mode; }
-bool Channel::hasMode(uint8_t mode) { return ((this->_mode & mode) > 0); }
+void Channel::addMode(short mode) { this->_mode |= mode; }
+void Channel::removeMode(short mode) { this->_mode &= ~mode; }
+bool Channel::hasMode(short mode) { return ((this->_mode & mode) > 0); }

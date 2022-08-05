@@ -1,15 +1,15 @@
-#include <stdio.h> 
-#include <stdlib.h> 
-#include <errno.h>
+#include <cstdlib> 
+#include <cerrno>
 #include <string>
 #include <cstring>
 #include <iostream> 
-#include <string.h> 
+#include <string> 
+#include <unistd.h>
 #include <netdb.h> 
 #include <sys/types.h> 
 #include <netinet/in.h> 
 #include <sys/socket.h> 
-#include <unistd.h>
+#include <cstdio>
 
 #include "../../includes/bot.hpp"
 

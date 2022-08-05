@@ -12,8 +12,7 @@
 
 #include <iostream>
 #include <csignal>
-# include <stdlib.h>
-# include <stdio.h>
+#include <cstdlib>
 
 void signalHandler( int signum ) {
 	(void)signum;

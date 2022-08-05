@@ -521,7 +521,6 @@ void    Server::start(void)
 		printError("\nServer is shutting down\n", 1, false); return; }
 	catch (Server::pollDelException &e){ _clearAll(); printError(e.what(), 1, true); return;}
 	catch (Server::acceptException &e){ _clearAll(); printError(e.what(), 1, true); return; }
-	catch (Server::sendException &e){ _clearAll(); printError(e.what(), 1, true); return; }
 	catch (Server::readException &e){ _clearAll(); printError(e.what(), 1, true); return; }
 	catch (Server::closeException &e){ _clearAll(); printError(e.what(), 1, true); return; }
 }
@@ -576,10 +575,7 @@ void    Server::sendClient(const int &fd, const std::string &message, \
     if (this->_userList.find(fd) == this->_userList.end())
         throw Server::invalidFdException();
     if (send(fd, message.c_str(), message.length(), MSG_NOSIGNAL) == -1)
-    {
-        clearUser(this, this->getUserByFd(fd));
-        throw Server::sendException();
-    }
+    { clearUser(this, this->getUserByFd(fd)); }
 }
 
 // SEND CLIENT (MULTIPLE FDS)
