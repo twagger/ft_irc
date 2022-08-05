@@ -30,7 +30,7 @@ private:
 
 public:
     /** Public attributes **/
-    uint8_t                 _mode;
+    short                 _mode;
     std::deque<User *>      _operators;
     std::deque<User *>      _users;
     std::deque<std::string> _bannedUsers;
@@ -71,9 +71,9 @@ public:
     void addInvitee(User *newInvitee);
 
     // mode
-    void addMode(uint8_t mode);
-    void removeMode(uint8_t mode);
-    bool hasMode(uint8_t mode);
+    void addMode(short mode);
+    void removeMode(short mode);
+    bool hasMode(short mode);
 };
 
 #endif

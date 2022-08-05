@@ -21,7 +21,7 @@ bool	isAuthenticatable(User *user)
 	return true;
 }
 
-void addDefaultMode(Server *srv, User *user, const int fd, uint8_t mod) {
+void addDefaultMode(Server *srv, User *user, const int fd, short mod) {
 	std::vector<std::string> params;
 	user->addMode(mod);
 	params.push_back(user->getNickname());

@@ -4,7 +4,6 @@
 #include <fstream>
 #include <ctime>
 
-#include <iostream>
 #define FILENAME "conf/botquotes.txt"
 
 std::string botQuote(void)
