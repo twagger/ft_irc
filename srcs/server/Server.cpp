@@ -518,7 +518,7 @@ void    Server::start(void)
 	catch (Server::pollException &e){ _clearAll(); printError(e.what(), 1, true); return; }
 	catch (Server::pollAddException &e){ _clearAll(); printError(e.what(), 1, true); return;}
 	catch (Server::pollWaitException &e){ _clearAll();
-		printError("Server is shutting down\n", 1, false); return; }
+		printError("\nServer is shutting down\n", 1, false); return; }
 	catch (Server::pollDelException &e){ _clearAll(); printError(e.what(), 1, true); return;}
 	catch (Server::acceptException &e){ _clearAll(); printError(e.what(), 1, true); return; }
 	catch (Server::readException &e){ _clearAll(); printError(e.what(), 1, true); return; }

@@ -33,9 +33,9 @@ void	authenticateUser(const int fd, Server *srv)
 	std::string					replyMsg;
 	std::vector<std::string>	params;
 	User*						user = srv->getUserByFd(fd);
-	bool						isNotBot = !user->hasMode(MOD_BOT);
+	bool						isBot = user->getIsBot();
 
-	if (isNotBot)
+	if (!isBot)
 		replyMsg.append(numericReply(srv, fd, "001",
 			RPL_WELCOME(user->getNickname(), user->getUsername(), user->getHostname())));
 	else
@@ -43,15 +43,17 @@ void	authenticateUser(const int fd, Server *srv)
 			RPL_YOURESERVICE(user->getNickname())));	
 	replyMsg.append(numericReply(srv, fd, "002",
 		RPL_YOURHOST(srv->getHostname(), srv->getVersion())));
-	if (isNotBot)
+	if (!isBot)
 		replyMsg.append(numericReply(srv, fd, "003", RPL_CREATED(srv->getDate())));
 	replyMsg.append(numericReply(srv, fd, "004",
 		RPL_MYINFO(srv->getHostname(), srv->getVersion(), USERMODES, CHANNELMODES)));
 	srv->sendClient(fd, replyMsg);
-	if (isNotBot) {
+	if (!isBot) {
 		motd(fd, params, "MOTD", srv);
 		addDefaultMode(srv, user, fd, MOD_INVISIBLE);
 	}
+	else
+		addDefaultMode(srv, user, fd, MOD_BOT);
 	user->setAuthenticated(true);																							// is client answering smth?
 	return ;
 }

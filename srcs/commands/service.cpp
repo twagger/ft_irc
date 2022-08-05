@@ -34,8 +34,8 @@ void service(const int &fd, const std::vector<std::string> &params, const std::s
 		else if (areValidServiceParams(params) == true) {
 			user->setNickname(params[0]);
 			user->setUsername(params[0]);
-			user->addMode(MOD_BOT);
 			user->setFullname(params[5]);
+			user->setIsBot(true);
 			if (isAuthenticatable(user)) 
 				authenticateUser(fd, srv);
 			return ;
