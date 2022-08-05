@@ -68,7 +68,7 @@ HEADERS		= -Iincludes -Isrcs/server
 CPPFLAGS		:= -Wall -Wextra -Werror -std=c++98 -pedantic -g3
 
 PROGRAMVAR		:= -DHOSTNAME=\"$(HOSTNAME)\" -DVERSION=\"$(VERSION)\" \
-				   -DVCOMMENT=\"$(VCOMMENT)\" -DCOMPILDATE=\"$(COMPILDATE)\"
+				   -DVCOMMENT=\"$(VCOMMENT)\" -DCOMPILDATE=\"$(COMPILDATE)\" \
 				   -DSERVERINFO=\"$(SERVERINFO)\"
 				   
 ifeq ($(DEBUG), true)
