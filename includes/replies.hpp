@@ -78,7 +78,7 @@
     // SERVER COMMANDS
     #define RPL_VERSION(vers, debuglvl, server, comments)   (vers + "." + debuglvl + " " + server + " :" + comments + "\r\n")                           // 351
     #define RPL_TIME(server, time)                          (server + " :" + time + "\r\n")                                                             // 391
-    #define RPL_INFO(string)                                (": " + string + "\r\n")                                                                    // 371
+    #define RPL_INFO(string)                                (":" + string + "\r\n")                                                                    // 371
     #define RPL_ENDOFINFO                                   (":End of INFO list\r\n")                                                                   // 374
 
     // SENDING MESSAGES
