@@ -124,7 +124,7 @@ void UserMode(const int &fd, const std::vector<std::string> &params, Server *srv
 	else if (params[0] != user->getNickname())
 		return (srv->sendClient(fd, numericReply(srv, fd, "502",
 												 ERR_USERSDONTMATCH)));
-	else if (params[1].find_first_not_of("aBiwros") == std::string::npos)
+	else if (params[1].find_first_not_of("+-aBiwros") != std::string::npos)
 		return (srv->sendClient(fd, numericReply(srv, fd, "501",
 												 ERR_UMODEUNKNOWNFLAG)));
 	else if (!params[1].empty())
