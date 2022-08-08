@@ -85,8 +85,8 @@ ifeq ($(DEBUG), true)
 	CPPFLAGS	+= -fsanitize=address -g3 -O0
 endif
 
-ifeq ($(SILENT), true)
-	CPPFLAGS	+= -DSILENCE
+ifeq ($(VERBOSE), true)
+	CPPFLAGS	+= -DVERBOSE
 endif
 
 # RULES
