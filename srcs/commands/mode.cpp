@@ -209,7 +209,11 @@ void handleChannelReply(const std::vector<std::string> params, const int &fd, Se
 		&& user.find('*') == std::string::npos)
 		return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
 			channel + " " + mode + " " + user + "!*@*")));
-	// Case where mode is operator and key or ban with *
+	// Case where mode is operator
+	if (mode.find('o') != std::string::npos)
+		return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
+			channel + " " + mode + " " + params[2])));
+	// Case where mode is key or ban with *
 	return(srv->sendChannel(channel, clientReply(srv, fd, "MODE " +
 		channel + " " + mode + " " + user)));
 }
