@@ -299,8 +299,9 @@ void    Server::_handleNewMessage(struct epoll_event event)
     catch (std::runtime_error &e) {printError(e.what(), 1, false); }
 
 	// Display of commands received by the server (temporary)
+#ifdef VERBOSE
 	displayCommands(cmds);
-
+#endif
     // execute all commands in the vector
     this->_executeCommands(event.data.fd, cmds);
 	//clearCmds(cmds);

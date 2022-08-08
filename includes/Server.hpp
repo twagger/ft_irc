@@ -16,7 +16,7 @@
 #define MAX_CMD_LEN 512
 #define BACKLOG 10
 #define BUF_SIZE 4096
-#define MAX_EVENTS 100
+#define MAX_EVENTS 50
 
 // Client check params
 #define PING_TIMEOUT 120	// in seconds
