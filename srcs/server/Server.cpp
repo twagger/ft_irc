@@ -274,7 +274,10 @@ void    Server::_handleNewMessage(struct epoll_event event)
     memset(buf, 0, BUF_SIZE);
     ret = recv(event.data.fd, buf, BUF_SIZE, 0);
     if (ret == -1)
-        throw Server::readException();
+    {
+        printError("Read error: ", 1, true);
+        return;
+    }
     buf[ret] = '\0';
 
 	// Adding current buf to fd's buffer on server
@@ -359,7 +362,7 @@ void    Server::_executeCommands(const int fd, std::vector<Command> cmds)
 			user = this->getUserByFd(fd);
 			// update client timers
 			user->setLastActivityTime();
-            if (user->getAuthenticated() || isAuthenticationCmd(it_cmd->first)) {
+            if (user->getAuthenticated() || isAuthenticationCmd(it_cmd->first)){
 				try { exec_command(fd, it->params, it->prefix, this); }
 				// send exception
 				catch (Server::invalidFdException &e)

@@ -98,6 +98,8 @@ void who(const int &fd, const std::vector<std::string> &params, \
             else
                 ++it;
         }
+        // Set the channel in the results to be to channel asked
+        channel = mask;
     }
     else {
         // 3. The mask is not a channel : Check the mask against users's Host, 
@@ -136,7 +138,8 @@ void who(const int &fd, const std::vector<std::string> &params, \
     // 5. Loop on the resulting user list and send information about users
     for (it = usersList.begin(); it != usersList.end(); it++)
     {
-        channel = getCommonChannel(srv, fd, (*it)->getFd());
+        if (channel.empty())
+            channel = getCommonChannel(srv, fd, (*it)->getFd());
         srv->sendClient(fd, \
            numericReply(srv, fd, "352", RPL_WHOREPLY(\
             channel, \
