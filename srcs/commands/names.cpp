@@ -34,6 +34,7 @@ void listUser(const int &fdUser, Server *server,
     reply = ":" + server->getHostname() + " " + "353" + " "
 						+ server->getUserByFd(fdUser)->getNickname() + " = "
                         + itChannel->second->getChannelName() + " ";
+    std::cout << "nickname = " << nicknameList << std::endl;
     reply += nicknameList + "\r\n";		
     server->sendClient(fdUser, reply);
 }

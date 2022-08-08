@@ -85,6 +85,16 @@ void oneChannelCase(std::string channel, std::vector<std::string> user,
             "KICK " + channel + " " + *itVector + " :" + kickMessage));
         itMap->second->removeUser(server->getUserByNickname(*itVector));
         server->getUserByNickname(*itVector)->removeChannelJoined(channel);
+        // Check if the user was operator and remove him from the operator list
+        if (findUserOnChannel(itMap->second->_operators,
+            server->getUserByFd(fdUser)) == true)
+            itMap->second->removeOperator(server->getUserByFd(fdUser));
+            // Check if the user was invited and remove him from the invitee list
+        if (findUserOnChannel(itMap->second->_invitees,
+            server->getUserByFd(fdUser)) == true)
+            itMap->second->removeInvitee(server->getUserByFd(fdUser));
+
+
     }
 }
 

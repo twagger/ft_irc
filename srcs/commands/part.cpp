@@ -87,6 +87,10 @@ void part(const int &fdUser, const std::vector<std::string> &parameter,
         if (findUserOnChannel(currentChannel->_invitees,
             server->getUserByFd(fdUser)) == true)
             currentChannel->removeInvitee(server->getUserByFd(fdUser));
+        // Check if the user was operator and remove him from the operator list
+        if (findUserOnChannel(currentChannel->_operators,
+            server->getUserByFd(fdUser)) == true)
+            currentChannel->removeOperator(server->getUserByFd(fdUser));
         // If channel is empty it must be deleted
         checkChannelMustBeDeleted(server, itMap);
     }
