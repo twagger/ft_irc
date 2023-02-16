@@ -8,6 +8,14 @@ We tested it with Netcat (TCP/UDP client) and IRSSI (IRC client)
 
 # Installation instructions
 
+Clone the project and launch `make` to build the server executable : 
+
+```sh
+git clone git@github.com:twagger/ft_irc.git
+cd ft_irc
+make
+```
+
 # Usage instruction
 
 ### Launch the server
